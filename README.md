@@ -56,6 +56,9 @@ options:
 
 # Commands
 
+ * `selpi live [--screen now,today,tech,dc,ac,...|all] [--json] [--list]`: every value SP LINK's data screens show (288 fields, see docs/protocol.md "Live data").
+
+
 Selpi uses a sub command structure meaning the base `selpi` accepts multiple commands that run it in different modes.
 
 See `selpi --help` for a full list of commands, some commands are documented below.
@@ -161,3 +164,17 @@ $ ./selpi stat
 This repository is primarily maintained by [David Schoen](http://github.com/neerolyte).
 
 Foundational code and inspirational advice provided by [Justin Stafford](https://www.linkedin.com/in/justin-stafford-blueshift/).
+
+## Configuration backup and data logs
+
+Built from the protocol decoded in [docs/protocol.md](docs/protocol.md) (SP PRO firmware 15.47, SP LINK 15.40).
+
+```
+selpi config show InitialReturnVoltage        # named settings with address and raw value
+selpi config backup --out backups/            # Config_<time>.SPLC + ServiceSettings_<time>.CSV (SP LINK format)
+selpi config backup --json --out backups/     # names, addresses and values as JSON
+selpi logs --since 2026-11-14 --out logs/     # EventData / DetailedData / DailySummaryData CSVs (SP LINK format)
+```
+
+`config` only reads. `logs` writes download mode (`0xa251`) and each log's range register, nothing else.
+Requests are retried on a new connection, because Select.Live occasionally drops a reply.

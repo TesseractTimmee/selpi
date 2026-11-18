@@ -1,0 +1,3117 @@
+[
+ {
+  "name": "ApplicationType",
+  "address": "0xc000",
+  "section": "Common"
+ },
+ {
+  "name": "BatteryType",
+  "address": "0xc001",
+  "section": "Common"
+ },
+ {
+  "name": "BeeperControl",
+  "address": "0xc002",
+  "section": "Common"
+ },
+ {
+  "name": "BeeperLockoutStartTime",
+  "address": "0xc003",
+  "section": "Common"
+ },
+ {
+  "name": "BeeperLockoutStopTime",
+  "address": "0xc004",
+  "section": "Common"
+ },
+ {
+  "name": "ACInputChargeAlert",
+  "address": "0xc005",
+  "section": "Common"
+ },
+ {
+  "name": "SoCMonitor",
+  "address": "0xc006",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorAvailable",
+  "address": "0xc008",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule1",
+  "address": "0xc009",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule1Day",
+  "address": "0xc00a",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule1StartTime",
+  "address": "0xc00b",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule1StopTime",
+  "address": "0xc00c",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule2",
+  "address": "0xc00d",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule2Day",
+  "address": "0xc00e",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule2StartTime",
+  "address": "0xc00f",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule2StopTime",
+  "address": "0xc010",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule3",
+  "address": "0xc011",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule3Day",
+  "address": "0xc012",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule3StartTime",
+  "address": "0xc013",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule3StopTime",
+  "address": "0xc014",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule4",
+  "address": "0xc015",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule4Day",
+  "address": "0xc016",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule4StartTime",
+  "address": "0xc017",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorSchedule4StopTime",
+  "address": "0xc018",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule1",
+  "address": "0xc019",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule1Day",
+  "address": "0xc01a",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule1StartTime",
+  "address": "0xc01b",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule1StopTime",
+  "address": "0xc01c",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule2",
+  "address": "0xc01d",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule2Day",
+  "address": "0xc01e",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule2StartTime",
+  "address": "0xc01f",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule2StopTime",
+  "address": "0xc020",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule3",
+  "address": "0xc021",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule3Day",
+  "address": "0xc022",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule3StartTime",
+  "address": "0xc023",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule3StopTime",
+  "address": "0xc024",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule4",
+  "address": "0xc025",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule4Day",
+  "address": "0xc026",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule4StartTime",
+  "address": "0xc027",
+  "section": "Common"
+ },
+ {
+  "name": "ShutdownTimeSchedule4StopTime",
+  "address": "0xc028",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorMinimumRunTime",
+  "address": "0xc029",
+  "section": "Common"
+ },
+ {
+  "name": "SoCNightAssistPeriod",
+  "address": "0xc02a",
+  "section": "Common"
+ },
+ {
+  "name": "SoCNightAssistPeriodStartTime",
+  "address": "0xc02b",
+  "section": "Common"
+ },
+ {
+  "name": "SoCNightAssistPeriodStopTime",
+  "address": "0xc02c",
+  "section": "Common"
+ },
+ {
+  "name": "SoCNightAssistPeriodStartSoC",
+  "address": "0xc02d",
+  "section": "Common"
+ },
+ {
+  "name": "SoCNightAssistPeriodStopSoC",
+  "address": "0xc02e",
+  "section": "Common"
+ },
+ {
+  "name": "NormalPeriodStartSoC",
+  "address": "0xc02f",
+  "section": "Common"
+ },
+ {
+  "name": "NormalPeriodStopSoC",
+  "address": "0xc030",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewAssistPeriod",
+  "address": "0xc031",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewAssistPeriodStartTime",
+  "address": "0xc032",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewAssistPeriodStopTime",
+  "address": "0xc033",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewAssistPeriodStartSoC",
+  "address": "0xc034",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewAssistPeriodStopSoC",
+  "address": "0xc035",
+  "section": "Common"
+ },
+ {
+  "name": "DetailedDataLogInterval",
+  "address": "0xc036",
+  "section": "Common"
+ },
+ {
+  "name": "5MinuteAverageBatteryToStartGenerator",
+  "address": "0xc037",
+  "section": "Common"
+ },
+ {
+  "name": "Port2DTRDCD",
+  "address": "0xc038",
+  "section": "Common"
+ },
+ {
+  "name": "15MinuteAverageBatteryToStartGenerator",
+  "address": "0xc039",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorMaxDaysExercise",
+  "address": "0xc03a",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorStartTimeExercise",
+  "address": "0xc03b",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorStartDelay",
+  "address": "0xc03c",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorStartTime",
+  "address": "0xc03d",
+  "section": "Common"
+ },
+ {
+  "name": "BatterySize",
+  "address": "0xc03f",
+  "section": "Common"
+ },
+ {
+  "name": "PrimaryMaxPower",
+  "address": "0xc040",
+  "section": "Common"
+ },
+ {
+  "name": "AlternateMaxPower",
+  "address": "0xc041",
+  "section": "Common"
+ },
+ {
+  "name": "InverterAcVolts",
+  "address": "0xc042",
+  "section": "Common"
+ },
+ {
+  "name": "EconoPulseRate",
+  "address": "0xc043",
+  "section": "Common"
+ },
+ {
+  "name": "EconoThreshold",
+  "address": "0xc044",
+  "section": "Common"
+ },
+ {
+  "name": "Port1DTRDCD",
+  "address": "0xc045",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorRunOutput",
+  "address": "0xc046",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorStartOutput",
+  "address": "0xc047",
+  "section": "Common"
+ },
+ {
+  "name": "AbsorbOutput",
+  "address": "0xc048",
+  "section": "Common"
+ },
+ {
+  "name": "FloatOutput",
+  "address": "0xc049",
+  "section": "Common"
+ },
+ {
+  "name": "TimedAssertOutput",
+  "address": "0xc04a",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule1",
+  "address": "0xc04b",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule1Day",
+  "address": "0xc04c",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule1AssertTime",
+  "address": "0xc04d",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule1DeassertTime",
+  "address": "0xc04e",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule2",
+  "address": "0xc04f",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule2Day",
+  "address": "0xc050",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule2AssertTime",
+  "address": "0xc051",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule2DeassertTime",
+  "address": "0xc052",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule3",
+  "address": "0xc053",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule3Day",
+  "address": "0xc054",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule3AssertTime",
+  "address": "0xc055",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule3DeassertTime",
+  "address": "0xc056",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule4",
+  "address": "0xc057",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule4Day",
+  "address": "0xc058",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule4AssertTime",
+  "address": "0xc059",
+  "section": "Common"
+ },
+ {
+  "name": "TimeSchedule4DeassertTime",
+  "address": "0xc05a",
+  "section": "Common"
+ },
+ {
+  "name": "BatteryVoltageOutput",
+  "address": "0xc05b",
+  "section": "Common"
+ },
+ {
+  "name": "BatteryVoltageAssertLevel",
+  "address": "0xc05c",
+  "section": "Common"
+ },
+ {
+  "name": "BatteryVoltageDeassertLevel",
+  "address": "0xc05d",
+  "section": "Common"
+ },
+ {
+  "name": "SoCOutput",
+  "address": "0xc05e",
+  "section": "Common"
+ },
+ {
+  "name": "SocAssertLevel",
+  "address": "0xc05f",
+  "section": "Common"
+ },
+ {
+  "name": "SocDeassertLevel",
+  "address": "0xc060",
+  "section": "Common"
+ },
+ {
+  "name": "DigitalControlOutput",
+  "address": "0xc061",
+  "section": "Common"
+ },
+ {
+  "name": "AnalogControlOutput",
+  "address": "0xc062",
+  "section": "Common"
+ },
+ {
+  "name": "AlarmType",
+  "address": "0xc063",
+  "section": "Common"
+ },
+ {
+  "name": "AlarmOutput",
+  "address": "0xc064",
+  "section": "Common"
+ },
+ {
+  "name": "AcLoadKwhCtrlAssertThreshold",
+  "address": "0xc065",
+  "section": "Common"
+ },
+ {
+  "name": "AcLoadKwhCtrlOutput",
+  "address": "0xc066",
+  "section": "Common"
+ },
+ {
+  "name": "AcLoadKwCtrlAssertThreshold",
+  "address": "0xc067",
+  "section": "Common"
+ },
+ {
+  "name": "AcLoadKwCtrlOutput",
+  "address": "0xc068",
+  "section": "Common"
+ },
+ {
+  "name": "FloatReturnInput",
+  "address": "0xc069",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorFaultInput",
+  "address": "0xc06a",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorLowFuelInput",
+  "address": "0xc06b",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorNoFuelInput",
+  "address": "0xc06c",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorAvailableInput",
+  "address": "0xc06d",
+  "section": "Common"
+ },
+ {
+  "name": "DigitalControlState",
+  "address": "0xc06e",
+  "section": "Common"
+ },
+ {
+  "name": "DigitalControlInput",
+  "address": "0xc06f",
+  "section": "Common"
+ },
+ {
+  "name": "AcInputPowerLevelInput",
+  "address": "0xc070",
+  "section": "Common"
+ },
+ {
+  "name": "StatOfChargeShutdownSoC",
+  "address": "0xc071",
+  "section": "Common"
+ },
+ {
+  "name": "AnalogControlAssertLevel",
+  "address": "0xc072",
+  "section": "Common"
+ },
+ {
+  "name": "AnalogControlDeassertLevel",
+  "address": "0xc073",
+  "section": "Common"
+ },
+ {
+  "name": "AnalogControlInput",
+  "address": "0xc074",
+  "section": "Common"
+ },
+ {
+  "name": "MidpointRange",
+  "address": "0xc075",
+  "section": "Common"
+ },
+ {
+  "name": "ScalingShunt1MaxCurrent",
+  "address": "0xc076",
+  "section": "Common"
+ },
+ {
+  "name": "ScalingShunt1MaxVoltage",
+  "address": "0xc077",
+  "section": "Common"
+ },
+ {
+  "name": "ScalingShunt2MaxCurrent",
+  "address": "0xc078",
+  "section": "Common"
+ },
+ {
+  "name": "ScalingShunt2MaxVoltage",
+  "address": "0xc079",
+  "section": "Common"
+ },
+ {
+  "name": "ACInputLockout",
+  "address": "0xc07a",
+  "section": "Common"
+ },
+ {
+  "name": "ACInputStartTime",
+  "address": "0xc07b",
+  "section": "Common"
+ },
+ {
+  "name": "ACInputStopTime",
+  "address": "0xc07c",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockOutSchedule1",
+  "address": "0xc07d",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule1StartTime",
+  "address": "0xc07e",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule1StopTime",
+  "address": "0xc07f",
+  "section": "Common"
+ },
+ {
+  "name": "SystemFaultRecovery",
+  "address": "0xc080",
+  "section": "Common"
+ },
+ {
+  "name": "NominalFrequency",
+  "address": "0xc081",
+  "section": "Common"
+ },
+ {
+  "name": "StateOfChargeShutdown",
+  "address": "0xc082",
+  "section": "Common"
+ },
+ {
+  "name": "AcLoadHoldOn",
+  "address": "0xc083",
+  "section": "Common"
+ },
+ {
+  "name": "ExternalContactorCT",
+  "address": "0xc084",
+  "section": "Common"
+ },
+ {
+  "name": "ExternalCTRatio",
+  "address": "0xc085",
+  "section": "Common"
+ },
+ {
+  "name": "Port1Baudrate",
+  "address": "0xc086",
+  "section": "Common"
+ },
+ {
+  "name": "HighBatteryAlert",
+  "address": "0xc088",
+  "section": "Common"
+ },
+ {
+  "name": "RemoteAcInputContactor",
+  "address": "0xc089",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorCoolDown",
+  "address": "0xc08a",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorWarmUp",
+  "address": "0xc08b",
+  "section": "Common"
+ },
+ {
+  "name": "Port2Baudrate",
+  "address": "0xc08c",
+  "section": "Common"
+ },
+ {
+  "name": "FloatReturnInputEdge",
+  "address": "0xc08d",
+  "section": "Common"
+ },
+ {
+  "name": "LowBattShdwnOverrride",
+  "address": "0xc08e",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewPrefferedPeriod",
+  "address": "0xc090",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewPrefferedPeriodStartTime",
+  "address": "0xc091",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewPrefferedPeriodStopTime",
+  "address": "0xc092",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewPrefferedPeriodStartSoC",
+  "address": "0xc093",
+  "section": "Common"
+ },
+ {
+  "name": "SoCRenewPrefferedPeriodStopSoC",
+  "address": "0xc094",
+  "section": "Common"
+ },
+ {
+  "name": "LowSoCToStartGen",
+  "address": "0xc095",
+  "section": "Common"
+ },
+ {
+  "name": "LowSoCToStartGenStartSoC",
+  "address": "0xc096",
+  "section": "Common"
+ },
+ {
+  "name": "LowSoCToStartGenStopSoC",
+  "address": "0xc097",
+  "section": "Common"
+ },
+ {
+  "name": "GenLockOut",
+  "address": "0xc098",
+  "section": "Common"
+ },
+ {
+  "name": "GenLockOutStartTime",
+  "address": "0xc099",
+  "section": "Common"
+ },
+ {
+  "name": "GenLockOutStopTime",
+  "address": "0xc09a",
+  "section": "Common"
+ },
+ {
+  "name": "YearToDateRollOverDay",
+  "address": "0xc09b",
+  "section": "Common"
+ },
+ {
+  "name": "YearToDateRollOverMonth",
+  "address": "0xc09c",
+  "section": "Common"
+ },
+ {
+  "name": "MaxPeakACVoltage",
+  "address": "0xc09e",
+  "section": "Common"
+ },
+ {
+  "name": "OveridePartialSoCStop",
+  "address": "0xc09f",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorFaultInputEdge",
+  "address": "0xc0a0",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorLowFuelInputEdge",
+  "address": "0xc0a1",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorNoFuelInputEdge",
+  "address": "0xc0a2",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorAvailableInputEdge",
+  "address": "0xc0a3",
+  "section": "Common"
+ },
+ {
+  "name": "DigitalControlInputEdge",
+  "address": "0xc0a4",
+  "section": "Common"
+ },
+ {
+  "name": "AcInputPowerLevelInputEdge",
+  "address": "0xc0a5",
+  "section": "Common"
+ },
+ {
+  "name": "LowBattShdwnOverrrideEdge",
+  "address": "0xc0a6",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorWaitExternalACTime",
+  "address": "0xc0a7",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorRemoteStart",
+  "address": "0xc0a8",
+  "section": "Common"
+ },
+ {
+  "name": "GeneratorRemoteStartEdge",
+  "address": "0xc0a9",
+  "section": "Common"
+ },
+ {
+  "name": "5MinAveBatteryPowerToStartGen",
+  "address": "0xc0aa",
+  "section": "Common"
+ },
+ {
+  "name": "15MinAveBatteryPowerToStartGen",
+  "address": "0xc0ab",
+  "section": "Common"
+ },
+ {
+  "name": "EqualiseOutput",
+  "address": "0xc0ad",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule1Day",
+  "address": "0xc0ae",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule2",
+  "address": "0xc0af",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule2Day",
+  "address": "0xc0b0",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule2StartTime",
+  "address": "0xc0b1",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule2StopTime",
+  "address": "0xc0b2",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule3",
+  "address": "0xc0b3",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule3Day",
+  "address": "0xc0b4",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule3StartTime",
+  "address": "0xc0b5",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule3StopTime",
+  "address": "0xc0b6",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule4",
+  "address": "0xc0b7",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule4Day",
+  "address": "0xc0b8",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule4StartTime",
+  "address": "0xc0b9",
+  "section": "Common"
+ },
+ {
+  "name": "InverterLockoutSchedule4StopTime",
+  "address": "0xc0ba",
+  "section": "Common"
+ },
+ {
+  "name": "InitialOutput",
+  "address": "0xc0bb",
+  "section": "Common"
+ },
+ {
+  "name": "BulkOutput",
+  "address": "0xc0bc",
+  "section": "Common"
+ },
+ {
+  "name": "InitialInput",
+  "address": "0xc0bd",
+  "section": "Common"
+ },
+ {
+  "name": "InitialInputEdge",
+  "address": "0xc0be",
+  "section": "Common"
+ },
+ {
+  "name": "BulkInput",
+  "address": "0xc0bf",
+  "section": "Common"
+ },
+ {
+  "name": "BulkInputEdge",
+  "address": "0xc0c0",
+  "section": "Common"
+ },
+ {
+  "name": "AbsorbInput",
+  "address": "0xc0c1",
+  "section": "Common"
+ },
+ {
+  "name": "AbsorbInputEdge",
+  "address": "0xc0c2",
+  "section": "Common"
+ },
+ {
+  "name": "EqualiseInput",
+  "address": "0xc0c3",
+  "section": "Common"
+ },
+ {
+  "name": "EqualiseInputEdge",
+  "address": "0xc0c4",
+  "section": "Common"
+ },
+ {
+  "name": "PreSyncGeneratorWarmUp",
+  "address": "0xc0e5",
+  "section": "Common"
+ },
+ {
+  "name": "ChargerLockoutInput",
+  "address": "0xc0e6",
+  "section": "Common"
+ },
+ {
+  "name": "ChargerLockoutInputEdge",
+  "address": "0xc0e7",
+  "section": "Common"
+ },
+ {
+  "name": "UseKacoFallBackProtocol",
+  "address": "0xc0e8",
+  "section": "Common"
+ },
+ {
+  "name": "EnableUserBatterylessMode",
+  "address": "0xc0e9",
+  "section": "Common"
+ },
+ {
+  "name": "IslandingKacoPowerLimit",
+  "address": "0xc0ea",
+  "section": "Common"
+ },
+ {
+  "name": "AcSourceInToleranceOutput",
+  "address": "0xc0eb",
+  "section": "Common"
+ },
+ {
+  "name": "ZeroPercentAcCoupledOutput",
+  "address": "0xc0ec",
+  "section": "Common"
+ },
+ {
+  "name": "AdvancedMultiPhaseStructure",
+  "address": "0xc0ed",
+  "section": "Common"
+ },
+ {
+  "name": "AdvancedMultiPhasePhase",
+  "address": "0xc0ee",
+  "section": "Common"
+ },
+ {
+  "name": "AdvancedMultiPhaseThreePhaseAcSourceBalanced",
+  "address": "0xc0ef",
+  "section": "Common"
+ },
+ {
+  "name": "AdvancedMultiphaseNumberOfWorkers",
+  "address": "0xc0f0",
+  "section": "Common"
+ },
+ {
+  "name": "ExternalContactorPullInTime",
+  "address": "0xc0f1",
+  "section": "Common"
+ },
+ {
+  "name": "ExternalContactorReleaseTime",
+  "address": "0xc0f2",
+  "section": "Common"
+ },
+ {
+  "name": "5MinuteAverageBatteryToStartGenerator_HiWord",
+  "address": "0xc0f3",
+  "section": "Common"
+ },
+ {
+  "name": "15MinuteAverageBatteryToStartGenerator_HiWord",
+  "address": "0xc0f4",
+  "section": "Common"
+ },
+ {
+  "name": "ModbusRtuPort",
+  "address": "0xc0f5",
+  "section": "Common"
+ },
+ {
+  "name": "ModbusRtuAddress",
+  "address": "0xc0f6",
+  "section": "Common"
+ },
+ {
+  "name": "PeriodicEqualise",
+  "address": "0xc100",
+  "section": "Application Type"
+ },
+ {
+  "name": "GeneratorControl",
+  "address": "0xc101",
+  "section": "Application Type"
+ },
+ {
+  "name": "BattMidPointStartGenerator",
+  "address": "0xc102",
+  "section": "Application Type"
+ },
+ {
+  "name": "GeneratorExercise",
+  "address": "0xc103",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExternalRegulatorBypass",
+  "address": "0xc104",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExternalRegulatorControl",
+  "address": "0xc105",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExternalMaximumPowerPoint",
+  "address": "0xc106",
+  "section": "Application Type"
+ },
+ {
+  "name": "MidpointMonitoringEnable",
+  "address": "0xc107",
+  "section": "Application Type"
+ },
+ {
+  "name": "MidpointEqualiseRequest",
+  "address": "0xc108",
+  "section": "Application Type"
+ },
+ {
+  "name": "Shunt1Name",
+  "address": "0xc109",
+  "section": "Application Type"
+ },
+ {
+  "name": "Shunt2Name",
+  "address": "0xc10a",
+  "section": "Application Type"
+ },
+ {
+  "name": "Region",
+  "address": "0xc10b",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACVMin",
+  "address": "0xc10c",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACVMax",
+  "address": "0xc10d",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACFreqMin",
+  "address": "0xc10e",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACfreqMax",
+  "address": "0xc10f",
+  "section": "Application Type"
+ },
+ {
+  "name": "UnitFaultRecovery",
+  "address": "0xc110",
+  "section": "Application Type"
+ },
+ {
+  "name": "Econo",
+  "address": "0xc111",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExportModeControlInput",
+  "address": "0xc112",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExportModeControlInputEdge",
+  "address": "0xc113",
+  "section": "Application Type"
+ },
+ {
+  "name": "GridAvailableInput",
+  "address": "0xc114",
+  "section": "Application Type"
+ },
+ {
+  "name": "GridAvailableInputEdge",
+  "address": "0xc115",
+  "section": "Application Type"
+ },
+ {
+  "name": "BackupSelectedOutput",
+  "address": "0xc116",
+  "section": "Application Type"
+ },
+ {
+  "name": "GridFailBackupEnable",
+  "address": "0xc117",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout1",
+  "address": "0xc118",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout1Day",
+  "address": "0xc119",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout1StartTime",
+  "address": "0xc11a",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout1StopTime",
+  "address": "0xc11b",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout2",
+  "address": "0xc11c",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout2Day",
+  "address": "0xc11d",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout2StartTime",
+  "address": "0xc11e",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout2StopTime",
+  "address": "0xc11f",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout3",
+  "address": "0xc120",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout3Day",
+  "address": "0xc121",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout3StartTime",
+  "address": "0xc122",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout3StopTime",
+  "address": "0xc123",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout4",
+  "address": "0xc124",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout4Day",
+  "address": "0xc125",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout4StartTime",
+  "address": "0xc126",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockout4StopTime",
+  "address": "0xc127",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout1",
+  "address": "0xc128",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLevel1",
+  "address": "0xc129",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout1Day",
+  "address": "0xc12a",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout1StartTime",
+  "address": "0xc12b",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout1StopTime",
+  "address": "0xc12c",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout2",
+  "address": "0xc12d",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLevel2",
+  "address": "0xc12e",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout2Day",
+  "address": "0xc12f",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout2StartTime",
+  "address": "0xc130",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout2StopTime",
+  "address": "0xc131",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout3",
+  "address": "0xc132",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLevel3",
+  "address": "0xc133",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout3Day",
+  "address": "0xc134",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout3StartTime",
+  "address": "0xc135",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout3StopTime",
+  "address": "0xc136",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout4",
+  "address": "0xc137",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLevel4",
+  "address": "0xc138",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout4Day",
+  "address": "0xc139",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout4StartTime",
+  "address": "0xc13a",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputCapacityLockout4StopTime",
+  "address": "0xc13b",
+  "section": "Application Type"
+ },
+ {
+  "name": "AlternateACVMin",
+  "address": "0xc13c",
+  "section": "Application Type"
+ },
+ {
+  "name": "AlternateACVMax",
+  "address": "0xc13d",
+  "section": "Application Type"
+ },
+ {
+  "name": "AlternateACFreqMin",
+  "address": "0xc13e",
+  "section": "Application Type"
+ },
+ {
+  "name": "AlternateACfreqMax",
+  "address": "0xc13f",
+  "section": "Application Type"
+ },
+ {
+  "name": "PeriodicRecharge",
+  "address": "0xc140",
+  "section": "Application Type"
+ },
+ {
+  "name": "GridFailBeeper",
+  "address": "0xc141",
+  "section": "Application Type"
+ },
+ {
+  "name": "KacoModeCommPort",
+  "address": "0xc142",
+  "section": "Application Type"
+ },
+ {
+  "name": "PowerUpMode",
+  "address": "0xc143",
+  "section": "Application Type"
+ },
+ {
+  "name": "MultipleChargers",
+  "address": "0xc144",
+  "section": "Application Type"
+ },
+ {
+  "name": "MultiplePhase",
+  "address": "0xc145",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExportPowerLimitUserSetting",
+  "address": "0xc146",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcCoupledInverterControl",
+  "address": "0xc147",
+  "section": "Application Type"
+ },
+ {
+  "name": "NumberOfKacosConnected",
+  "address": "0xc148",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExportCapacityLimitEnable",
+  "address": "0xc149",
+  "section": "Application Type"
+ },
+ {
+  "name": "PowerControlOverrideMode",
+  "address": "0xc14a",
+  "section": "Application Type"
+ },
+ {
+  "name": "PowerControlOverrideInput",
+  "address": "0xc14b",
+  "section": "Application Type"
+ },
+ {
+  "name": "PowerControlOverrideInputEdge",
+  "address": "0xc14c",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcInputChargerLockoutMode",
+  "address": "0xc14d",
+  "section": "Application Type"
+ },
+ {
+  "name": "MarginForBackfeedProtection",
+  "address": "0xc14e",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcCoupledInverterFrequencyControl",
+  "address": "0xc14f",
+  "section": "Application Type"
+ },
+ {
+  "name": "ParallelConnectMode",
+  "address": "0xc150",
+  "section": "Application Type"
+ },
+ {
+  "name": "SynchOverloadShutdownCountTrip",
+  "address": "0xc151",
+  "section": "Application Type"
+ },
+ {
+  "name": "DisableSourcePreTrip",
+  "address": "0xc152",
+  "section": "Application Type"
+ },
+ {
+  "name": "SupportPowerFactor",
+  "address": "0xc153",
+  "section": "Application Type"
+ },
+ {
+  "name": "ChargePowerFactor",
+  "address": "0xc154",
+  "section": "Application Type"
+ },
+ {
+  "name": "SourceRmsVoltage10MinDisconnectTrip",
+  "address": "0xc155",
+  "section": "Application Type"
+ },
+ {
+  "name": "PowerFactorCorrectionMode",
+  "address": "0xc156",
+  "section": "Application Type"
+ },
+ {
+  "name": "KacoExportPreTripPowerLimit",
+  "address": "0xc157",
+  "section": "Application Type"
+ },
+ {
+  "name": "KacoExportPreTripTime",
+  "address": "0xc158",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcCoupledFrequencyRampLimit",
+  "address": "0xc159",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcCoupledFrequencyRampRate",
+  "address": "0xc15a",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcCoupledAlarmOutput",
+  "address": "0xc15b",
+  "section": "Application Type"
+ },
+ {
+  "name": "InverterLockoutInput",
+  "address": "0xc15c",
+  "section": "Application Type"
+ },
+ {
+  "name": "InverterLockoutInputEdge",
+  "address": "0xc15d",
+  "section": "Application Type"
+ },
+ {
+  "name": "ResyncDelay",
+  "address": "0xc15e",
+  "section": "Application Type"
+ },
+ {
+  "name": "VacBatteryCharging0Percent",
+  "address": "0xc15f",
+  "section": "Application Type"
+ },
+ {
+  "name": "VacBatteryCharging100Percent",
+  "address": "0xc160",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExportRampTime",
+  "address": "0xc161",
+  "section": "Application Type"
+ },
+ {
+  "name": "ExportHighFrequencyRampEnd",
+  "address": "0xc162",
+  "section": "Application Type"
+ },
+ {
+  "name": "KacoExportPreTripDirection",
+  "address": "0xc163",
+  "section": "Application Type"
+ },
+ {
+  "name": "MpptModel",
+  "address": "0xc164",
+  "section": "Application Type"
+ },
+ {
+  "name": "MpptNumber",
+  "address": "0xc165",
+  "section": "Application Type"
+ },
+ {
+  "name": "VoltWattVoltageStart",
+  "address": "0xc166",
+  "section": "Application Type"
+ },
+ {
+  "name": "VoltWattVoltageStop",
+  "address": "0xc167",
+  "section": "Application Type"
+ },
+ {
+  "name": "VoltVarLowVoltageStop",
+  "address": "0xc168",
+  "section": "Application Type"
+ },
+ {
+  "name": "VoltVarLowVoltageStart",
+  "address": "0xc169",
+  "section": "Application Type"
+ },
+ {
+  "name": "VoltVarHighVoltageStart",
+  "address": "0xc16a",
+  "section": "Application Type"
+ },
+ {
+  "name": "VoltVarHighVoltageStop",
+  "address": "0xc16b",
+  "section": "Application Type"
+ },
+ {
+  "name": "LeadingVarMax",
+  "address": "0xc16c",
+  "section": "Application Type"
+ },
+ {
+  "name": "LaggingVarMax",
+  "address": "0xc16d",
+  "section": "Application Type"
+ },
+ {
+  "name": "CosPowerFactorEnd",
+  "address": "0xc16e",
+  "section": "Application Type"
+ },
+ {
+  "name": "EnablePowerQualityModes",
+  "address": "0xc16f",
+  "section": "Application Type"
+ },
+ {
+  "name": "GenerationManagementRampUp",
+  "address": "0xc170",
+  "section": "Application Type"
+ },
+ {
+  "name": "GenerationManagementRampDown",
+  "address": "0xc171",
+  "section": "Application Type"
+ },
+ {
+  "name": "GenerationManagementMinimumSoc",
+  "address": "0xc172",
+  "section": "Application Type"
+ },
+ {
+  "name": "GenerationManagementMaximumExportPower",
+  "address": "0xc173",
+  "section": "Application Type"
+ },
+ {
+  "name": "Drm3ReactivePower",
+  "address": "0xc174",
+  "section": "Application Type"
+ },
+ {
+  "name": "Drm7ReactivePower",
+  "address": "0xc175",
+  "section": "Application Type"
+ },
+ {
+  "name": "ConstantVarPercent",
+  "address": "0xc176",
+  "section": "Application Type"
+ },
+ {
+  "name": "ChargeLowFrequencyRampEnd",
+  "address": "0xc177",
+  "section": "Application Type"
+ },
+ {
+  "name": "AcCoupledPowerReductionFromAcSource",
+  "address": "0xc178",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACVMinConnect",
+  "address": "0xc179",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACVMaxConnect",
+  "address": "0xc17a",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACFreqMinConnect",
+  "address": "0xc17b",
+  "section": "Application Type"
+ },
+ {
+  "name": "ACFreqMaxConnect",
+  "address": "0xc17c",
+  "section": "Application Type"
+ },
+ {
+  "name": "LowDcShutDown0PercentLoad",
+  "address": "0xc180",
+  "section": "Battery Type"
+ },
+ {
+  "name": "LowDcShutDown100PercentLoad",
+  "address": "0xc181",
+  "section": "Battery Type"
+ },
+ {
+  "name": "LowDcShutDownRecovery",
+  "address": "0xc182",
+  "section": "Battery Type"
+ },
+ {
+  "name": "HighDcAlert",
+  "address": "0xc183",
+  "section": "Battery Type"
+ },
+ {
+  "name": "HighDcAlertClear",
+  "address": "0xc184",
+  "section": "Battery Type"
+ },
+ {
+  "name": "InitialReturnVoltage",
+  "address": "0xc185",
+  "section": "Battery Type"
+ },
+ {
+  "name": "MaximumChargeCapability",
+  "address": "0xc186",
+  "section": "Battery Type"
+ },
+ {
+  "name": "InitialChargeV",
+  "address": "0xc187",
+  "section": "Battery Type"
+ },
+ {
+  "name": "InitialChargeI",
+  "address": "0xc188",
+  "section": "Battery Type"
+ },
+ {
+  "name": "InitialChargeTime",
+  "address": "0xc189",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BulkChargeV",
+  "address": "0xc18a",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BulkChargeI",
+  "address": "0xc18b",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BulkChargeTime",
+  "address": "0xc18c",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AbsorbChargeV",
+  "address": "0xc18d",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AbsorbChargeI",
+  "address": "0xc18e",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AbsorbIChange",
+  "address": "0xc18f",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AbsorbChangeTime",
+  "address": "0xc190",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AbsorbMaxTime",
+  "address": "0xc191",
+  "section": "Battery Type"
+ },
+ {
+  "name": "FloatV",
+  "address": "0xc192",
+  "section": "Battery Type"
+ },
+ {
+  "name": "FloatI",
+  "address": "0xc193",
+  "section": "Battery Type"
+ },
+ {
+  "name": "FloatReturn",
+  "address": "0xc194",
+  "section": "Battery Type"
+ },
+ {
+  "name": "EqualiseV",
+  "address": "0xc195",
+  "section": "Battery Type"
+ },
+ {
+  "name": "EqualiseI",
+  "address": "0xc196",
+  "section": "Battery Type"
+ },
+ {
+  "name": "EqualiseTime",
+  "address": "0xc197",
+  "section": "Battery Type"
+ },
+ {
+  "name": "MinimumCompensationTemperature",
+  "address": "0xc198",
+  "section": "Battery Type"
+ },
+ {
+  "name": "ReferenceTemperatureA",
+  "address": "0xc199",
+  "section": "Battery Type"
+ },
+ {
+  "name": "ReferenceTemperatureB",
+  "address": "0xc19a",
+  "section": "Battery Type"
+ },
+ {
+  "name": "MaximumCompensationTemperature",
+  "address": "0xc19b",
+  "section": "Battery Type"
+ },
+ {
+  "name": "ReferenceATemperatureCoefficent",
+  "address": "0xc19c",
+  "section": "Battery Type"
+ },
+ {
+  "name": "ReferenceBTemperatureCoefficent",
+  "address": "0xc19d",
+  "section": "Battery Type"
+ },
+ {
+  "name": "InitialBatteryChargeEfficiency",
+  "address": "0xc19e",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BulkBatteryChargeEfficiency",
+  "address": "0xc19f",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AbsorbBatteryChargeEfficiency",
+  "address": "0xc1a0",
+  "section": "Battery Type"
+ },
+ {
+  "name": "MaxDaysBetweenPeriodicEqualise",
+  "address": "0xc1a1",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AbsoluteVoltageLimit",
+  "address": "0xc1a2",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BackOffTemperature",
+  "address": "0xc1a3",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BackOffRate",
+  "address": "0xc1a4",
+  "section": "Battery Type"
+ },
+ {
+  "name": "StopSoCOverridePeriodicFloat",
+  "address": "0xc1a5",
+  "section": "Battery Type"
+ },
+ {
+  "name": "LowBatteryToStartGenNoLoad",
+  "address": "0xc1a6",
+  "section": "Battery Type"
+ },
+ {
+  "name": "LowBatteryToStartGenFullLoad",
+  "address": "0xc1a7",
+  "section": "Battery Type"
+ },
+ {
+  "name": "PeukertsExponent",
+  "address": "0xc1a8",
+  "section": "Battery Type"
+ },
+ {
+  "name": "SocKOne",
+  "address": "0xc1a9",
+  "section": "Battery Type"
+ },
+ {
+  "name": "SocKTwo",
+  "address": "0xc1aa",
+  "section": "Battery Type"
+ },
+ {
+  "name": "SocKThree",
+  "address": "0xc1ab",
+  "section": "Battery Type"
+ },
+ {
+  "name": "MaxDaysBetweenPeriodicRecharge",
+  "address": "0xc1ac",
+  "section": "Battery Type"
+ },
+ {
+  "name": "UseZenBms",
+  "address": "0xc1ad",
+  "section": "Battery Type"
+ },
+ {
+  "name": "HighBatteryTempProtectionLimit",
+  "address": "0xc1ae",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AcCoupledHiBatteryInstantTripV",
+  "address": "0xc1af",
+  "section": "Battery Type"
+ },
+ {
+  "name": "SoftBattery",
+  "address": "0xc1b0",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AcCoupledHighBatteryTripDelay",
+  "address": "0xc1b1",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AcCoupledHighBatteryTripScaleVolt",
+  "address": "0xc1b2",
+  "section": "Battery Type"
+ },
+ {
+  "name": "AcCoupledHighBatteryTripScaleCurrent",
+  "address": "0xc1b3",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BMSBatteryFloatVoltageScale",
+  "address": "0xc1b4",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BMSBatteryCurrentTargetScale",
+  "address": "0xc1b5",
+  "section": "Battery Type"
+ },
+ {
+  "name": "InitialReturnSoC",
+  "address": "0xc1b6",
+  "section": "Battery Type"
+ },
+ {
+  "name": "MaximumBatteryDischargeCurrent",
+  "address": "0xc1b7",
+  "section": "Battery Type"
+ },
+ {
+  "name": "MaximumBatteryDischargeCurrentEnable",
+  "address": "0xc1b8",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BMSBatteryDischargeSurgeTime",
+  "address": "0xc1b9",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BMSBatteryDischargeSurgePercent",
+  "address": "0xc1ba",
+  "section": "Battery Type"
+ },
+ {
+  "name": "BMSBatteryDischargeSurgeDuty",
+  "address": "0xc1bb",
+  "section": "Battery Type"
+ },
+ {
+  "name": "SystemSchedule1Enable",
+  "address": "0xc800",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1Day",
+  "address": "0xc801",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1StartTime",
+  "address": "0xc802",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1StopTime",
+  "address": "0xc803",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1AcInputCapacity",
+  "address": "0xc804",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1AcExportCapacity",
+  "address": "0xc805",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1InvDcSupportCapacity",
+  "address": "0xc806",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1InvDcChargeCapacity",
+  "address": "0xc807",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1InvDcChargeCapacityViaSoC",
+  "address": "0xc808",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1MinSoCToSupportLoad",
+  "address": "0xc809",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1SoCStartCharging",
+  "address": "0xc80a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1SoCStopCharging",
+  "address": "0xc80b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1InverterLockout",
+  "address": "0xc80c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1ChargerLockout",
+  "address": "0xc80d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1ExportOnDemand",
+  "address": "0xc80e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1DigitalInput",
+  "address": "0xc80f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1DigitalInputEdge",
+  "address": "0xc810",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1DigitalOutput",
+  "address": "0xc811",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1AcSourceDisconnect",
+  "address": "0xc812",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1StartDate",
+  "address": "0xc813",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1StopDate",
+  "address": "0xc814",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1ChargerLockoutViaSoC",
+  "address": "0xc815",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1SpareA",
+  "address": "0xc816",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2Enable",
+  "address": "0xc817",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2Day",
+  "address": "0xc818",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2StartTime",
+  "address": "0xc819",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2StopTime",
+  "address": "0xc81a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2AcInputCapacity",
+  "address": "0xc81b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2AcExportCapacity",
+  "address": "0xc81c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2InvDcSupportCapacity",
+  "address": "0xc81d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2InvDcChargeCapacity",
+  "address": "0xc81e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2InvDcChargeCapacityViaSoC",
+  "address": "0xc81f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2MinSoCToSupportLoad",
+  "address": "0xc820",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2SoCStartCharging",
+  "address": "0xc821",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2SoCStopCharging",
+  "address": "0xc822",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2InverterLockout",
+  "address": "0xc823",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2ChargerLockout",
+  "address": "0xc824",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2ExportOnDemand",
+  "address": "0xc825",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2DigitalInput",
+  "address": "0xc826",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2DigitalInputEdge",
+  "address": "0xc827",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2DigitalOutput",
+  "address": "0xc828",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2AcSourceDisconnect",
+  "address": "0xc829",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2StartDate",
+  "address": "0xc82a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2StopDate",
+  "address": "0xc82b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2ChargerLockoutViaSoC",
+  "address": "0xc82c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2SpareA",
+  "address": "0xc82d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3Enable",
+  "address": "0xc82e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3Day",
+  "address": "0xc82f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3StartTime",
+  "address": "0xc830",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3StopTime",
+  "address": "0xc831",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3AcInputCapacity",
+  "address": "0xc832",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3AcExportCapacity",
+  "address": "0xc833",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3InvDcSupportCapacity",
+  "address": "0xc834",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3InvDcChargeCapacity",
+  "address": "0xc835",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3InvDcChargeCapacityViaSoC",
+  "address": "0xc836",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3MinSoCToSupportLoad",
+  "address": "0xc837",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3SoCStartCharging",
+  "address": "0xc838",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3SoCStopCharging",
+  "address": "0xc839",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3InverterLockout",
+  "address": "0xc83a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3ChargerLockout",
+  "address": "0xc83b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3ExportOnDemand",
+  "address": "0xc83c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3DigitalInput",
+  "address": "0xc83d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3DigitalInputEdge",
+  "address": "0xc83e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3DigitalOutput",
+  "address": "0xc83f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3AcSourceDisconnect",
+  "address": "0xc840",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3StartDate",
+  "address": "0xc841",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3StopDate",
+  "address": "0xc842",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3ChargerLockoutViaSoC",
+  "address": "0xc843",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3SpareA",
+  "address": "0xc844",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4Enable",
+  "address": "0xc845",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4Day",
+  "address": "0xc846",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4StartTime",
+  "address": "0xc847",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4StopTime",
+  "address": "0xc848",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4AcInputCapacity",
+  "address": "0xc849",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4AcExportCapacity",
+  "address": "0xc84a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4InvDcSupportCapacity",
+  "address": "0xc84b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4InvDcChargeCapacity",
+  "address": "0xc84c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4InvDcChargeCapacityViaSoC",
+  "address": "0xc84d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4MinSoCToSupportLoad",
+  "address": "0xc84e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4SoCStartCharging",
+  "address": "0xc84f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4SoCStopCharging",
+  "address": "0xc850",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4InverterLockout",
+  "address": "0xc851",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4ChargerLockout",
+  "address": "0xc852",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4ExportOnDemand",
+  "address": "0xc853",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4DigitalInput",
+  "address": "0xc854",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4DigitalInputEdge",
+  "address": "0xc855",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4DigitalOutput",
+  "address": "0xc856",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4AcSourceDisconnect",
+  "address": "0xc857",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4StartDate",
+  "address": "0xc858",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4StopDate",
+  "address": "0xc859",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4ChargerLockoutViaSoC",
+  "address": "0xc85a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4SpareA",
+  "address": "0xc85b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5Enable",
+  "address": "0xc85c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5Day",
+  "address": "0xc85d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5StartTime",
+  "address": "0xc85e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5StopTime",
+  "address": "0xc85f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5AcInputCapacity",
+  "address": "0xc860",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5AcExportCapacity",
+  "address": "0xc861",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5InvDcSupportCapacity",
+  "address": "0xc862",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5InvDcChargeCapacity",
+  "address": "0xc863",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5InvDcChargeCapacityViaSoC",
+  "address": "0xc864",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5MinSoCToSupportLoad",
+  "address": "0xc865",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5SoCStartCharging",
+  "address": "0xc866",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5SoCStopCharging",
+  "address": "0xc867",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5InverterLockout",
+  "address": "0xc868",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5ChargerLockout",
+  "address": "0xc869",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5ExportOnDemand",
+  "address": "0xc86a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5DigitalInput",
+  "address": "0xc86b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5DigitalInputEdge",
+  "address": "0xc86c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5DigitalOutput",
+  "address": "0xc86d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5AcSourceDisconnect",
+  "address": "0xc86e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5StartDate",
+  "address": "0xc86f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5StopDate",
+  "address": "0xc870",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5ChargerLockoutViaSoC",
+  "address": "0xc871",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5SpareA",
+  "address": "0xc872",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6Enable",
+  "address": "0xc873",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6Day",
+  "address": "0xc874",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6StartTime",
+  "address": "0xc875",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6StopTime",
+  "address": "0xc876",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6AcInputCapacity",
+  "address": "0xc877",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6AcExportCapacity",
+  "address": "0xc878",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6InvDcSupportCapacity",
+  "address": "0xc879",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6InvDcChargeCapacity",
+  "address": "0xc87a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6InvDcChargeCapacityViaSoC",
+  "address": "0xc87b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6MinSoCToSupportLoad",
+  "address": "0xc87c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6SoCStartCharging",
+  "address": "0xc87d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6SoCStopCharging",
+  "address": "0xc87e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6InverterLockout",
+  "address": "0xc87f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6ChargerLockout",
+  "address": "0xc880",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6ExportOnDemand",
+  "address": "0xc881",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6DigitalInput",
+  "address": "0xc882",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6DigitalInputEdge",
+  "address": "0xc883",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6DigitalOutput",
+  "address": "0xc884",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6AcSourceDisconnect",
+  "address": "0xc885",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6StartDate",
+  "address": "0xc886",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6StopDate",
+  "address": "0xc887",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6ChargerLockoutViaSoC",
+  "address": "0xc888",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6SpareA",
+  "address": "0xc889",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7Enable",
+  "address": "0xc88a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7Day",
+  "address": "0xc88b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7StartTime",
+  "address": "0xc88c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7StopTime",
+  "address": "0xc88d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7AcInputCapacity",
+  "address": "0xc88e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7AcExportCapacity",
+  "address": "0xc88f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7InvDcSupportCapacity",
+  "address": "0xc890",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7InvDcChargeCapacity",
+  "address": "0xc891",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7InvDcChargeCapacityViaSoC",
+  "address": "0xc892",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7MinSoCToSupportLoad",
+  "address": "0xc893",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7SoCStartCharging",
+  "address": "0xc894",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7SoCStopCharging",
+  "address": "0xc895",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7InverterLockout",
+  "address": "0xc896",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7ChargerLockout",
+  "address": "0xc897",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7ExportOnDemand",
+  "address": "0xc898",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7DigitalInput",
+  "address": "0xc899",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7DigitalInputEdge",
+  "address": "0xc89a",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7DigitalOutput",
+  "address": "0xc89b",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7AcSourceDisconnect",
+  "address": "0xc89c",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7StartDate",
+  "address": "0xc89d",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7StopDate",
+  "address": "0xc89e",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7ChargerLockoutViaSoC",
+  "address": "0xc89f",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7SpareA",
+  "address": "0xc8a0",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8Enable",
+  "address": "0xc8a1",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8Day",
+  "address": "0xc8a2",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8StartTime",
+  "address": "0xc8a3",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8StopTime",
+  "address": "0xc8a4",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8AcInputCapacity",
+  "address": "0xc8a5",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8AcExportCapacity",
+  "address": "0xc8a6",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8InvDcSupportCapacity",
+  "address": "0xc8a7",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8InvDcChargeCapacity",
+  "address": "0xc8a8",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8InvDcChargeCapacityViaSoC",
+  "address": "0xc8a9",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8MinSoCToSupportLoad",
+  "address": "0xc8aa",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8SoCStartCharging",
+  "address": "0xc8ab",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8SoCStopCharging",
+  "address": "0xc8ac",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8InverterLockout",
+  "address": "0xc8ad",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8ChargerLockout",
+  "address": "0xc8ae",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8ExportOnDemand",
+  "address": "0xc8af",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8DigitalInput",
+  "address": "0xc8b0",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8DigitalInputEdge",
+  "address": "0xc8b1",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8DigitalOutput",
+  "address": "0xc8b2",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8AcSourceDisconnect",
+  "address": "0xc8b3",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8StartDate",
+  "address": "0xc8b4",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8StopDate",
+  "address": "0xc8b5",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8ChargerLockoutViaSoC",
+  "address": "0xc8b6",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8SpareA",
+  "address": "0xc8b7",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule1ChargeOverrideACSource",
+  "address": "0xc8b8",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule2ChargeOverrideACSource",
+  "address": "0xc8b9",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule3ChargeOverrideACSource",
+  "address": "0xc8ba",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule4ChargeOverrideACSource",
+  "address": "0xc8bb",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule5ChargeOverrideACSource",
+  "address": "0xc8bc",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule6ChargeOverrideACSource",
+  "address": "0xc8bd",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule7ChargeOverrideACSource",
+  "address": "0xc8be",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "SystemSchedule8ChargeOverrideACSource",
+  "address": "0xc8bf",
+  "section": "System Scheduler"
+ },
+ {
+  "name": "FanType",
+  "address": "0xc201",
+  "section": "Service"
+ },
+ {
+  "name": "InitialSoC",
+  "address": "0xc202",
+  "section": "Service"
+ },
+ {
+  "name": "Shunt1UserZero",
+  "address": "0xc203",
+  "section": "Service"
+ },
+ {
+  "name": "Shunt2UserZero",
+  "address": "0xc204",
+  "section": "Service"
+ },
+ {
+  "name": "ACInputDisconnectionMonitor",
+  "address": "0xc205",
+  "section": "Service"
+ },
+ {
+  "name": "ExpansionCardEnabled",
+  "address": "0xc206",
+  "section": "Service"
+ },
+ {
+  "name": "SynchOverloadShutdownCountTrips",
+  "address": "0xc20a",
+  "section": "Service"
+ },
+ {
+  "name": "EmulatedInductanceRatio",
+  "address": "0xc20b",
+  "section": "Service"
+ },
+ {
+  "name": "ActiveAntiIslandingSensitivityPercent",
+  "address": "0xc20c",
+  "section": "Service"
+ },
+ {
+  "name": "MultiPhaseValuesSplink",
+  "address": "0xc20d",
+  "section": "Service"
+ },
+ {
+  "name": "AllowPowerOverride",
+  "address": "0xc20e",
+  "section": "Service"
+ },
+ {
+  "name": "IndependentGridDisconnect",
+  "address": "0xc20f",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarIntegralGainConnectedToSource",
+  "address": "0xc210",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarDifferentialGainConnectedToSource",
+  "address": "0xc211",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarFeedForwardGainConnectedToSource",
+  "address": "0xc212",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalGainConnectedToSource",
+  "address": "0xc213",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarIntegralGain",
+  "address": "0xc214",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarDifferentialGain",
+  "address": "0xc215",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarFeedForwardGain",
+  "address": "0xc216",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalVoltage0",
+  "address": "0xc217",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalGain0",
+  "address": "0xc218",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalVoltage1",
+  "address": "0xc219",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalGain1",
+  "address": "0xc21a",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalVoltage2",
+  "address": "0xc21b",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalGain2",
+  "address": "0xc21c",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalVoltage3",
+  "address": "0xc21d",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalGain3",
+  "address": "0xc21e",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalVoltage4",
+  "address": "0xc21f",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarProportionalGain4",
+  "address": "0xc220",
+  "section": "Service"
+ },
+ {
+  "name": "ServiceSettingReserved33",
+  "address": "0xc221",
+  "section": "Service"
+ },
+ {
+  "name": "ServiceSettingReserved34",
+  "address": "0xc222",
+  "section": "Service"
+ },
+ {
+  "name": "AemoRideThrough",
+  "address": "0xc223",
+  "section": "Service"
+ },
+ {
+  "name": "ActivePowerDisconnect",
+  "address": "0xc224",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarFilterRisingSync",
+  "address": "0xc225",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarFilterFallingSync",
+  "address": "0xc226",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarFilterRisingStandalone",
+  "address": "0xc227",
+  "section": "Service"
+ },
+ {
+  "name": "AcSolarFilterFallingStandalone",
+  "address": "0xc228",
+  "section": "Service"
+ }
+]
