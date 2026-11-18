@@ -133,14 +133,24 @@ class TestButtons(unittest.TestCase):
         self.api = api.Api(self.inv, Busy, lambda r: None, lambda: [], {}, 'id1')
 
     def test_press(self):
-        self.assertEqual(self.api.info()['buttons'], ['generator', 'silence'])
+        self.assertEqual(self.api.info()['buttons'], ['generator', 'silence', 'on'])
         code, body = self.post(self.api, 'generator')
         self.assertEqual(code, 200)
         self.assertEqual(body['register'], '0xa232')
         self.assertEqual(self.inv.sim.presses, [('generator', 1)])
 
-    def test_on_and_unknown_refused(self):
-        for name in ('on', 'nope', ''):
+    def test_on_needs_confirm(self):
+        code, body = self.post(self.api, 'on')
+        self.assertEqual(code, 400)
+        self.assertIn('confirm=outage', body['error'])
+        self.assertEqual(self.inv.sim.writes, [])
+        code, body = self.post(self.api, 'on&confirm=outage')
+        self.assertEqual(code, 200)
+        self.assertEqual(body['register'], '0xa233')
+        self.assertEqual(self.inv.sim.presses, [('on', 2)])
+
+    def test_unknown_refused(self):
+        for name in ('nope', ''):
             code, body = self.post(self.api, name)
             self.assertEqual(code, 400, name)
         self.assertEqual(self.inv.sim.writes, [])

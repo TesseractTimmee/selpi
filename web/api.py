@@ -9,9 +9,10 @@ bearer token, because HA core doesn't come through the ingress proxy.
     GET  /api/v1/diagnostics       link status, clock check, last backup
     POST /api/v1/backup            start a config backup
     POST /api/v1/button?name=generator|silence   press a front panel button (short press)
+    POST /api/v1/button?name=on&confirm=outage   long press of the ON button: SP PRO ON <-> IDLE (IDLE = no AC output)
 
 Read-only towards the SP PRO (same reads as the Live page), except front panel button presses (generator
-start/stop, silence alarm; never the ON button). Values are cached; if the link is busy (a backup or log download), the
+start/stop, silence alarm, and the ON button only with confirm=outage). Values are cached; if the link is busy (a backup or log download), the
 last values come back with "stale": true.
 """
 import hmac
@@ -115,7 +116,7 @@ class Api:
         return {'id': self.install_id, 'connection': conn, 'scan_interval': 60 if conn == 'SelectLive' else 10,
                 'model': 'SP PRO', 'manufacturer': 'Selectronic', 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
-                'buttons': sorted(API_BUTTONS)}
+                'buttons': sorted(API_BUTTONS) + ['on']}
 
     def values(self, keys):
         keys = [k for k in keys if k in self.fields]
@@ -155,13 +156,20 @@ class Api:
                 'last_backup': last and {'name': last['name'], 'reason': last.get('reason'), 'at': at},
                 'proxy': self.proxy and dict(self.proxy.status, port=self.proxy.port)}
 
-    def button(self, name):
-        """Press a front panel button (short press; the ON button isn't offered here)."""
-        if name not in API_BUTTONS:
-            raise ValueError('unknown button %r (one of %s)' % (name, ', '.join(sorted(API_BUTTONS))))
+    def button(self, name, confirm=''):
+        """Press a front panel button: generator / silence (short), or on (long; needs confirm='outage')."""
+        long = False
+        if name == 'on':
+            if confirm != 'outage':
+                raise ValueError('the ON button switches the SP PRO between ON and IDLE (no AC output): '
+                                 'add confirm=outage')
+            long = True
+        elif name not in API_BUTTONS:
+            raise ValueError('unknown button %r (one of %s, on)' % (name, ', '.join(sorted(API_BUTTONS))))
         from sppro import buttons
-        logging.warning('front panel button press via the API: %s', name)
-        out = self.sppro.use('button %s' % name, lambda r: buttons.press(r, name), wait=30, check_versions=False)
+        logging.warning('front panel button press via the API: %s%s', name, ' (long)' if long else '')
+        out = self.sppro.use('button %s' % name, lambda r: buttons.press(r, name, long=long), wait=30,
+                             check_versions=False)
         return {'pressed': name, 'register': '0x%x' % out['register'], 'read_back': out['read_back']}
 
     def backup(self):
@@ -180,7 +188,7 @@ class Api:
         return {'started': True}
 
 
-API_BUTTONS = {'generator', 'silence'}   # the ON button (ON <-> IDLE, an outage) is CLI only
+API_BUTTONS = {'generator', 'silence'}   # short presses; 'on' (long, ON <-> IDLE) needs confirm=outage
 
 
 def serve(api, port, token, host='::'):
@@ -225,7 +233,7 @@ def serve(api, port, token, host='::'):
                 if method == 'POST' and path == '/api/v1/backup':
                     return self._send(200, api.backup())
                 if method == 'POST' and path == '/api/v1/button':
-                    return self._send(200, api.button(q.get('name', '')))
+                    return self._send(200, api.button(q.get('name', ''), q.get('confirm', '')))
                 return self._send(404, {'error': 'not found'})
             except api.Busy as e:
                 return self._send(503, {'error': str(e)})
