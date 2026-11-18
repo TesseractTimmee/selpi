@@ -334,6 +334,36 @@ sends them, so the Modbus map can't be read from SP LINK. An installer build of 
 | `0xa251` | download mode, 1 while a log/config download runs |
 | `0xca14` | `0xffff` normally, `0x0000` while configuration is written |
 | `0x1d0000` | real-time clock (8 words, BCD); polled ~1/s by SP LINK |
+| `0xa000` low byte | comms port this link is on (1 = DB9 / Select.Live, 2 = the other port); SP LINK reads it at connect to pick the button registers |
+
+## Front panel buttons (SP LINK Quick View)
+
+SP LINK's Quick View front panel presses the SP PRO's buttons over the link (SP LINK 15.40,
+`fclsMain::CommunicateButtonPress`). Each comms port has its own registers; use the set for the port in
+`0xa000` (low byte):
+
+| Button | Port 1 | Port 2 | Presses (SP PRO manual) |
+|---|---|---|---|
+| Generator | `0xa232` | `0xa235` | short: start/stop the auto start generator (a stop skips the cool down) |
+| ON ("Output Mode" in SP LINK) | `0xa233` | `0xa236` | long: ON <-> IDLE (IDLE = no AC output) |
+| Silence alarm | `0xa234` | `0xa237` | short: silence the alarm for this alert |
+
+Write 1 for a short press or 2 for a long press, then read the register back: it returns to 0 once the
+unit has taken the press; 3 means the button is already being pressed (not accepted). The unit logs each
+press as an event, e.g. "Generator Button - Port 1 - Short Press" (seen 18 Nov 2026 via Select.Live).
+
+Which presses the unit accepts is in its front panel block (`0xa0be` x95, SP LINK's LED status request):
+`0xa11a` generator, `0xa11b` ON, `0xa11c` silence; bit 0 = short accepted, bit 1 = long accepted. Seen on an
+SPMC482 (firmware 15.47): generator 3, ON 2, silence 3. Long generator / silence presses are not documented
+(SP LINK's event texts include "Charger - Equalise Requested from front panel", possibly one of them).
+`selpi button` and the HA app's `/api/v1/button` implement this (`sppro/buttons.py`).
+
+## Managed battery (CAN) frames
+
+Seen between a BMS and the SP PRO (18 Nov 2026): BMS → SP PRO `0x351` (charge voltage / current limits),
+`0x355` (SoC, SoH), `0x356` (voltage, current, temperature), `0x359` (protection / alarms); SP PRO → BMS
+`0x305`. A Pylontech-style `0x35C` "force charge" request (byte 0 bit 5) is ignored by the SP PRO. The SP PRO's
+charging follows the SoC in `0x355` against the active Solar Hybrid priority's start / stop charging SoC.
 
 
 # Cross-reference: Selectronic Modbus RTU map
