@@ -14,6 +14,9 @@ class Protocol:
         self.__read_buffer = bytearray()
         self.__logging_in = False
 
+    def close(self):
+        self.__connection.close()
+
     """
     Request memory from the SP Pro
     """
@@ -33,6 +36,13 @@ class Protocol:
         response = self.__send(request)
         if not request.get_message() == response.get_message():
             raise Exception("Write check failed, expected '%s' got '%s" % (request.get_message(), response.get_message()))
+
+    def raw(self, frame: bytes, reply_len: int) -> bytes:
+        """Pass one complete client frame (SP LINK via the proxy) through and return the raw reply.
+        No login retry: the client handles its own login; a silent unit raises BufferError."""
+        self.__read_buffer = bytearray()
+        self.__connection.write(bytes(frame))
+        return bytes(self.__read(reply_len))
 
     def __send(self, request: Request) -> Response:
         self.__connection.write(request.get_message())

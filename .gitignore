@@ -1,2 +1,7 @@
 *.pyc
 .env
+captures/
+
+# ESPHome
+esphome/secrets.yaml
+esphome/.esphome/

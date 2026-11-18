@@ -25,4 +25,13 @@ class Connection:
     def _write(self, data: bytes):
         raise NotImplementedError
 
+    def close(self):
+        """Drop the link (reconnects on next use)."""
+        if self.__connected:
+            self._close()
+            self.__connected = False
+
+    def _close(self):
+        pass
+
 

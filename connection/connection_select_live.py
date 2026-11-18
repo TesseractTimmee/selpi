@@ -48,6 +48,14 @@ class ConnectionSelectLive(Connection):
                 % (device.decode('utf-8'), response.decode('utf-8').strip(), devices)
             )
 
+    def _close(self):
+        if self.__socket is not None:
+            try:
+                self.__socket.close()
+            except OSError:
+                pass
+            self.__socket = None
+
     def _get_devices(self):
         self._write(b'LIST DEVICES\r\n')
         match = re.search(r'^DEVICE:([0-9]+)\r\n', self._read(1024).decode('utf-8'), re.MULTILINE)

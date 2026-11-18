@@ -3,7 +3,7 @@ import os
 import connection
 from memory import Protocol
 import socket
-from memory import Request
+from memory import Request, Response
 import logging
 
 def add_parser(subparsers):
@@ -51,7 +51,6 @@ class Proxy:
         self.__buffer = self.__buffer[wl:]
         req = Request(msg)
         logging.debug("request:  %s" % req)
-        res = self.__protocol.send(req)
-        msg = res.get_message()
+        msg = self.__protocol.raw(bytes(msg), Response(req).expected_length())
         logging.debug("response: %s" % bytes(msg))
         socket.sendall(msg)
