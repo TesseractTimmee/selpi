@@ -8,7 +8,7 @@ import json
 import os
 from datetime import datetime
 
-from sppro import config
+from sppro import config, live
 from sppro.reader import Reader
 
 
@@ -26,7 +26,9 @@ def add_parser(subparsers):
 
 
 def run_backup(args, reader=None):
-    memory = config.read_memory(reader or Reader())
+    reader = reader or Reader()
+    live.check_versions(reader)
+    memory = config.read_memory(reader)
     stamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     os.makedirs(args.out, exist_ok=True)
     if args.json:
@@ -49,6 +51,7 @@ def run_show(args, reader=None):
     if not matches:
         raise SystemExit('no setting matches %s' % ', '.join(args.names))
     reader = reader or Reader()
+    live.check_versions(reader)
     for s in matches:
         value = reader.words(int(s['address'], 16), 1)[0]
         print('%-50s %-8s %6d   (%s)' % (s['name'], s['address'], value, s['section']))

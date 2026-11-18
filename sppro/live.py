@@ -39,6 +39,23 @@ def version_problems(v):
     return ['%s %d (verified %d)' % (k, v[k], want) for k, want in VERIFIED.items() if v.get(k) != want]
 
 
+class VersionMismatch(Exception):
+    pass
+
+
+def check_versions(reader, writes=False, force=False):
+    """Compare the unit's version block with the verified map. Reading commands get a warning on stderr;
+    commands that write raise VersionMismatch unless force. Returns the problems (empty = matches)."""
+    import sys
+    problems = version_problems(versions(reader))
+    if problems:
+        text = 'this unit differs from the verified map (%s)' % ', '.join(problems)
+        if writes and not force:
+            raise VersionMismatch(text + ': not writing (--force to override)')
+        print('WARNING: %s; values may be wrong' % text, file=sys.stderr)
+    return problems
+
+
 SCREENS = {  # short names for the command line
     'now': 'NowSubTab', 'today': 'TodaySubTab', 'tech': 'TechnicalDataSubTab', 'dc': 'DCHistorySubTab',
     'ac': 'ACHistorySubTab', 'ac2': 'ACHistorySubTab2', 'service': 'ServiceReadings1',

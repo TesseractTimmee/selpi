@@ -207,3 +207,29 @@ class TestClock(unittest.TestCase):
         self.assertEqual([0x33, 0x43, 0x15, 3, 0x17, 0x11, 0x26], words)
         self.assertEqual(t, clock.decode([0x44] + words))
         self.assertEqual(1, struct.unpack('<7H', clock.encode(datetime(2026, 11, 15, 6, 0, 0)))[3])  # Sunday
+
+
+class VersionCheckTest(unittest.TestCase):
+    class Reader:
+        def __init__(self, memory_map):
+            self.w = [48, 14, memory_map, 3, 3, 5] + [0] * 19
+
+        def words(self, address, n):
+            return self.w[:n]
+
+    def test_match_is_silent(self):
+        from sppro import live
+        self.assertEqual([], live.check_versions(self.Reader(31), writes=True))
+
+    def test_mismatch_warns_reads_and_refuses_writes(self):
+        import io
+        from contextlib import redirect_stderr
+        from sppro import live
+        err = io.StringIO()
+        with redirect_stderr(err):
+            self.assertEqual(['memory_map 30 (verified 31)'], live.check_versions(self.Reader(30)))
+        self.assertIn('WARNING', err.getvalue())
+        with self.assertRaises(live.VersionMismatch):
+            live.check_versions(self.Reader(30), writes=True)
+        with redirect_stderr(io.StringIO()):
+            self.assertTrue(live.check_versions(self.Reader(30), writes=True, force=True))

@@ -29,9 +29,7 @@ def run(args, reader=None):
                                                 ','.join(f['words'])))
         return
     reader = reader or Reader()
-    problems = live.version_problems(live.versions(reader))
-    if problems:
-        print('WARNING: this unit differs from the verified map; values may be wrong: ' + ', '.join(problems))
+    live.check_versions(reader)
     rows = live.snapshot(reader, screens)
     if args.json:
         print(json.dumps(rows, indent=1, default=str))

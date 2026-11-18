@@ -4,7 +4,7 @@ This acts on the inverter: `generator` starts or stops the auto start generator,
 SP PRO between ON and IDLE (no AC output). It refuses to run without --yes; `on` also needs --i-accept-an-outage.
 `--show` only reads the port and the button registers.
 """
-from sppro import buttons
+from sppro import buttons, live
 from sppro.reader import Reader
 
 
@@ -15,6 +15,7 @@ def add_parser(subparsers):
     parser.add_argument('--show', action='store_true', help='read the port and button registers, press nothing')
     parser.add_argument('--yes', action='store_true', help='really press it')
     parser.add_argument('--i-accept-an-outage', action='store_true', help='needed for "on" (IDLE = no AC output)')
+    parser.add_argument('--force', action='store_true', help='press even if the unit\'s versions differ from the verified map')
     parser.set_defaults(func=run)
 
 
@@ -32,6 +33,10 @@ def run(args, reader=None):
         raise SystemExit('refusing to press %s without --yes' % args.button)
     if args.button == 'on' and not args.i_accept_an_outage:
         raise SystemExit('"on" switches the SP PRO between ON and IDLE (no AC output): add --i-accept-an-outage')
+    try:
+        live.check_versions(reader, writes=True, force=args.force)
+    except live.VersionMismatch as e:
+        raise SystemExit(str(e))
     r = buttons.press(reader, args.button, long=args.long)
     print('%s %s press: wrote %d to 0x%x (was %d), read back %s' % (
         r['press'], r['button'], r['value'], r['register'], r['before'], r['read_back']))

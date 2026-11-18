@@ -1,5 +1,5 @@
 """settime: set the SP PRO clock to this machine's local time (or only when it is out by more than --max-drift)."""
-from sppro import clock
+from sppro import clock, live
 from sppro.reader import Reader
 
 
@@ -10,5 +10,7 @@ def add_parser(subparsers):
 
 
 def run(args, reader=None):
-    before, after = clock.sync(reader or Reader(), max_drift=args.max_drift, lead=2.0)
+    reader = reader or Reader()
+    live.check_versions(reader)   # the clock registers sit outside the versioned map: warn only
+    before, after = clock.sync(reader, max_drift=args.max_drift, lead=2.0)
     print('drift %+d s' % before + ('' if after is None else ', set: now %+d s' % after))

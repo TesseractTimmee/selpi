@@ -10,7 +10,7 @@ import csv
 import os
 from datetime import datetime
 
-from sppro import logs
+from sppro import live as live_check, logs
 from sppro.reader import Reader
 
 FILES = {'events': 'EventData', 'detailed': 'DetailedData', 'daily': 'DailySummaryData'}
@@ -48,6 +48,7 @@ def run(args, reader=None):
         raise SystemExit('unknown log(s): %s' % ', '.join(unknown))
 
     reader = reader or Reader()
+    live_check.check_versions(reader)
     live = logs.live_scales(reader)
     records = logs.download(reader, keys, since, until)
 
