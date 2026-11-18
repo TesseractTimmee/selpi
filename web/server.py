@@ -228,8 +228,21 @@ def logs_job(since, until, keys):
             job['message'] = 'reading scale factors'
             scales = logs.live_scales(reader)
             job['message'] = 'searching and downloading %s' % ', '.join(keys)
-            return scales, logs.download(reader, keys, since, until)
+
+            def progress(key, index, phase, done, total):
+                title = logs.LOGS[key].title
+                part = (done / total) if total else (0.0 if phase == 'search' else 1.0)
+                job['progress'] = {'log': title, 'log_index': index + 1, 'logs': len(keys), 'phase': phase,
+                                   'done': done, 'total': total,
+                                   'percent': round(100 * (index + part) / len(keys), 1)}
+                job['message'] = ('%s (%d of %d): SP PRO is searching…' % (title, index + 1, len(keys))
+                                  if phase == 'search' else
+                                  '%s (%d of %d): %d of %d records' % (title, index + 1, len(keys), done, total))
+            return scales, logs.download(reader, keys, since, until, progress)
+        job['message'] = 'waiting for the SP PRO link' + (' (busy: %s)' % SPPRO.busy if SPPRO.busy else '')
         scales, records = SPPRO.use('log download', work, wait=True)
+        job['message'] = 'building the CSV files'
+        job['progress'] = dict(job.get('progress') or {}, percent=100)
         merged = {}
         for key, recs in records.items():
             header, rows = logs.rows(key, recs, scales)

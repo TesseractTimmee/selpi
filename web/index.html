@@ -188,9 +188,24 @@ $('#set-go').onclick = async () => {
 
 // ---- jobs
 async function waitJob(job, out, done) {
+  const t0 = Date.now();
+  let misses = 0;
   while (true) {
-    const j = await api('api/jobs/' + job.id);
-    out.innerHTML = `<p class="note">${esc(j.message)}</p>`;
+    let j;
+    try { j = await api('api/jobs/' + job.id); misses = 0; }
+    catch (e) {   // page lost contact (HA reconnecting, app restarting): say so instead of freezing
+      if (++misses > 40) { out.innerHTML = `<p class="err">lost contact with the app: ${esc(e.message)}</p>`; return; }
+      out.insertAdjacentHTML('beforeend', misses === 1 ? `<p class="note">lost contact, retrying…</p>` : '');
+      await new Promise(r => setTimeout(r, 3000));
+      continue;
+    }
+    const s = Math.round((Date.now() - t0) / 1000);
+    const elapsed = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    const p = j.progress;
+    // a bar for jobs that report progress (log downloads); no value = indeterminate (searching / waiting)
+    const bar = p === undefined && job.kind !== 'logs' ? '' :
+      `<progress max="100" ${p && p.phase !== 'search' ? `value="${p.percent}"` : ''} style="width:100%"></progress>`;
+    out.innerHTML = `${bar}<p class="note">${esc(j.message)} · ${elapsed}${p ? ` · ${Math.round(p.percent)}%` : ''}</p>`;
     if (j.state === 'done') return done(j);
     if (j.state === 'failed') { out.innerHTML = `<p class="err">${esc(j.message)}</p>`; return; }
     await new Promise(r => setTimeout(r, 1500));

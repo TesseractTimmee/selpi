@@ -92,13 +92,18 @@ def record_addresses(segs, size, first, last, count):
             a = segs[i][0]
 
 
-def read_records(reader: Reader, log: Log, since: datetime, until: datetime):
-    """Yield (address, raw bytes) for every record of `log` in [since, until]."""
+def read_records(reader: Reader, log: Log, since: datetime, until: datetime, progress=None):
+    """Yield (address, raw bytes) for every record of `log` in [since, until].
+    progress(phase, done, total), if given: ('search', 0, 0) while the SP PRO searches, then ('read', n, total)."""
+    progress = progress or (lambda *a: None)
+    progress('search', 0, 0)
     found = find(reader, log, since, until)
     if not found:
+        progress('read', 0, 0)
         return
     first, last, count = found
     addresses = list(record_addresses(segments(reader, log), log.record_words, first, last, count))
+    progress('read', 0, len(addresses))
     per_read = 256 // log.record_words
     i = 0
     while i < len(addresses):
@@ -110,16 +115,19 @@ def read_records(reader: Reader, log: Log, since: datetime, until: datetime):
         for k in range(n):
             yield addresses[i + k], raw[k * log.record_words * 2:(k + 1) * log.record_words * 2]
         i += n
+        progress('read', i, len(addresses))
 
 
-def download(reader: Reader, keys, since: datetime, until: datetime) -> dict:
-    """{key: [(address, raw)]} for the requested logs; download mode is always cleared afterwards."""
+def download(reader: Reader, keys, since: datetime, until: datetime, progress=None) -> dict:
+    """{key: [(address, raw)]} for the requested logs; download mode is always cleared afterwards.
+    progress(key, index, phase, done, total), if given, reports each log's search and records read."""
     out = {}
     reader.write(DOWNLOAD_MODE, struct.pack('<H', 1))
     try:
-        for key in keys:
+        for index, key in enumerate(keys):
             log = LOGS[key]
-            out[key] = list(read_records(reader, log, since, until))
+            report = (lambda ph, d, t, k=key, ix=index: progress(k, ix, ph, d, t)) if progress else None
+            out[key] = list(read_records(reader, log, since, until, report))
             logging.info('%s: %d records', log.title, len(out[key]))
     finally:
         reader.write(DOWNLOAD_MODE, struct.pack('<H', 0))
