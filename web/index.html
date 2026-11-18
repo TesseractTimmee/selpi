@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SP PRO</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --text: #1b1f24; --muted: #5d6673; --line: #e1e4e8;
+  --accent: #0b6bcb; --accent-text: #ffffff; --warn-bg: #fff4d6; --warn: #7a5200; --bad: #b42318; --good: #1a7f37;
+  --chip: #eef1f5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418; --panel: #1a1e24; --text: #e6e9ed; --muted: #9aa4b1; --line: #2c323a;
+    --accent: #5aa7f0; --accent-text: #0b1520; --warn-bg: #3a2f12; --warn: #f2c66d; --bad: #ff7b72; --good: #56d364;
+    --chip: #232a33;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+nav { display: flex; gap: 4px; flex-wrap: wrap; }
+nav button { border: 0; background: transparent; color: var(--muted); padding: 6px 12px; border-radius: 6px; font: inherit; cursor: pointer; }
+nav button.on { background: var(--chip); color: var(--text); font-weight: 600; }
+#state { margin-left: auto; color: var(--muted); font-size: 12px; }
+main { padding: 16px; max-width: 1100px; margin: 0 auto; }
+section { display: none; } section.on { display: block; }
+.bar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.bar .grow { flex: 1; }
+button.act { background: var(--accent); color: var(--accent-text); border: 0; border-radius: 6px; padding: 6px 14px; font: inherit; cursor: pointer; }
+button.act:disabled { opacity: .5; cursor: default; }
+input, select { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0; margin-bottom: 16px; overflow: hidden; }
+.card h2 { font-size: 13px; margin: 0; padding: 10px 12px; border-bottom: 1px solid var(--line); color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+td, th { padding: 6px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; }
+tr:last-child td { border-bottom: 0; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.addr, .muted { color: var(--muted); font-size: 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0 16px; }
+.msg { padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; background: var(--warn-bg); color: var(--warn); }
+.err { color: var(--bad); }
+.ok { color: var(--good); }
+.note { color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SP PRO</h1>
+  <nav id="tabs">
+    <button data-tab="live" class="on">Live</button>
+    <button data-tab="settings">Settings</button>
+    <button data-tab="backups">Backups</button>
+    <button data-tab="logs">Logs</button>
+    <button data-tab="status">Status</button>
+  </nav>
+  <span id="state"></span>
+</header>
+<main>
+  <div id="banner"></div>
+
+  <section id="live" class="on">
+    <div class="bar">
+      <select id="screens">
+        <option value="now,today">Now + Today</option>
+        <option value="tech">Technical</option>
+        <option value="dc,ac,ac2">History</option>
+        <option value="service,unit">Service + Unit</option>
+        <option value="settings">Service settings screen</option>
+        <option value="now,today,tech,dc,ac,ac2,service,unit">Everything</option>
+      </select>
+      <label class="muted"><input type="checkbox" id="auto" checked> refresh every 15 s</label>
+      <span class="grow"></span><span class="note" id="live-at"></span>
+      <button class="act" id="live-go">Refresh</button>
+    </div>
+    <div id="live-out"></div>
+  </section>
+
+  <section id="settings">
+    <div class="bar">
+      <input id="filter" placeholder="Search settings" class="grow">
+      <span class="note" id="set-at"></span>
+      <button class="act" id="set-go">Read from SP PRO</button>
+    </div>
+    <p class="note">Raw values as stored in the SP PRO. Read-only: changes go through SP LINK for now.</p>
+    <div id="set-out"></div>
+  </section>
+
+  <section id="backups">
+    <div class="bar">
+      <span class="note grow" id="bk-sched"></span>
+      <button class="act" id="bk-go">Back up now</button>
+    </div>
+    <div class="card"><h2>Compare</h2>
+      <div class="bar" style="padding:10px 12px;margin:0">
+        <select id="bk-a"></select><span class="muted">→</span><select id="bk-b"></select>
+        <button class="act" id="bk-diff">Show changes</button>
+      </div>
+      <div id="diff-out"></div>
+    </div>
+    <div class="card"><h2>Saved backups</h2><div class="scroll" id="bk-out"></div></div>
+  </section>
+
+  <section id="logs">
+    <div class="card" style="padding:12px">
+      <div class="bar">
+        <label>From <input type="date" id="lg-since"></label>
+        <label>To <input type="date" id="lg-until"></label>
+      </div>
+      <div class="bar">
+        <label><input type="checkbox" class="lg" value="events" checked> Events</label>
+        <label><input type="checkbox" class="lg" value="alerts" checked> Alerts</label>
+        <label><input type="checkbox" class="lg" value="daily" checked> Daily summary</label>
+        <label><input type="checkbox" class="lg" value="detailed"> Detailed (large)</label>
+        <span class="grow"></span>
+        <button class="act" id="lg-go">Download</button>
+      </div>
+      <p class="note">SP LINK-format CSVs in a zip. The SP PRO serves one download at a time; this waits if SP LINK or the installer is downloading.</p>
+      <div id="lg-out"></div>
+    </div>
+  </section>
+
+  <section id="status"><div class="card"><div id="st-out"></div></div></section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const ct = r.headers.get('content-type') || '';
+  const body = ct.includes('json') ? await r.json() : null;
+  if (!r.ok) throw new Error((body && body.error) || r.statusText);
+  return body;
+}
+function show(tab) {
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === tab));
+  if (tab === 'backups') loadBackups();
+  if (tab === 'status') loadStatus();
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.tab));
+
+// ---- live
+const SCREEN = {NowSubTab:'Now', TodaySubTab:'Today', TechnicalDataSubTab:'Technical', DCHistorySubTab:'DC history',
+  ACHistorySubTab:'AC history', ACHistorySubTab2:'AC history 2', ServiceReadings1:'Service', ServiceSettings:'Service settings',
+  Now_Today_Tech_KacoModelsCapacityAndOEM:'Unit'};
+let liveBusy = false;
+async function loadLive() {
+  if (liveBusy) return; liveBusy = true;
+  try {
+    const d = await api('api/live?screens=' + $('#screens').value);
+    $('#banner').innerHTML = d.version_problems.length ? `<div class="msg">This unit differs from the verified memory map (${esc(d.version_problems.join(', '))}); values may be wrong.</div>` : '';
+    const groups = {};
+    d.rows.forEach(r => (groups[r.screen] = groups[r.screen] || []).push(r));
+    $('#live-out').innerHTML = '<div class="grid">' + Object.entries(groups).map(([s, rows]) =>
+      `<div class="card"><h2>${esc(SCREEN[s] || s)}</h2><table>${rows.map(r =>
+        `<tr><td>${esc(r.label)}</td><td class="num">${esc(r.text)} <span class="muted">${esc(r.unit)}</span></td></tr>`).join('')}</table></div>`).join('') + '</div>';
+    $('#live-at').textContent = 'read ' + d.at.slice(11);
+  } catch (e) { $('#live-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  liveBusy = false;
+}
+$('#live-go').onclick = loadLive; $('#screens').onchange = loadLive;
+setInterval(() => { if ($('#auto').checked && $('#live').classList.contains('on') && !document.hidden) loadLive(); }, 15000);
+
+// ---- settings
+let settings = [];
+function drawSettings() {
+  const f = $('#filter').value.toLowerCase();
+  const groups = {};
+  settings.filter(s => !f || s.name.toLowerCase().includes(f) || s.section.toLowerCase().includes(f) || s.address.includes(f))
+    .forEach(s => (groups[s.section] = groups[s.section] || []).push(s));
+  $('#set-out').innerHTML = Object.entries(groups).map(([sec, rows]) =>
+    `<div class="card"><h2>${esc(sec)} (${rows.length})</h2><div class="scroll"><table>${rows.map(s =>
+      `<tr><td>${esc(s.name)}</td><td class="addr">${esc(s.address)}</td><td class="num">${esc(s.value)}</td></tr>`).join('')}</table></div></div>`).join('')
+    || '<p class="note">Nothing to show yet.</p>';
+}
+$('#filter').oninput = drawSettings;
+$('#set-go').onclick = async () => {
+  $('#set-go').disabled = true; $('#set-at').textContent = 'reading…';
+  try { const d = await api('api/settings'); settings = d.settings; $('#set-at').textContent = 'read ' + d.at.slice(11); drawSettings(); }
+  catch (e) { $('#set-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  $('#set-go').disabled = false;
+};
+
+// ---- jobs
+async function waitJob(job, out, done) {
+  while (true) {
+    const j = await api('api/jobs/' + job.id);
+    out.innerHTML = `<p class="note">${esc(j.message)}</p>`;
+    if (j.state === 'done') return done(j);
+    if (j.state === 'failed') { out.innerHTML = `<p class="err">${esc(j.message)}</p>`; return; }
+    await new Promise(r => setTimeout(r, 1500));
+  }
+}
+
+// ---- backups
+async function loadBackups() {
+  const [d, st] = await Promise.all([api('api/backups'), api('api/status')]);
+  $('#bk-sched').textContent = st.backup_time ? `Daily backup at ${st.backup_time}.` : 'No daily backup scheduled.';
+  const opts = d.backups.map(b => `<option value="${esc(b.name)}">${esc(b.name.replace('_', ' '))} (${esc(b.reason)})</option>`).join('');
+  $('#bk-a').innerHTML = opts; $('#bk-b').innerHTML = opts;
+  if (d.backups.length > 1) $('#bk-a').selectedIndex = 1;
+  $('#bk-out').innerHTML = d.backups.length ? '<table>' + d.backups.map(b =>
+    `<tr><td>${esc(b.name.replace('_', ' '))}</td><td class="muted">${esc(b.reason)}</td><td>${b.files.map(f =>
+      `<a href="api/backups/${esc(b.name)}/${esc(f)}">${esc(f.split('_')[0])}</a>`).join(' · ')}</td></tr>`).join('') + '</table>'
+    : '<p class="note" style="padding:0 12px">No backups yet.</p>';
+}
+$('#bk-go').onclick = async () => {
+  $('#bk-go').disabled = true;
+  try { const j = await api('api/backups', {method: 'POST'}); await waitJob(j, $('#diff-out'), () => { $('#diff-out').innerHTML = ''; loadBackups(); }); }
+  catch (e) { $('#diff-out').innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+  $('#bk-go').disabled = false;
+};
+$('#bk-diff').onclick = async () => {
+  try {
+    const d = await api(`api/diff?a=${$('#bk-a').value}&b=${$('#bk-b').value}`);
+    $('#diff-out').innerHTML = d.changes.length ? '<div class="scroll"><table><tr><th>Setting</th><th>Section</th><th></th><th class="num">Before</th><th class="num">After</th></tr>' +
+      d.changes.map(c => `<tr><td>${esc(c.name)}</td><td class="muted">${esc(c.section)}</td><td class="addr">${esc(c.address)}</td><td class="num">${esc(c.a)}</td><td class="num">${esc(c.b)}</td></tr>`).join('') + '</table></div>'
+      : '<p class="note" style="padding:0 12px">No differences.</p>';
+  } catch (e) { $('#diff-out').innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+};
+
+// ---- logs
+const today = new Date().toISOString().slice(0, 10);
+$('#lg-since').value = today; $('#lg-until').value = today;
+$('#lg-go').onclick = async () => {
+  $('#lg-go').disabled = true;
+  try {
+    const j = await api('api/logs', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+      since: $('#lg-since').value, until: $('#lg-until').value, logs: [...document.querySelectorAll('.lg:checked')].map(x => x.value)})});
+    await waitJob(j, $('#lg-out'), j2 => {
+      $('#lg-out').innerHTML = `<p class="ok">${esc(Object.entries(j2.result).map(([k, n]) => `${k}: ${n} rows`).join(', '))}</p>`;
+      location.href = 'api/jobs/' + j2.id + '/file';
+    });
+  } catch (e) { $('#lg-out').innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+  $('#lg-go').disabled = false;
+};
+
+// ---- status
+async function loadStatus() {
+  const s = await api('api/status');
+  const v = s.versions ? `settings ${s.versions.config_settings}/${s.versions.service_settings}, map ${s.versions.memory_map}, logs ${s.versions.event_log_format}/${s.versions.detailed_log_format}/${s.versions.daily_log_format}, comms card ${s.versions.comms_card_software}` : 'not read yet';
+  $('#st-out').innerHTML = '<table>' + [
+    ['Connection', `${s.connection} (${s.target})`],
+    ['Unit versions', v + (s.version_problems.length ? ` <span class="err">— differs: ${esc(s.version_problems.join(', '))}</span>` : (s.versions ? ' <span class="ok">verified</span>' : ''))],
+    ['Last good read', s.last_ok || '—'], ['Last error', s.last_error ? `<span class="err">${esc(s.last_error)}</span>` : '—'],
+    ['Busy', s.busy || 'idle'], ['Backups', s.backups],
+    ['Clock sync', !s.clock_sync ? 'off' : (s.clock.checked ? `checked ${s.clock.checked.slice(11, 19)}: ` + (s.clock.error ? 'error ' + s.clock.error : `drift ${s.clock.drift} s` + (s.clock.set_to != null ? `, set (now ${s.clock.set_to} s)` : '')) : 'on, first check soon')],
+  ].map(([k, val]) => `<tr><th>${k}</th><td>${typeof val === 'string' && val.includes('<span') ? val : esc(val)}</td></tr>`).join('') + '</table>';
+  $('#state').textContent = s.busy ? s.busy + '…' : (s.last_error ? 'error' : '');
+}
+loadLive();
+</script>
+</body>
+</html>
