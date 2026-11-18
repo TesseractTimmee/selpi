@@ -56,10 +56,26 @@ def capture_memory(path):
     return mem
 
 
+BUTTON_REGS = {0xa232: 'generator', 0xa233: 'on', 0xa234: 'silence',
+               0xa235: 'generator', 0xa236: 'on', 0xa237: 'silence'}   # port 1 / port 2 (see sppro/buttons.py)
+
+
 class SimProtocol:
     def __init__(self, mem):
         self.mem = dict(mem)
         self.writes = []
+        self.presses = []           # (button, value) for each accepted front panel button press
+        self._pressed = {}          # button register -> (value, time pressed)
+
+    def _buttons(self):
+        """A pressed button reads back its value for about a second, then 0."""
+        import time
+        for a, (v, t) in list(self._pressed.items()):
+            if time.monotonic() - t > 1.0:
+                del self._pressed[a]
+        for a in BUTTON_REGS:
+            v = self._pressed.get(a, (0, 0))[0]
+            self.mem[a] = struct.pack('<H', v)
 
     clock_offset = -40          # simulated SP PRO clock: local time + this many seconds (set by writes)
 
@@ -74,10 +90,24 @@ class SimProtocol:
     def query(self, rng):
         if 0x1d0000 <= rng.address < 0x1d0008:
             self._clock()
+        if any(rng.address <= a < rng.address + rng.words for a in BUTTON_REGS):
+            self._buttons()
         return b''.join(self.mem.get(rng.address + i, b'\0\0') for i in range(rng.words))
 
     def write(self, address, data):
         self.writes.append((address, data))
+        if address in BUTTON_REGS and len(data) >= 2:
+            import time
+            self._buttons()
+            value = struct.unpack('<H', data[:2])[0]
+            if address in self._pressed:              # still being pressed: the unit reports 3
+                self._pressed[address] = (3, self._pressed[address][1])
+            else:
+                self._pressed[address] = (value, time.monotonic())
+                self.presses.append((BUTTON_REGS[address], value))
+                print('sim: %s button %s press' % (BUTTON_REGS[address], 'long' if value == 2 else 'short'), flush=True)
+            self._buttons()
+            return
         if address == 0x1d0011 and len(data) >= 14:      # set clock: sec min hour wday day month yy (BCD)
             import datetime
             b = lambda i: (data[2 * i] >> 4) * 10 + (data[2 * i] & 15)
