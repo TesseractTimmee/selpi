@@ -98,3 +98,85 @@ class VariableTest(TestCase):
             'Can not convert value for unknown variable type',
             context.exception.args[0]
         )
+
+
+class LiveVariableTest(TestCase):
+    """Names not in MAP come from SP LINK's field table (sppro/live_fields.json)."""
+
+    def test_create_by_splink_name_or_key(self):
+        for arg in ('BattOutKWHTotalAcc', 'battoutkwhtotalacc', 'batt_out_kwh_total_acc'):
+            v = variable.create(arg)
+            self.assertIsInstance(v, variable.LiveVariable)
+            self.assertEqual('BattOutKWHTotalAcc', v.get_name())
+            self.assertEqual(Range(0xa1a5, 2), v.range)
+            self.assertEqual('kWh', v.units)
+
+    def test_map_names_unchanged(self):
+        v = variable.create('BattOutkWhTotalAcc')
+        self.assertNotIsInstance(v, variable.LiveVariable)
+        self.assertEqual('uint', v.get_type())
+        self.assertEqual('BattOutkWhTotalAcc', variable.create(0xa1a5).get_name())
+
+    def test_unknown(self):
+        with self.assertRaises(KeyError):
+            variable.create('NoSuchVariable')
+        self.assertEqual('Unknown', variable.create(0xcafe).get_name())
+
+    def test_value_and_enum(self):
+        import struct
+        soc = variable.create('BattSocPercent')               # MAP: percent / 256
+        live = variable.LiveVariable(variable.live_field('batt_soc_percent'))
+        soc.bytes = live.bytes = struct.pack('<H', 64 * 256)
+        self.assertEqual(64.0, soc.get_value(scales))
+        self.assertEqual(64.0, live.get_value(scales))
+        mode = variable.create('ac_out_status')                # enum: SP LINK label
+        mode.bytes = b'\x00' * 2 * mode.range.words
+        self.assertIsInstance(mode.get_value(scales), str)
+
+    def test_needs_scales(self):
+        v = variable.create('BattOutKWHTotalAcc')
+        v.bytes = b'\x01\x00\x00\x00'
+        with self.assertRaises(ValueError):
+            v.get_value({})
+
+    def test_many_fields_available(self):
+        self.assertGreater(len(variable.live_names()), 250)
+
+
+class AgreementTest(TestCase):
+    """Where MAP and SP LINK's table cover the same words, both conversions give the same value
+    (MAP in W / Wh, SP LINK in kW / kWh), on real memory captured from an SP PRO."""
+
+    def test_map_agrees_with_splink(self):
+        import os, struct, sys
+        root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        capture = os.path.join(root, 'captures', 'sl-20261117-071605.jsonl')
+        if not os.path.exists(capture):
+            self.skipTest('capture not present (captures/ is git-ignored)')
+        sys.path.insert(0, os.path.join(root, 'tools'))
+        import sim_sppro
+        mem = {a: b for a, b in sim_sppro.capture_memory(capture).items()}
+        caps = {n: struct.unpack('<H', mem[0xa028 + i])[0] for i, n in enumerate(
+            ['CommonScaleForAcVolts', 'CommonScaleForAcCurrent', 'CommonScaleForDcVolts', 'CommonScaleForDcCurrent',
+             'CommonScaleForTemperature', 'CommonScaleForInternalVoltages'])}
+        checked = 0
+        for name, m in variable.MAP.items():
+            if variable.CONVERSION not in m or m[variable.CONVERSION] == 'shunt_name':
+                continue
+            field = variable._live_by_address().get(m[variable.ADDRESS])
+            if field is None:
+                continue
+            legacy = variable.create(name)
+            live = variable.LiveVariable(field)
+            if legacy.range.words != live.range.words:
+                continue
+            try:
+                legacy.bytes = b''.join(mem[legacy.range.address + i] for i in range(legacy.range.words))
+                live.bytes = legacy.bytes
+            except KeyError:
+                continue
+            a, b = legacy.get_value(caps), live.get_value(caps)
+            factor = 1000.0 if field['unit'] in ('kW', 'kWh') else 1.0   # MAP is in W / Wh
+            self.assertAlmostEqual(a, b * factor, delta=abs(a) * 1e-6 + 1e-6, msg=name)
+            checked += 1
+        self.assertGreater(checked, 15)

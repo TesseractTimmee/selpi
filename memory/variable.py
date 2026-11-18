@@ -1,13 +1,34 @@
-from email.headerregistry import Address
+"""
+Variables: named SP PRO memory values.
+
+Two sources:
+- MAP below: the original hand-written variables (names, units W / Wh, conversions in memory/converter.py),
+  used by `selpi stat` / `http` and kept unchanged so their output stays the same.
+- SP LINK's own field table (sppro/live_fields.json, 276 fields, matching SP LINK 15.40):
+  any name not in MAP is looked up there, by SP LINK field name (e.g. 'BattOutKWHTotalAcc') or selpi key
+  (e.g. 'batt_out_kwh_total_acc'), and evaluated with SP LINK's formula (units as SP LINK shows them, e.g. kW,
+  kWh). Where both cover the same value they agree (tests/memory/test_variable.py checks it).
+"""
+import re
 import struct
 from memory import convert
 from memory import Range
 
 def create(arg):
     if type(arg) is str:
-        return Variable(arg, MAP[arg][ADDRESS])
+        if arg in MAP:
+            return Variable(arg, MAP[arg][ADDRESS])
+        field = live_field(arg)
+        if field is not None:
+            return LiveVariable(field)
+        raise KeyError("unknown variable %r (not in MAP or SP LINK's field table)" % arg)
     if type(arg) is int:
-        return Variable(address_to_name(arg), arg)
+        name = address_to_name(arg)
+        if name == 'Unknown':
+            field = _live_by_address().get(arg)
+            if field is not None:
+                return LiveVariable(field)
+        return Variable(name, arg)
     raise NotImplementedError("Unable to create Variable from %s" % type(arg))
 
 def address_to_name(address):
@@ -15,6 +36,37 @@ def address_to_name(address):
         if MAP[name][ADDRESS] == address:
             return name
     return 'Unknown'
+
+
+_LIVE = {}
+
+
+def _live_tables():
+    """{lower-case SP LINK field name or selpi key: field}, loaded on first use."""
+    if not _LIVE:
+        from sppro import live
+        for f in live.FIELDS:
+            _LIVE.setdefault(f['field'].lower(), f)
+            _LIVE.setdefault(f['key'].lower(), f)
+    return _LIVE
+
+
+def _live_by_address():
+    out = {}
+    for f in _live_tables().values():
+        if f['words']:
+            out.setdefault(int(f['words'][0], 16), f)
+    return out
+
+
+def live_field(name: str):
+    """SP LINK field for a field name or selpi key (case-insensitive), or None."""
+    return _live_tables().get(name.lower())
+
+
+def live_names() -> list:
+    """Every SP LINK field name available through create()."""
+    return sorted({f['field'] for f in _live_tables().values()})
 
 ADDRESS = 'address'
 TYPE = 'type'
@@ -387,3 +439,49 @@ class Variable:
 
     def is_known(self):
         return self.__name in MAP
+
+
+class LiveVariable(Variable):
+    """A field from SP LINK's table (sppro/live_fields.json), evaluated with SP LINK's formula.
+
+    Its range covers every word the formula reads; scale factors come from get_value(scales), as for MAP
+    variables ('CommonScaleForDcVolts', ...). Enum fields return their SP LINK label."""
+
+    def __init__(self, field: dict, bytes: bytes = None):
+        self.field = field
+        words = sorted({int(a, 16) for a in re.findall(r'\{(0x[0-9a-f]+)\}', field['formula'] or '')}
+                       | {int(a, 16) for a in field['words']})
+        self.__first = words[0]
+        self.__words = words[-1] - words[0] + 1
+        super().__init__(field['field'], self.__first, bytes if bytes is not None else b'\x00\x00' * self.__words)
+
+    @property
+    def range(self):
+        return Range(self.__first, self.__words)
+
+    def get_type(self):
+        return 'live'
+
+    @property
+    def units(self):
+        return self.field['unit']
+
+    @property
+    def description(self):
+        return self.field['name']
+
+    def get_value(self, scales: dict):
+        from sppro import live
+        mem = {self.__first + i: w for i, w in enumerate(struct.unpack('<%dH' % self.__words, self.bytes))}
+        scales = scales or {}
+        short = {n: scales.get('CommonScaleFor' + n) for n in live.SCALES}
+        missing = [n for n in re.findall(r'\{scale:(\w+)\}', self.field['formula'] or '') if short.get(n) is None]
+        if missing:
+            raise ValueError('%s needs scale factors %s' % (self.get_name(), ', '.join(sorted(set(missing)))))
+        for i, n in enumerate(live.SCALES):   # every scale must be present; unused ones may be 0
+            mem[live.SCALE_BASE + i] = short[n] if short[n] is not None else 0
+        value, text = live.evaluate(self.field, mem)
+        return text if self.field['kind'] == 'enum' else value
+
+    def is_known(self):
+        return True
