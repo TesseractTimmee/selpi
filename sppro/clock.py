@@ -2,7 +2,7 @@
 The SP PRO's real-time clock (local time, BCD).
 
 Read  0x1d0000 x8: [?, sec, min, hour, weekday (Sun=1), day, month, year-2000]
-Set   0x1d0011 x7: [sec, min, hour, weekday, day, month, year-2000]   (login only, no installer code)
+Set   0x1d0011 x7: [sec, min, hour, weekday, day, month, year-2000]   (login only, no passcode)
 Same registers SP LINK uses (btnSetInverterTime / mServiceTab.CheckTime).
 """
 import logging

@@ -100,12 +100,16 @@ SP LINK negotiates TLS 1.0 (AES256-SHA). Select.Live occasionally fails to deliv
 the connection about 60 s later, so clients should keep transfers short (e.g. download logs by date range)
 and reconnect on failure.
 
-## Write unlock (installer code)
+## Write unlock (SP LINK passcode)
 
-Writing configuration needs the installer code. SP LINK does:
+Writing configuration needs a passcode, the one SP LINK asks for before "Configure SP PRO". SP LINK sends
+it to the unit, and **the SP PRO checks it** (SP LINK 15.40 `fnAskForAndVerifyPasscode`): an unknown code
+leaves it locked. SP LINK also has a separate factory passcode field, so there are higher access levels;
+whether the unit itself limits which settings each level may write (or only SP LINK's screens do) is not
+known. SP LINK does:
 
 1. write `0x0000` to `0xca14` (reads `0xffff` normally)
-2. write the installer code (decimal, one word) to `0xa001`, then `0x0000` to `0xa001`
+2. write the passcode (decimal, one word) to `0xa001`, then `0x0000` to `0xa001`
 3. write the configuration blocks (below)
 4. write `0x0000` to `0xa002`, then `0xffff` to `0xca14`
 

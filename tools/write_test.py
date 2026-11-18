@@ -43,12 +43,12 @@ def main():
     names = {addr: name for _, _, name, addr in config.slots() if name}
     if a.address not in names:
         sys.exit('0x%x is not a known config slot' % a.address)
-    plan = [('download mode on', DL_MODE, 1), ('unlock step 1', LOCK, 0), ('installer code', CODE, a.code),
+    plan = [('download mode on', DL_MODE, 1), ('unlock step 1', LOCK, 0), ('passcode', CODE, a.code),
             ('clear code', CODE, 0), ('SETTING %s' % names[a.address], a.address, a.value),
             ('relock 1', UNLOCKED, 0), ('relock 2', LOCK, 0xffff), ('download mode off', DL_MODE, 0)]
     print('Frames (hex):')
     for what, addr, val in plan:
-        shown = frame(addr, val) if addr != CODE or val == 0 else '<installer code frame>'
+        shown = frame(addr, val) if addr != CODE or val == 0 else '<passcode frame>'
         print('  %-28s W 0x%04x = %-6d %s' % (what, addr, val if addr != CODE or val == 0 else 0, shown))
     print('  (check Q 0xa002 == 1 between "clear code" and SETTING; relock always runs)')
     if not a.send:
