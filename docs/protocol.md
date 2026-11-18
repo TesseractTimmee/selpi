@@ -355,7 +355,10 @@ press as an event, e.g. "Generator Button - Port 1 - Short Press" (seen 18 Nov 2
 Which presses the unit accepts is in its front panel block (`0xa0be` x95, SP LINK's LED status request):
 `0xa11a` generator, `0xa11b` ON, `0xa11c` silence; bit 0 = short accepted, bit 1 = long accepted. Seen on an
 SPMC482 (firmware 15.47): generator 3, ON 2, silence 3. Long generator / silence presses are not documented
-(SP LINK's event texts include "Charger - Equalise Requested from front panel", possibly one of them).
+(SP LINK's event texts include "Charger - Equalise Requested from front panel"). Tested 18 Nov 2026 on grid
+(no alarm sounding, equalise not configured): each is accepted and logged ("... Button - Port 1 - Long Press")
+and nothing else changed (charger stage, generator status/reasons, AC source, accepted-press words). Off grid
+(generator available) not tried yet.
 `selpi button` and the HA app's `/api/v1/button` implement this (`sppro/buttons.py`).
 
 ## Managed battery (CAN) frames
