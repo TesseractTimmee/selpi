@@ -8,9 +8,11 @@ bearer token, because HA core doesn't come through the ingress proxy.
     GET  /api/v1/values?keys=a,b   current values (enum fields as their label); reads only the screens needed
     GET  /api/v1/diagnostics       link status, clock check, last backup
     POST /api/v1/backup            start a config backup
+    POST /api/v1/button?name=generator|silence   press a front panel button (short press)
 
-Read-only towards the SP PRO (same reads as the Live page). Values are cached; if the link is busy
-(a backup or log download), the last values come back with "stale": true.
+Read-only towards the SP PRO (same reads as the Live page), except front panel button presses (generator
+start/stop, silence alarm; never the ON button). Values are cached; if the link is busy (a backup or log download), the
+last values come back with "stale": true.
 """
 import hmac
 import json
@@ -112,7 +114,8 @@ class Api:
                 logging.debug('firmware read failed: %s', e)
         return {'id': self.install_id, 'connection': conn, 'scan_interval': 60 if conn == 'SelectLive' else 10,
                 'model': 'SP PRO', 'manufacturer': 'Selectronic', 'firmware': self.firmware,
-                'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems}
+                'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
+                'buttons': sorted(API_BUTTONS)}
 
     def values(self, keys):
         keys = [k for k in keys if k in self.fields]
@@ -152,6 +155,15 @@ class Api:
                 'last_backup': last and {'name': last['name'], 'reason': last.get('reason'), 'at': at},
                 'proxy': self.proxy and dict(self.proxy.status, port=self.proxy.port)}
 
+    def button(self, name):
+        """Press a front panel button (short press; the ON button isn't offered here)."""
+        if name not in API_BUTTONS:
+            raise ValueError('unknown button %r (one of %s)' % (name, ', '.join(sorted(API_BUTTONS))))
+        from sppro import buttons
+        logging.warning('front panel button press via the API: %s', name)
+        out = self.sppro.use('button %s' % name, lambda r: buttons.press(r, name), wait=30, check_versions=False)
+        return {'pressed': name, 'register': '0x%x' % out['register'], 'read_back': out['read_back']}
+
     def backup(self):
         if self.backup_running:
             return {'started': False, 'error': 'a backup is already running'}
@@ -166,6 +178,9 @@ class Api:
                 self.backup_running = False
         threading.Thread(target=run, daemon=True).start()
         return {'started': True}
+
+
+API_BUTTONS = {'generator', 'silence'}   # the ON button (ON <-> IDLE, an outage) is CLI only
 
 
 def serve(api, port, token, host='::'):
@@ -209,9 +224,15 @@ def serve(api, port, token, host='::'):
                     return self._send(200, api.diagnostics())
                 if method == 'POST' and path == '/api/v1/backup':
                     return self._send(200, api.backup())
+                if method == 'POST' and path == '/api/v1/button':
+                    return self._send(200, api.button(q.get('name', '')))
                 return self._send(404, {'error': 'not found'})
             except api.Busy as e:
                 return self._send(503, {'error': str(e)})
+            except PermissionError as e:
+                return self._send(403, {'error': str(e)})
+            except ValueError as e:
+                return self._send(400, {'error': str(e)})
             except Exception as e:
                 logging.debug('api error', exc_info=True)
                 return self._send(502, {'error': str(e)})

@@ -18,7 +18,7 @@ class FakeInverter:
         self.lock = threading.Lock()
         self.reads = []
 
-    def use(self, what, fn, wait=False):
+    def use(self, what, fn, wait=False, check_versions=True):
         if not self.lock.acquire(blocking=False):
             raise Busy('busy: backup')
         try:
@@ -94,3 +94,53 @@ class TestHttp(unittest.TestCase):
             self.assertEqual(json.load(urllib.request.urlopen(req))['id'], 'id1')
         finally:
             srv.shutdown()
+
+
+class SimInverter:
+    """Inverter.use() over the simulator (for button presses through the API)."""
+    versions = {'memory_map': 31}
+    version_problems = []
+    last_ok = last_error = busy = None
+
+    def __init__(self):
+        import struct
+        import sys
+        sys.path.insert(0, os.path.join(os.path.dirname(api.__file__), '..', 'tools'))
+        import sim_sppro
+        from sppro.reader import Reader
+        self.sim = sim_sppro.SimProtocol({0xa000: struct.pack('<H', 0x0101)})
+        self.reader = Reader(lambda: self.sim)
+
+    def use(self, what, fn, wait=False, check_versions=True):
+        return fn(self.reader)
+
+
+class TestButtons(unittest.TestCase):
+    def post(self, a, name):
+        srv = api.serve(a, 0, 'secret', host='127.0.0.1')
+        try:
+            req = urllib.request.Request('http://127.0.0.1:%d/api/v1/button?name=%s' % (srv.server_address[1], name),
+                                         data=b'', headers={'Authorization': 'Bearer secret'}, method='POST')
+            try:
+                return 200, json.load(urllib.request.urlopen(req))
+            except urllib.error.HTTPError as e:
+                return e.code, json.load(e)
+        finally:
+            srv.shutdown()
+
+    def setUp(self):
+        self.inv = SimInverter()
+        self.api = api.Api(self.inv, Busy, lambda r: None, lambda: [], {}, 'id1')
+
+    def test_press(self):
+        self.assertEqual(self.api.info()['buttons'], ['generator', 'silence'])
+        code, body = self.post(self.api, 'generator')
+        self.assertEqual(code, 200)
+        self.assertEqual(body['register'], '0xa232')
+        self.assertEqual(self.inv.sim.presses, [('generator', 1)])
+
+    def test_on_and_unknown_refused(self):
+        for name in ('on', 'nope', ''):
+            code, body = self.post(self.api, name)
+            self.assertEqual(code, 400, name)
+        self.assertEqual(self.inv.sim.writes, [])
