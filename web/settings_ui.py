@@ -36,7 +36,7 @@ def layout():
     if _LAYOUT is None:
         keep = ('kind', 'values', 'unit', 'min', 'max', 'step', 'decimals', 'range_text', 'per_cell_min',
                 'per_cell_max', 'disabled', 'words', 'unnamed_in_splink', 'section', 'directions', 'pf_mode', 'offset',
-                'date_part')
+                'date_part', 'installer_only')
         meta = {n: {k: e[k] for k in keep if k in e} for n, e in settings.META.items()}
         lay = settings._load('settings_layout.json')
         tabs, loose = [], []
@@ -147,6 +147,9 @@ def _evaluate(reader, s, changes):
             e = settings.entry(name)
             if e.get('words') == 2:
                 raise settings.SettingError('%s spans two words: not writable here' % name)
+            if e.get('installer_only'):
+                raise settings.SettingError('%s is an installer-only setting; selpi keeps these read-only (change it '
+                                            'in SP LINK)' % e['name'])
             raw, warnings = settings.from_display(e['name'], text, cells, shown.get('BatteryType'), shown)
             out[e['name']] = {'raw': raw, 'text': settings.to_display(e['name'], raw, cells)[1],
                               'old': raw_now.get(e['name']), 'warnings': warnings}

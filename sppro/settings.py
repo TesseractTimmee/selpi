@@ -107,6 +107,12 @@ def entry(name: str) -> dict:
     return e
 
 
+def installer_only(name):
+    """True for settings SP LINK keeps behind the installer code (AS4777 grid-protection window, Volt-Var/Volt-Watt,
+    battery charge-voltage window). A SP LINK UI gate, not firmware-enforced; selpi keeps these read-only."""
+    return bool(entry(name).get('installer_only'))
+
+
 def model(reader):
     i = reader.words(MODEL_WORD, 1)[0] & 0xff
     return MODEL_ORDER[i] if i < len(MODEL_ORDER) else None

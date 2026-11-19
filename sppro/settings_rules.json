@@ -201,7 +201,8 @@
   "three-phase solar inverters on L2/L3 need one on L1; Powador with multi-phase workers > 1 (multi-phase sites)",
   "AS4777.2:2020 not available on some models (model list)",
   "InhibitNewFunctionsIn*Area (settings hidden for older firmware)",
-  "multi-phase structure / count must match the detected inverters (multi-phase sites only)"
+  "multi-phase structure / count must match the detected inverters (multi-phase sites only)",
+  "String Inverter model not supported by the SP PRO firmware (firmware-version gated, like the Inhibit* checks)"
  ],
  "send_checks": [
   {

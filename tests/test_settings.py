@@ -126,6 +126,11 @@ class TestRules(unittest.TestCase):
                          '12.5 % Leading')
         self.assertTrue(S.from_display('SupportPowerFactor', '0.4', CELLS)[1])               # SP LINK: 0.500 - 1.000
 
+    def test_installer_only_flagged(self):
+        self.assertTrue(S.installer_only('ACVMin'))
+        self.assertTrue(S.installer_only('VoltVarLowVoltageStart'))
+        self.assertFalse(S.installer_only('EqualiseV'))
+
     def test_models(self):
         self.assertEqual(S.cells_for('SPMC482'), 24)
         self.assertEqual(S.cells_for('SPMC241'), 12)

@@ -85,6 +85,19 @@ class TestConfigurationPage(unittest.TestCase):
         with self.assertRaises(ValueError):      # the read is used up: the page must read again
             settings_ui.check(r, rid, {})
 
+    def test_installer_only_is_read_only(self):
+        s, r = sim()
+        rid = settings_ui.read(r)['read_id']
+        # the page should refuse to write it even with writes allowed and a correct passcode
+        with self.assertRaises(ValueError) as e:
+            settings_ui.write(r, rid, {'ACVMin': '200'}, '1234', out_dir=self.tmp.name)
+        self.assertIn('installer-only', str(e.exception))
+        self.assertEqual(word(s, settings.address('ACVMin')), struct.unpack('<H', s.mem.get(settings.address('ACVMin'), b'\0\0'))[0])
+        # and the check call reports it as an error, not a writable change
+        c = settings_ui.check(r, rid, {'ACVMin': '200'})
+        self.assertIn('error', c['changes']['ACVMin'])
+        self.assertFalse(c['writable'])
+
     def test_refuses_without_the_option(self):
         s, r = sim()
         rid = settings_ui.read(r)['read_id']

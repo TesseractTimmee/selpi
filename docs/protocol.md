@@ -113,6 +113,8 @@ known. SP LINK does:
 3. write the configuration blocks (below)
 4. write `0x0000` to `0xa002`, then `0xffff` to `0xca14`
 
+Some settings are marked `installer_only` in `settings_meta.json` (AS4777 grid-protection window, Volt-Var / Volt-Watt, the battery charge-voltage window). SP LINK keeps these behind an installer code; it is a SP LINK UI gate, not firmware-enforced, so selpi reads and displays them but keeps them read-only (`selpi config set` refuses them and the web page shows them without an editable control). Change them in SP LINK.
+
 Setting meanings, SP LINK's screen layout and its validation are in `sppro/settings_meta.json`, `sppro/settings_layout.json` and `sppro/settings_rules.json` (used by `sppro/settings.py`): per setting the kind (pick-list labels, scaling, time, packed day/month), SP LINK's limits and units, where SP LINK shows it, and SP LINK's cross-setting rules and send-time checks. DC voltages are stored in mV per cell (x 12 / 24 / 60 cells for 24 / 48 / 120 V models; the model is the low byte of `0xa05d`).
 
 `selpi config set NAME VALUE` (`sppro/config_write.py`) does this for one setting: dry run without `--yes`; with

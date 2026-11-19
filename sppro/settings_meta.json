@@ -3532,7 +3532,8 @@
     "2": "0 %",
     "3": "20 %",
     "4": "20 %"
-   }
+   },
+   "installer_only": true
   },
   {
    "name": "ACVMin",
@@ -3548,7 +3549,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[-1 - -25 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "ACVMax",
@@ -3564,7 +3566,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[1 - 10 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "ACFreqMin",
@@ -3580,7 +3583,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[-1 - -10 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "ACfreqMax",
@@ -3596,7 +3600,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[1 - 10 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "UnitFaultRecovery",
@@ -4803,7 +4808,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[207 - 207 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "VacBatteryCharging100Percent",
@@ -4819,7 +4825,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[216 - 230 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "ExportRampTime",
@@ -4910,7 +4917,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[230 - 255 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "VoltWattVoltageStop",
@@ -4926,7 +4934,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[240 - 265 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "VoltVarLowVoltageStop",
@@ -4942,7 +4951,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[180 - 230 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "VoltVarLowVoltageStart",
@@ -4958,7 +4968,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[180 - 230 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "VoltVarHighVoltageStart",
@@ -4974,7 +4985,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[230 - 265 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "VoltVarHighVoltageStop",
@@ -4990,7 +5002,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[230 - 265 V]",
-   "unit": "V"
+   "unit": "V",
+   "installer_only": true
   },
   {
    "name": "LeadingVarMax",
@@ -5006,7 +5019,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[0.0 - 60.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "LaggingVarMax",
@@ -5022,7 +5036,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[0.0 - 60.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "CosPowerFactorEnd",
@@ -5217,7 +5232,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[-0.1 - -25.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "ACVMaxConnect",
@@ -5233,7 +5249,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[0.1 - 10.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "ACFreqMinConnect",
@@ -5249,7 +5266,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[-0.1 - -10.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "ACFreqMaxConnect",
@@ -5265,7 +5283,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[0.1 - 10.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "installer_only": true
   },
   {
    "name": "LowDcShutDown0PercentLoad",

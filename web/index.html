@@ -59,6 +59,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
 .cfg .date input[type=number] { width: 4.5em; }
 .cfg tr.changed td { background: var(--warn-bg); }
 .cfg .unit { color: var(--muted); font-size: 12px; margin-left: 4px; }
+.badge { display: inline-block; font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 4px; white-space: nowrap; }
 .cfg .fieldmsg { display: block; font-size: 12px; }
 .problems { margin: 0 0 12px; padding: 10px 12px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); }
 .problems li { margin-left: 16px; }
@@ -199,6 +200,7 @@ function currentText(name) { const v = READ && READ.values[name]; return v ? v.t
 function control(name) {
   const m = LAYOUT.settings[name] || {}, v = READ.values[name];
   if (!v) return '<span class="muted">not read</span>';
+  if (m.installer_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind the installer code (AS4777 grid-protection / power quality). selpi shows it but keeps it read-only.">installer&nbsp;only &middot; read-only</span>`;
   const ed = EDITS[name], dis = m.words === 2 ? ' disabled title="spans two words"' : '';
   if (m.kind === 'enum') {
     const cur = ed !== undefined ? ed : v.value;

@@ -148,6 +148,9 @@ def run_set(args, reader=None, passcode=None, fresh_reader=None):
         raise SystemExit(str(ex))
     if e.get('words') == 2:
         raise SystemExit('%s spans two words; not supported by config set' % setting['name'])
+    if e.get('installer_only'):
+        raise SystemExit('%s is an installer-only setting (AS4777 grid-protection / power-quality); selpi keeps these '
+                         'read-only. Change it in SP LINK.' % setting['name'])
     old_text, new_text = settings.to_display(setting['name'], current, cells)[1], settings.to_display(setting['name'], new, cells)[1]
     print('%s (0x%x)%s: %s -> %s   (raw %d -> %d)' % (setting['name'], setting['address'],
           '  [%s]' % settings.where(setting['name']) if settings.where(setting['name']) else '', old_text, new_text, current, new))
