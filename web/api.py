@@ -10,9 +10,13 @@ bearer token, because HA core doesn't come through the ingress proxy.
     POST /api/v1/backup            start a config backup
     POST /api/v1/button?name=generator|silence   press a front panel button (short press)
     POST /api/v1/button?name=on&confirm=outage   long press of the ON button: SP PRO ON <-> IDLE (IDLE = no AC output)
+    POST /api/v1/control?name=generator&state=on|off   start / stop the generator if it isn't already (state-aware)
+    POST /api/v1/control?name=output&state=on|idle     inverter output; idle (no AC output) needs confirm=outage
+    POST /api/v1/control?name=equalise                 request an equalise charge (two long Generator presses)
 
 Read-only towards the SP PRO (same reads as the Live page), except front panel button presses (generator
-start/stop, silence alarm, and the ON button only with confirm=outage). Values are cached; if the link is busy (a backup or log download), the
+start/stop, silence alarm, and the ON button only with confirm=outage) and the controls built on them
+(sppro/controls.py: they read the unit's state and press only when needed; 409 when the unit can't). Values are cached; if the link is busy (a backup or log download), the
 last values come back with "stale": true.
 """
 import hmac
@@ -105,6 +109,7 @@ class Api:
         self.firmware = None
         self.backup_running = False
         self.proxy = None         # web.proxy.Proxy when the SP LINK proxy is on
+        self.last_control = {}    # control -> (time pressed, state code before the press)
 
     def info(self):
         conn = os.environ.get('SELPI_CONNECTION_TYPE', '')
@@ -116,10 +121,11 @@ class Api:
         return {'id': self.install_id, 'connection': conn, 'scan_interval': 60 if conn == 'SelectLive' else 10,
                 'model': 'SP PRO', 'manufacturer': 'Selectronic', 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
-                'buttons': sorted(API_BUTTONS) + ['on']}
+                'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS)}
 
     def values(self, keys):
-        keys = [k for k in keys if k in self.fields]
+        asked = {live.KEY_ALIASES.get(k, k): k for k in keys}   # old (renamed) keys still answered
+        keys = [k for k in asked if k in self.fields]
         fields = [self.fields[k] for k in keys]
         stale = False
         try:
@@ -137,7 +143,7 @@ class Api:
             if not any(k in self.cache for k in keys):
                 raise
         now = time.time()
-        out = {k: self.cache[k][0] for k in keys if k in self.cache and now - self.cache[k][1] < STALE_AFTER}
+        out = {asked[k]: self.cache[k][0] for k in keys if k in self.cache and now - self.cache[k][1] < STALE_AFTER}
         return {'at': datetime.now().isoformat(timespec='seconds'), 'stale': stale, 'values': out,
                 'version_problems': self.sppro.version_problems}
 
@@ -172,6 +178,48 @@ class Api:
                              check_versions=False)
         return {'pressed': name, 'register': '0x%x' % out['register'], 'read_back': out['read_back']}
 
+    def control(self, name, state='', confirm=''):
+        """State-aware controls: generator on/off, output on/idle (idle needs confirm=outage), equalise."""
+        from sppro import controls
+        if name not in CONTROLS:
+            raise ValueError('unknown control %r (one of %s)' % (name, ', '.join(sorted(CONTROLS))))
+        allowed = {'generator': ('on', 'off'), 'output': ('on', 'idle'), 'equalise': ('',)}[name]
+        if state not in allowed:
+            raise ValueError('%s: state must be %s' % (name, ' or '.join(allowed) or 'empty'))
+        if name == 'output' and state == 'idle' and confirm != 'outage':
+            raise ValueError('output idle cuts the AC output (an outage): add confirm=outage')
+        read_state = {'generator': controls.generator_state, 'output': controls.output_state}.get(name)
+
+        def act(r):
+            # a press the unit hasn't shown yet (same state as before it, within 30 s): don't press again
+            if read_state and name in self.last_control:
+                at, code = self.last_control[name]
+                if time.monotonic() - at < CONTROL_SETTLE and read_state(r)['code'] == code:
+                    raise controls.ControlError('the last %s press is still being processed; try again shortly' % name)
+            before = read_state(r)['code'] if read_state else None
+            if name == 'generator':
+                out = controls.set_generator(r, state == 'on')
+            elif name == 'output':
+                out = controls.set_output(r, state == 'on')
+            else:
+                out = controls.equalise(r)
+            if read_state and out.get('pressed'):
+                self.last_control[name] = (time.monotonic(), before)
+            return out
+        if self.sppro.version_problems:
+            raise ConflictError('SP PRO versions not verified (%s): not pressing'
+                                % ', '.join(self.sppro.version_problems))
+        logging.warning('control via the API: %s %s', name, state)
+        try:
+            out = self.sppro.use('control %s' % name, act, wait=60, check_versions=False)
+        except controls.ControlError as e:
+            raise ConflictError(str(e))
+        result = {'control': name, 'state': state, 'pressed': out.get('pressed', True)}
+        for k in ('status', 'mode', 'note', 'days_to_equalise_before', 'days_to_equalise_after'):
+            if k in out:
+                result[k] = out[k]
+        return result
+
     def backup(self):
         if self.backup_running:
             return {'started': False, 'error': 'a backup is already running'}
@@ -189,6 +237,12 @@ class Api:
 
 
 API_BUTTONS = {'generator', 'silence'}   # short presses; 'on' (long, ON <-> IDLE) needs confirm=outage
+CONTROLS = {'generator', 'output', 'equalise'}   # state-aware (sppro/controls.py)
+CONTROL_SETTLE = 30                       # s: a press not yet visible in the unit's state blocks another
+
+
+class ConflictError(Exception):
+    """The SP PRO can't do it now (e.g. generator with the grid present): HTTP 409."""
 
 
 def serve(api, port, token, host='::'):
@@ -234,11 +288,15 @@ def serve(api, port, token, host='::'):
                     return self._send(200, api.backup())
                 if method == 'POST' and path == '/api/v1/button':
                     return self._send(200, api.button(q.get('name', ''), q.get('confirm', '')))
+                if method == 'POST' and path == '/api/v1/control':
+                    return self._send(200, api.control(q.get('name', ''), q.get('state', ''), q.get('confirm', '')))
                 return self._send(404, {'error': 'not found'})
             except api.Busy as e:
                 return self._send(503, {'error': str(e)})
             except PermissionError as e:
                 return self._send(403, {'error': str(e)})
+            except ConflictError as e:
+                return self._send(409, {'error': str(e)})
             except ValueError as e:
                 return self._send(400, {'error': str(e)})
             except Exception as e:

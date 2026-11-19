@@ -75,6 +75,11 @@ class TestValues(unittest.TestCase):
         finally:
             self.inv.lock.release()
 
+    def test_renamed_keys_still_answered(self):
+        out = self.api.values(['days_to_equalise', 'daysto_recharge'])
+        self.assertEqual(set(out['values']), {'days_to_equalise', 'daysto_recharge'})
+        self.assertNotIn('daysto_equalise', self.api.fields)
+
     def test_enum_as_label(self):
         out = self.api.values(['digital_in_status1'])
         self.assertEqual(out['values']['digital_in_status1'], 'Inactive')
@@ -153,4 +158,83 @@ class TestButtons(unittest.TestCase):
         for name in ('nope', ''):
             code, body = self.post(self.api, name)
             self.assertEqual(code, 400, name)
+        self.assertEqual(self.inv.sim.writes, [])
+
+
+class TestControls(unittest.TestCase):
+    """State-aware controls through the API (generator / output / equalise) over the simulator."""
+
+    def post(self, query):
+        srv = api.serve(self.api, 0, 'secret', host='127.0.0.1')
+        try:
+            req = urllib.request.Request('http://127.0.0.1:%d/api/v1/control?%s' % (srv.server_address[1], query),
+                                         data=b'', headers={'Authorization': 'Bearer secret'}, method='POST')
+            try:
+                return 200, json.load(urllib.request.urlopen(req))
+            except urllib.error.HTTPError as e:
+                return e.code, json.load(e)
+        finally:
+            srv.shutdown()
+
+    def setUp(self):
+        import struct
+        self.inv = SimInverter()
+        self.inv.version_problems = []
+        self.inv.sim.mem[0xa096] = struct.pack('<H', 0)      # generator Not Running
+        self.inv.sim.mem[0xa07d] = struct.pack('<H', 2)      # output On
+        self.inv.sim.TRANSITION = 60                         # stays Starting for the test
+        self.api = api.Api(self.inv, Busy, lambda r: None, lambda: [], {}, 'id1')
+
+    def test_info_lists_controls(self):
+        self.assertEqual(self.api.info()['controls'], ['equalise', 'generator', 'output'])
+
+    def test_generator_on_once(self):
+        code, body = self.post('name=generator&state=on')
+        self.assertEqual((code, body['pressed'], body['status']), (200, True, 'Not Running'))
+        code, body = self.post('name=generator&state=on')      # now Starting: already on, no press
+        self.assertEqual((code, body['pressed']), (200, False))
+        self.assertEqual(self.inv.sim.presses, [('generator', 1)])
+
+    def test_press_not_yet_visible_blocks_a_second(self):
+        import struct
+        self.post('name=generator&state=on')
+        self.inv.sim._gen_change = None
+        self.inv.sim.mem[0xa096] = struct.pack('<H', 0)      # the unit hasn't shown the start yet
+        code, body = self.post('name=generator&state=on')
+        self.assertEqual(code, 409)
+        self.assertIn('still being processed', body['error'])
+        self.assertEqual(len(self.inv.sim.presses), 1)
+
+    def test_generator_refused_on_grid(self):
+        import struct
+        self.inv.sim.mem[0xa096] = struct.pack('<H', 10)     # AC Source Present
+        code, body = self.post('name=generator&state=on')
+        self.assertEqual(code, 409)
+        self.assertIn('AC Source Present', body['error'])
+        self.assertEqual(self.inv.sim.writes, [])
+
+    def test_output_idle_needs_confirm(self):
+        code, body = self.post('name=output&state=idle')
+        self.assertEqual(code, 400)
+        self.assertEqual(self.inv.sim.writes, [])
+        code, body = self.post('name=output&state=idle&confirm=outage')
+        self.assertEqual((code, body['pressed'], body['mode']), (200, True, 'On'))
+        self.assertEqual(self.inv.sim.presses, [('on', 2)])
+
+    def test_equalise(self):
+        code, body = self.post('name=equalise')
+        self.assertEqual(code, 200)
+        self.assertEqual(self.inv.sim.presses, [('generator', 2), ('generator', 2)])
+        self.assertTrue(self.inv.sim.equalise_requested)
+
+    def test_bad_requests(self):
+        for q in ('name=nope', 'name=generator', 'name=generator&state=idle', 'name=output&state=off'):
+            code, body = self.post(q)
+            self.assertEqual(code, 400, q)
+        self.assertEqual(self.inv.sim.writes, [])
+
+    def test_unverified_versions_refused(self):
+        self.inv.version_problems = ['memory map 32 (verified: 31)']
+        code, body = self.post('name=generator&state=on')
+        self.assertEqual(code, 409)
         self.assertEqual(self.inv.sim.writes, [])

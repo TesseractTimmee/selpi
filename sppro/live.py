@@ -13,6 +13,8 @@ import re
 _HERE = os.path.dirname(os.path.abspath(__file__))
 TABLE = json.load(open(os.path.join(_HERE, 'live_fields.json')))
 FIELDS = TABLE['fields']
+# keys renamed in 0.4.7 (SP LINK's "DaystoEqualise" split badly into daysto_...): old key -> new key
+KEY_ALIASES = {'daysto_recharge': 'days_to_recharge', 'daysto_equalise': 'days_to_equalise'}
 BLOCKS = {screen: [(int(a, 16), n) for a, n in v] for screen, v in TABLE['blocks'].items()}
 SCALES = ['AcVolts', 'AcCurrent', 'DcVolts', 'DcCurrent', 'Temperature', 'InternalVoltages']
 SCALE_BASE = 0xa028

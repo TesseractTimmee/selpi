@@ -66,6 +66,46 @@ class SimProtocol:
         self.writes = []
         self.presses = []           # (button, value) for each accepted front panel button press
         self._pressed = {}          # button register -> (value, time pressed)
+        self._gen_change = None     # (new status, at) while the generator is starting / stopping
+        self._long_gen = []         # times of long generator presses (two = equalise request)
+        self.equalise_requested = False
+
+    GEN_REG, OUT_REG = 0xa096, 0xa07d   # Generator Status, Output Mode (see sppro/controls.py)
+    TRANSITION = 2.0                     # simulated seconds for Starting -> Running, Stopping -> Not Running
+
+    def _word(self, a):
+        return struct.unpack('<H', self.mem.get(a, b'\0\0'))[0]
+
+    def _state(self):
+        """Finish a generator start / stop once its transition time has passed."""
+        import time
+        if self._gen_change and time.monotonic() >= self._gen_change[1]:
+            self.mem[self.GEN_REG] = struct.pack('<H', self._gen_change[0])
+            self._gen_change = None
+
+    def _press_effect(self, button, value):
+        """What an accepted press does, as the SP PRO manual describes it."""
+        import time
+        self._state()
+        now = time.monotonic()
+        if button == 'generator' and value == 1:
+            g = self._word(self.GEN_REG)
+            if g == 0:                                   # Not Running -> Starting -> Running
+                self.mem[self.GEN_REG] = struct.pack('<H', 6)
+                self._gen_change = (1, now + self.TRANSITION)
+            elif g in (1, 6):                            # Running / Starting -> Stopping -> Not Running
+                self.mem[self.GEN_REG] = struct.pack('<H', 8)
+                self._gen_change = (0, now + self.TRANSITION)
+            # anything else (AC Source Present, Disabled, Fault, ...): logged, nothing happens
+        elif button == 'generator' and value == 2:
+            self._long_gen = [t for t in self._long_gen if now - t < 10] + [now]
+            if len(self._long_gen) >= 2:
+                self.equalise_requested = True
+                self._long_gen = []
+                print('sim: equalise requested', flush=True)
+        elif button == 'on' and value == 2:
+            o = self._word(self.OUT_REG)
+            self.mem[self.OUT_REG] = struct.pack('<H', 2 if o == 0 else 0)
 
     def _buttons(self):
         """A pressed button reads back its value for about a second, then 0."""
@@ -92,6 +132,7 @@ class SimProtocol:
             self._clock()
         if any(rng.address <= a < rng.address + rng.words for a in BUTTON_REGS):
             self._buttons()
+        self._state()
         return b''.join(self.mem.get(rng.address + i, b'\0\0') for i in range(rng.words))
 
     def write(self, address, data):
@@ -105,6 +146,7 @@ class SimProtocol:
             else:
                 self._pressed[address] = (value, time.monotonic())
                 self.presses.append((BUTTON_REGS[address], value))
+                self._press_effect(BUTTON_REGS[address], value)
                 print('sim: %s button %s press' % (BUTTON_REGS[address], 'long' if value == 2 else 'short'), flush=True)
             self._buttons()
             return

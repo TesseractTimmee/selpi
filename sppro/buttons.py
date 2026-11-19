@@ -7,11 +7,13 @@ through, which the unit reports in the low byte of 0xa000 (port 1 = the DB9, whe
 A press writes 1 (short) or 2 (long) to the button's register; SP LINK then reads it back, and a 3 means the
 button is "already being pressed" (the press was not accepted).
 
-What the buttons do (SP PRO manual OI0003 rev 43, Controls and Indicators):
-  generator  short press: start or stop the auto start generator (a stop skips the cool down time)
+What the buttons do (SP PRO manual OI0003 rev 04, Controls and Indicators):
+  generator  short press: start or stop the auto start generator (a stop skips the cool down time);
+             two long presses (>2 s): request an equalise charge after the next full charge
   on         long press: SP PRO ON <-> IDLE (IDLE = no AC output: an outage)
   silence    press: silence the alarm for this alert
-Long presses of generator and silence are not documented, so they are not offered.
+A single long generator press and long silence presses do nothing documented, so `press` doesn't offer them;
+the equalise request (two long generator presses) is `sppro.controls.equalise`.
 """
 import struct
 import time
@@ -48,6 +50,11 @@ def press(reader, button: str, long: bool = False, settle: float = 3.0, poll: fl
         raise ButtonError('%s %s press is not supported (only: %s)' % (
             'long' if long else 'short', button,
             ', '.join('%s %s' % ('long' if v == LONG else 'short', b) for b, v in sorted(ALLOWED))))
+    return send(reader, button, value, settle, poll)
+
+
+def send(reader, button: str, value: int, settle: float = 3.0, poll: float = 0.5) -> dict:
+    """Write one press (no check against ALLOWED: for sppro.controls) and watch the register settle."""
     address = register(reader, button)
     before = reader.words(address, 1)[0]
     if before == ALREADY_PRESSED:
@@ -63,5 +70,5 @@ def press(reader, button: str, long: bool = False, settle: float = 3.0, poll: fl
         if time.monotonic() >= deadline or (v == 0 and len(seen) > 1):
             break
         time.sleep(poll)
-    return {'button': button, 'press': 'long' if long else 'short', 'register': address, 'value': value,
+    return {'button': button, 'press': 'long' if value == LONG else 'short', 'register': address, 'value': value,
             'before': before, 'read_back': seen}

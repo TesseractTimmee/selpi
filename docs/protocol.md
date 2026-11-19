@@ -348,7 +348,7 @@ SP LINK's Quick View front panel presses the SP PRO's buttons over the link (SP 
 
 | Button | Port 1 | Port 2 | Presses (SP PRO manual) |
 |---|---|---|---|
-| Generator | `0xa232` | `0xa235` | short: start/stop the auto start generator (a stop skips the cool down) |
+| Generator | `0xa232` | `0xa235` | short: start/stop the auto start generator (a stop skips the cool down); two long (>2 s): request an equalise charge after the next full charge |
 | ON ("Output Mode" in SP LINK) | `0xa233` | `0xa236` | long: ON <-> IDLE (IDLE = no AC output) |
 | Silence alarm | `0xa234` | `0xa237` | short: silence the alarm for this alert |
 
@@ -358,12 +358,25 @@ press as an event, e.g. "Generator Button - Port 1 - Short Press" (seen 18 Nov 2
 
 Which presses the unit accepts is in its front panel block (`0xa0be` x95, SP LINK's LED status request):
 `0xa11a` generator, `0xa11b` ON, `0xa11c` silence; bit 0 = short accepted, bit 1 = long accepted. Seen on an
-SPMC482 (firmware 15.47): generator 3, ON 2, silence 3. Long generator / silence presses are not documented
-(SP LINK's event texts include "Charger - Equalise Requested from front panel"). Tested 18 Nov 2026 on grid
-(no alarm sounding, equalise not configured): each is accepted and logged ("... Button - Port 1 - Long Press")
-and nothing else changed (charger stage, generator status/reasons, AC source, accepted-press words). Off grid
-(generator available) not tried yet.
+SPMC482 (firmware 15.47): generator 3, ON 2, silence 3. The manual (front panel) gives the Generator long
+press one use: two long presses request an equalise charge after the next full charge (SP LINK's event
+texts include "Charger - Equalise Requested from front panel"). A long silence press is not documented.
+Tested 18 Nov 2026 on grid (no alarm sounding, periodic equalise off): one long press of each is accepted and
+logged ("... Button - Port 1 - Long Press") and nothing else changed (charger stage, generator status/reasons,
+AC source, accepted-press words). Two long Generator presses not tried yet.
 `selpi button` and the HA app's `/api/v1/button` implement this (`sppro/buttons.py`).
+
+### State-aware controls
+
+The Generator and ON buttons toggle, so `sppro/controls.py` reads the unit's state first and presses only
+when that changes something (`selpi control`, the HA app's `/api/v1/control`, the ESPHome component's
+`generator:` / `output:` switches and `equalise:` button):
+
+| Control | State word | On | Off | Press | Refused when |
+|---|---|---|---|---|---|
+| generator | Generator Status `0xa096` | 1 Running, 6 Starting | 0 Not Running, 8 Stopping | Generator short | 2 Low Fuel, 3 No Fuel, 4 Fault, 5 Not Available, 7 Retry Pause, 9 Disabled, 10 AC Source Present; start while 8 Stopping |
+| output | Output Mode `0xa07d` | 1 Econo, 2 On, 3 Sync | 0 Idle | ON long | any other code |
+| equalise | (Days to Equalise `0xa048`) | | | Generator long, twice (the second once the register reads 0 again) | |
 
 ## Managed battery (CAN) frames
 
