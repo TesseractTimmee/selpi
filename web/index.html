@@ -102,7 +102,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
   <section id="settings">
     <div class="bar">
       <input id="cfg-filter" placeholder="Search settings" class="grow">
-      <label class="muted"><input type="checkbox" id="cfg-factory"> factory settings</label>
+      <label class="muted"><input type="checkbox" id="cfg-factory"> show hidden</label>
       <label class="muted"><input type="checkbox" id="cfg-rawview"> raw list</label>
       <span class="note" id="cfg-at"></span>
       <button class="act" id="cfg-go">Read from SP PRO</button>
@@ -246,6 +246,9 @@ function rowHtml(r, where) {
   return `<tr class="${changed ? 'changed' : ''}"><td class="lbl">${esc(r.label || r.setting)}${where ? `<div class="muted">${esc(where)}</div>` : ''}</td>` +
     `<td>${ctl}${was}${held}${msgs}</td><td class="rng">${esc(r.month ? '' : (r.range || ''))}</td></tr>`;
 }
+const CAT_LABEL = {legacy: 'legacy', unreleased: 'experimental', advanced: 'advanced'};
+const groupShown = g => !g.visibility || $('#cfg-factory').checked;
+const catBadge = g => g.visibility ? ` <span class="badge" title="SP LINK hides this group (${esc(g.visibility === 'legacy' ? 'legacy settings, off by default' : g.visibility === 'unreleased' ? 'unreleased / experimental feature' : 'advanced view')}).">${esc(CAT_LABEL[g.visibility] || g.visibility)}</span>` : '';
 function drawCfg() {
   if ($('#cfg-rawview').checked) return drawRaw();
   if (!LAYOUT || !READ) return;
@@ -254,7 +257,7 @@ function drawCfg() {
   if (f) {   // search across every tab
     $('#cfg-tabs').innerHTML = ''; $('#cfg-subtabs').innerHTML = '';
     const rows = [];
-    tabs.forEach(t => t.subtabs.forEach(st => st.groups.forEach(g => g.rows.forEach(r => {
+    tabs.forEach(t => t.subtabs.forEach(st => st.groups.filter(groupShown).forEach(g => g.rows.forEach(r => {
       const where = [t.title, st.title, g.title].filter(Boolean).join(' › ');
       if ((r.label || '').toLowerCase().includes(f) || r.setting.toLowerCase().includes(f) || where.toLowerCase().includes(f)) rows.push([r, where]);
     }))));
@@ -268,7 +271,7 @@ function drawCfg() {
     $('#cfg-subtabs').innerHTML = tab.subtabs.length > 1 ? tab.subtabs.map(st =>
       `<button data-st="${esc(st.id)}" class="${st.id === curSub ? 'on' : ''}">${esc(st.title || '-')}</button>`).join('') : '';
     const sub = tab.subtabs.find(st => st.id === curSub);
-    $('#cfg-out').innerHTML = '<div class="grid">' + sub.groups.map(g => `<div class="card"><h2>${esc(g.title || tab.title)}</h2>` +
+    $('#cfg-out').innerHTML = '<div class="grid">' + sub.groups.filter(groupShown).map(g => `<div class="card"><h2>${esc(g.title || tab.title)}${catBadge(g)}</h2>` +
       `<table class="cfg">${g.rows.filter(r => !r.hidden || $('#cfg-factory').checked).map(r => rowHtml(r)).join('')}</table></div>`).join('') + '</div>';
   }
   drawWrite();

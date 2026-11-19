@@ -438,7 +438,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "legacy"
       }
      ]
     }
@@ -802,7 +803,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "unreleased"
       }
      ]
     }
@@ -1695,7 +1697,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "legacy"
       },
       {
        "id": "gbAcChargerLockoutSchedule",
@@ -1893,7 +1896,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "legacy"
       },
       {
        "id": "gbACInputLockout",
@@ -1937,7 +1941,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "legacy"
       },
       {
        "id": "gbACExportPowerLimit",
@@ -1970,7 +1975,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "legacy"
       }
      ]
     },
@@ -6536,7 +6542,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "unreleased"
       },
       {
        "id": "gbKacoMode",
@@ -7278,7 +7285,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "legacy"
       },
       {
        "id": "gbPowerOverride",
@@ -7300,7 +7308,8 @@
          ],
          "hidden": false
         }
-       ]
+       ],
+       "visibility": "legacy"
       }
      ]
     },

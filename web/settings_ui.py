@@ -61,7 +61,8 @@ def layout():
                     merged = {d: m for d, m in months.items() if d in names and m in names}
                     g['rows'] = [dict(r, month=merged[r['setting']]) if r['setting'] in merged else r
                                  for r in g['rows'] if r['setting'] not in merged.values()]
-        _LAYOUT = {'tabs': tabs, 'settings': meta, 'hidden_tabs': ['Factory Mode Settings']}
+        _LAYOUT = {'tabs': tabs, 'settings': meta, 'hidden_tabs': ['Factory Mode Settings'],
+                   'hidden_group_categories': ['legacy', 'unreleased', 'advanced']}
     return dict(_LAYOUT, writes_allowed=writes_allowed(), writes_available=writes_available())
 
 

@@ -44,6 +44,19 @@ class TestConfigurationPage(unittest.TestCase):
         self.tmp.cleanup()
         os.environ.pop('SELPI_ALLOW_CONFIG_WRITES', None)
 
+    def test_hidden_group_categories(self):
+        lay = settings_ui.layout()
+        self.assertIn('hidden_group_categories', lay)
+        vis = {}
+        for t in lay['tabs']:
+            for st in t['subtabs']:
+                for g in st['groups']:
+                    if g.get('visibility'):
+                        vis.setdefault(g['visibility'], []).append(g['title'])
+        self.assertIn('Managed DC Coupled Solar', vis.get('unreleased', []))   # SP LINK hides as unreleased
+        self.assertIn('Inverter Lockout', vis.get('legacy', []))               # SP LINK's Show Legacy Settings
+        self.assertGreaterEqual(len(vis.get('legacy', [])), 6)
+
     def test_layout(self):
         lay = settings_ui.layout()
         titles = [t['title'] for t in lay['tabs']]
