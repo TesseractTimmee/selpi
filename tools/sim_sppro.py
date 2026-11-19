@@ -69,6 +69,12 @@ class SimProtocol:
         self._gen_change = None     # (new status, at) while the generator is starting / stopping
         self._long_gen = []         # times of long generator presses (two = equalise request)
         self.equalise_requested = False
+        # configuration write lock (sppro/config_write.py): 0xca14 = 0, passcode -> 0xa001 unlocks (0xa002 = 1)
+        self.passcode = 1234        # the SP LINK passcode this simulated unit accepts
+        self.blocked_config_writes = []
+        self.mem.setdefault(0xca14, struct.pack('<H', 0xffff))
+        self.mem.setdefault(0xa002, struct.pack('<H', 0))
+        self._lock_open = False     # 0xca14 was written 0 (waiting for the passcode)
 
     GEN_REG, OUT_REG = 0xa096, 0xa07d   # Generator Status, Output Mode (see sppro/controls.py)
     TRANSITION = 2.0                     # simulated seconds for Starting -> Running, Stopping -> Not Running
@@ -149,6 +155,21 @@ class SimProtocol:
                 self._press_effect(BUTTON_REGS[address], value)
                 print('sim: %s button %s press' % (BUTTON_REGS[address], 'long' if value == 2 else 'short'), flush=True)
             self._buttons()
+            return
+        if address in (0xca14, 0xa001, 0xa002) and len(data) >= 2:
+            v = struct.unpack('<H', data[:2])[0]
+            if address == 0xca14:
+                self._lock_open = v == 0
+                if v == 0xffff:
+                    self.mem[0xa002] = struct.pack('<H', 0)
+            elif address == 0xa001 and v != 0:
+                self.mem[0xa002] = struct.pack('<H', 1 if self._lock_open and v == self.passcode else 0)
+            elif address == 0xa002:
+                self.mem[0xa002] = struct.pack('<H', v)
+            self.mem[address] = data[:2]
+            return
+        if 0xc000 <= address < 0xc900 and struct.unpack('<H', self.mem.get(0xa002, b'\0\0'))[0] != 1:
+            self.blocked_config_writes.append((address, data))   # locked: the unit ignores setting writes
             return
         if address == 0x1d0011 and len(data) >= 14:      # set clock: sec min hour wday day month yy (BCD)
             import datetime

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+Superseded by `selpi config set NAME VALUE` (sppro/config_write.py, with tests); kept for the 17 Nov record.
+
 Single-setting write test (SP PRO), mirroring SP LINK's unlock sequence from the 17 Nov capture.
 
     write_test.py --code N ADDRESS VALUE            dry run: print every frame, send nothing

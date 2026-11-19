@@ -113,7 +113,9 @@ known. SP LINK does:
 3. write the configuration blocks (below)
 4. write `0x0000` to `0xa002`, then `0xffff` to `0xca14`
 
-SP LINK always rewrites every block, but single-word writes work too (tested 17 Nov 2026 with
+`selpi config set NAME VALUE` (`sppro/config_write.py`) does this for one setting: dry run without `--yes`; with
+it, it asks for the passcode, refuses unless the unit is idle and on the verified versions, backs up the whole
+configuration, relocks even after an error and reports every word that changed. SP LINK always rewrites every block, but single-word writes work too (tested 17 Nov 2026 with
 `tools/write_test.py`, InitialReturnVoltage `0xc185` 2183 → 2184 → 2183): SP LINK also sets download mode
 `0xa251` = 1 before step 1 and 0 after step 4; after step 2 `0xa002` reads 1 (unlocked). Each write is
 echoed; read-back showed only the target word changed.
