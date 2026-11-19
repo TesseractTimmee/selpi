@@ -60,9 +60,9 @@ class DerivedFields(unittest.TestCase):
         src = BY_KEY['ac_source_power']
         # (Generator Status, Output Mode) -> which of grid / generator gets the AC source power
         cases = {(10, 3): 'grid', (1, 3): 'generator',
-                 (10, 2): None, (1, 2): None,          # not synchronised: nothing drawn from either
-                 (6, 3): None, (8, 3): None,           # starting / stopping
-                 (0, 3): None, (5, 2): None, (9, 0): None}
+                 (0, 3): 'grid', (5, 3): 'grid', (9, 3): 'grid',     # no generator in use: synchronised = the grid
+                 (6, 3): 'generator', (8, 3): 'generator',           # two-stage start (loads first) / stopping
+                 (10, 2): None, (1, 2): None, (5, 2): None, (9, 0): None}   # not synchronised: nothing drawn
         for (status, mode), who in cases.items():
             for raw in (-1500, 1500):          # import, export
                 mem = mem_with(src, raw)

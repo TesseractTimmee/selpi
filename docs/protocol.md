@@ -301,7 +301,9 @@ and `dc_battery_power_in/out`, the signed powers split into >= 0 parts (the SP P
 negative), so averages and statistics don't net the two directions out.
 `grid_power_in/out` and `generator_power_in` split the AC source further: only while the inverter is synchronised to
 the AC source (Output Mode `0xa07d` = 3 Sync, the live side of the "AC Mode - Synchronised begin/end" events), and by
-Generator Status (`0xa096`): 10 (AC Source Present) = grid, 1 (Running) = generator; otherwise 0.
+Generator Status (`0xa096`): a generator state (1 Running, 6 Starting: the two-stage start carries the loads
+before the charger, 8 Stopping) = generator, anything else = grid (the generator doesn't run on grid, and units
+without a generator report e.g. Not Available / Disabled); not synchronised = 0 for both.
 `selpi live` reads them; values were checked against the SP PRO's Modbus map on 17 Nov 2026 (load, inverter, grid, solar
 power; reactive power; voltages; frequencies; battery V/SoC/power; today's energies; generator status; solar
 hybrid priority; run hours all agree).
