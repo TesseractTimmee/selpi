@@ -119,6 +119,21 @@ class TestConfigWrite(unittest.TestCase):
         self.assertNotIn('1234', buf.getvalue())
 
 
+class TestInstallerOnlyBlocked(unittest.TestCase):
+    """Every installer-only setting is refused at the write engine itself, not just in the UI/CLI."""
+
+    def test_all_installer_only_refused(self):
+        from sppro import settings
+        io = [n for n, e in settings.META.items() if e.get('installer_only')]
+        self.assertGreaterEqual(len(io), 19)
+        for n in io:
+            s, r = sim()
+            with self.assertRaises(config_write.WriteError) as e:
+                config_write.write_setting(r, n, 1, 1234, out_dir=tempfile.mkdtemp(), log=lambda *a: None)
+            self.assertIn('installer-only', str(e.exception))
+            self.assertEqual(s.writes, [])
+
+
 class TestSetChecks(unittest.TestCase):
     """config set refuses out-of-range values and failing rules unless overridden."""
 

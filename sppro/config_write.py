@@ -97,7 +97,15 @@ def write_settings(reader, values: dict, passcode: int, out_dir='config-writes',
     for name, value in values.items():
         if not 0 <= value <= 0xffff:
             raise WriteError('%s: value %r out of range (raw 16-bit: 0..65535)' % (name, value))
-        settings_.append((find_setting(name), value))
+        st = find_setting(name)
+        try:                               # last-line guard: never write an installer-gated setting, whatever the caller
+            from sppro import settings as _settings
+            if _settings.entry(st['name']).get('installer_only'):
+                raise WriteError('%s is an installer-only setting (grid-protection / power-quality); selpi keeps these '
+                                 'read-only' % st['name'])
+        except _settings.SettingError:
+            pass
+        settings_.append((st, value))
     preflight(reader, force=force)
     before = config.read_memory(reader)
     if expected is not None:
