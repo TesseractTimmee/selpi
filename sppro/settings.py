@@ -118,6 +118,21 @@ def available(name, config_version):
     return config_version is None or mv is None or config_version >= mv
 
 
+def factory_only(name):
+    """True for Selectronic factory-calibration settings (SP LINK's password-gated Factory Mode tab)."""
+    w = where(name)
+    return bool(w and w.startswith('Factory Mode'))
+
+
+def read_only_reason(name):
+    """Why selpi keeps a setting read-only, or None: installer-only (grid-protection) or factory-mode."""
+    if entry(name).get('installer_only'):
+        return 'an installer-only setting (AS4777 grid-protection / power-quality)'
+    if factory_only(name):
+        return 'a factory-mode setting (Selectronic factory calibration)'
+    return None
+
+
 def installer_only(name):
     """True for settings SP LINK keeps behind the installer code (AS4777 grid-protection window, Volt-Var/Volt-Watt,
     battery charge-voltage window). A SP LINK UI gate, not firmware-enforced; selpi keeps these read-only."""

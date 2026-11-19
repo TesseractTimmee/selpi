@@ -135,6 +135,19 @@ class TestInstallerOnlyBlocked(unittest.TestCase):
             self.assertEqual(s.writes, [])
 
 
+class TestFactoryReadOnly(unittest.TestCase):
+    """Factory-mode settings are read-only at the write engine (SP LINK password-gates them)."""
+
+    def test_factory_setting_refused(self):
+        from sppro import settings
+        fac = next(n for n in settings.META if settings.factory_only(n))
+        s, r = sim()
+        with self.assertRaises(config_write.WriteError) as e:
+            config_write.write_setting(r, fac, 1, 1234, out_dir=tempfile.mkdtemp(), log=lambda *a: None)
+        self.assertIn('factory-mode', str(e.exception))
+        self.assertEqual(s.writes, [])
+
+
 class TestSetChecks(unittest.TestCase):
     """config set refuses out-of-range values and failing rules unless overridden."""
 

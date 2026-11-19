@@ -61,6 +61,9 @@ def layout():
                     merged = {d: m for d, m in months.items() if d in names and m in names}
                     g['rows'] = [dict(r, month=merged[r['setting']]) if r['setting'] in merged else r
                                  for r in g['rows'] if r['setting'] not in merged.values()]
+        for n in meta:
+            if settings.factory_only(n):
+                meta[n]['factory_only'] = True
         _LAYOUT = {'tabs': tabs, 'settings': meta, 'hidden_tabs': ['Factory Mode Settings'],
                    'hidden_group_categories': ['legacy', 'unreleased', 'advanced']}
     return dict(_LAYOUT, writes_allowed=writes_allowed(), writes_available=writes_available())
@@ -158,9 +161,9 @@ def _evaluate(reader, s_sess, changes):
             e = settings.entry(name)
             if e.get('words') == 2:
                 raise settings.SettingError('%s spans two words: not writable here' % name)
-            if e.get('installer_only'):
-                raise settings.SettingError('%s is an installer-only setting; selpi keeps these read-only (change it '
-                                            'in SP LINK)' % e['name'])
+            ro = settings.read_only_reason(e['name'])
+            if ro:
+                raise settings.SettingError('%s is %s; selpi keeps it read-only (change it in SP LINK)' % (e['name'], ro))
             if not settings.available(e['name'], s_sess['config_version']):
                 raise settings.SettingError('%s needs SP PRO config version %d; this unit is %s'
                                             % (e['name'], e['min_version'], s_sess['config_version']))

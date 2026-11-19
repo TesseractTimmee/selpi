@@ -201,6 +201,7 @@ function control(name) {
   const m = LAYOUT.settings[name] || {}, v = READ.values[name];
   if (!v) return '<span class="muted">not read</span>';
   if (m.installer_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind the installer code (AS4777 grid-protection / power quality). selpi shows it but keeps it read-only.">installer&nbsp;only &middot; read-only</span>`;
+  if (m.factory_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind a factory passcode (Selectronic factory calibration). selpi shows it but keeps it read-only.">factory &middot; read-only</span>`;
   if (m.min_version && READ.config_version != null && READ.config_version < m.min_version)
     return `<span class="muted">${esc(v.text)}</span> <span class="badge" title="This setting needs SP PRO config-settings version ${m.min_version}; this unit is ${READ.config_version}. SP LINK greys it out on older firmware.">needs&nbsp;firmware&nbsp;v${m.min_version}</span>`;
   if (!READ.writes_available) return `<span>${esc(v.text)}</span>`;   // read-only release: viewer only

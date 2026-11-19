@@ -114,9 +114,9 @@ def write_settings(reader, values: dict, passcode: int, out_dir='config-writes',
         st = find_setting(name)
         try:                               # last-line guard: never write an installer-gated setting, whatever the caller
             from sppro import settings as _settings
-            if _settings.entry(st['name']).get('installer_only'):
-                raise WriteError('%s is an installer-only setting (grid-protection / power-quality); selpi keeps these '
-                                 'read-only' % st['name'])
+            ro = _settings.read_only_reason(st['name'])
+            if ro:
+                raise WriteError('%s is %s; selpi keeps these read-only' % (st['name'], ro))
         except _settings.SettingError:
             pass
         settings_.append((st, value))
