@@ -107,6 +107,17 @@ def entry(name: str) -> dict:
     return e
 
 
+def min_version(name):
+    """The minimum SP PRO config-settings version a setting needs (SP LINK greys it out below this), or None."""
+    return entry(name).get('min_version')
+
+
+def available(name, config_version):
+    """True if the setting exists on a unit with this config-settings version (0xa007 block)."""
+    mv = entry(name).get('min_version')
+    return config_version is None or mv is None or config_version >= mv
+
+
 def installer_only(name):
     """True for settings SP LINK keeps behind the installer code (AS4777 grid-protection window, Volt-Var/Volt-Watt,
     battery charge-voltage window). A SP LINK UI gate, not firmware-enforced; selpi keeps these read-only."""

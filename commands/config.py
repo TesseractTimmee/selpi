@@ -87,7 +87,8 @@ def run_show(args, reader=None):
     reader = reader or Reader()
     live.check_versions(reader)
     model, cells = _unit(reader)
-    print('unit model %s (%s cells)' % (model or '?', cells or '?'))
+    cfgver = live.versions(reader).get('config_settings')
+    print('unit model %s (%s cells), config version %s' % (model or '?', cells or '?', cfgver))
     for n in names:
         a = settings.address(n)
         if a is None:
@@ -96,6 +97,8 @@ def run_show(args, reader=None):
         w = settings.where(n)
         if w:
             print('%44s   SP LINK: %s' % ('', w))
+        if not settings.available(n, cfgver):
+            print('%44s   (needs config version %d; greyed out on this firmware)' % ('', settings.min_version(n)))
     if getattr(args, 'check', False):
         raw = settings.raw_config(config.read_memory(reader))
         _report(settings.check(raw, cells, model))

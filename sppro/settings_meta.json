@@ -1988,7 +1988,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "InverterLockoutSchedule1StartTime",
@@ -2130,7 +2131,8 @@
    "values": {
     "0": "External (DB9)",
     "1": "Internal (RJ45)"
-   }
+   },
+   "min_version": 38
   },
   {
    "name": "HighBatteryAlert",
@@ -2671,7 +2673,8 @@
     "5": "Relay Output 2",
     "6": "Relay Output 3",
     "7": "Relay Output 4"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "InverterLockoutSchedule1Day",
@@ -2705,7 +2708,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "InverterLockoutSchedule2Day",
@@ -2763,7 +2767,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "InverterLockoutSchedule3Day",
@@ -2821,7 +2826,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "InverterLockoutSchedule4Day",
@@ -2885,7 +2891,8 @@
     "5": "Relay Output 2",
     "6": "Relay Output 3",
     "7": "Relay Output 4"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "BulkOutput",
@@ -2904,7 +2911,8 @@
     "5": "Relay Output 2",
     "6": "Relay Output 3",
     "7": "Relay Output 4"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "InitialInput",
@@ -2921,7 +2929,8 @@
     "3": "Digital Control Input 3",
     "4": "Digital Control Input 4",
     "5": "Follow Backup Select"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "InitialInputEdge",
@@ -2935,7 +2944,8 @@
     "0": "Rising",
     "1": "Falling",
     "2": "Both"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "BulkInput",
@@ -2952,7 +2962,8 @@
     "3": "Digital Control Input 3",
     "4": "Digital Control Input 4",
     "5": "Follow Backup Select"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "BulkInputEdge",
@@ -2966,7 +2977,8 @@
     "0": "Rising",
     "1": "Falling",
     "2": "Both"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AbsorbInput",
@@ -2983,7 +2995,8 @@
     "3": "Digital Control Input 3",
     "4": "Digital Control Input 4",
     "5": "Follow Backup Select"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AbsorbInputEdge",
@@ -2997,7 +3010,8 @@
     "0": "Rising",
     "1": "Falling",
     "2": "Both"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "EqualiseInput",
@@ -3014,7 +3028,8 @@
     "3": "Digital Control Input 3",
     "4": "Digital Control Input 4",
     "5": "Follow Backup Select"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "EqualiseInputEdge",
@@ -3028,7 +3043,8 @@
     "0": "Rising",
     "1": "Falling",
     "2": "Both"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "PreSyncGeneratorWarmUp",
@@ -3171,7 +3187,8 @@
     "3": "Three Phase",
     "4": "Three Phase + Split",
     "5": "Split Phase (180°)"
-   }
+   },
+   "min_version": 38
   },
   {
    "name": "AdvancedMultiPhasePhase",
@@ -3199,7 +3216,8 @@
     "14": "L2 Worker 3",
     "15": "L3 Worker 3",
     "16": "Split Worker 3"
-   }
+   },
+   "min_version": 38
   },
   {
    "name": "AdvancedMultiPhaseThreePhaseAcSourceBalanced",
@@ -3645,7 +3663,8 @@
     "3": "Digital Control Input 3",
     "4": "Digital Control Input 4",
     "5": "Follow Backup Select"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "ExportModeControlInputEdge",
@@ -3661,7 +3680,8 @@
     "2": "Both"
    },
    "range_text": "[Rising, Falling, Both]",
-   "unit": null
+   "unit": null,
+   "min_version": 14
   },
   {
    "name": "GridAvailableInput",
@@ -3694,7 +3714,8 @@
     "2": "Both"
    },
    "range_text": "[Rising, Falling, Both]",
-   "unit": null
+   "unit": null,
+   "min_version": 14
   },
   {
    "name": "BackupSelectedOutput",
@@ -3739,7 +3760,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputChargerLockout1Day",
@@ -3797,7 +3819,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputChargerLockout2Day",
@@ -3855,7 +3878,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputChargerLockout3Day",
@@ -3913,7 +3937,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputChargerLockout4Day",
@@ -3971,7 +3996,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputCapacityLevel1",
@@ -4045,7 +4071,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputCapacityLevel2",
@@ -4119,7 +4146,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputCapacityLevel3",
@@ -4193,7 +4221,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 14
   },
   {
    "name": "AcInputCapacityLevel4",
@@ -4270,7 +4299,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[-1 - -25 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 14
   },
   {
    "name": "AlternateACVMax",
@@ -4286,7 +4316,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[1 - 10 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 14
   },
   {
    "name": "AlternateACFreqMin",
@@ -4302,7 +4333,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[-1 - -10 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 14
   },
   {
    "name": "AlternateACfreqMax",
@@ -4318,7 +4350,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[1 - 10 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 14
   },
   {
    "name": "PeriodicRecharge",
@@ -4331,7 +4364,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 15
   },
   {
    "name": "GridFailBeeper",
@@ -4344,7 +4378,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 15
   },
   {
    "name": "KacoModeCommPort",
@@ -4461,7 +4496,8 @@
    "min": 1.0,
    "max": 5.0,
    "step": 1.0,
-   "decimals": 0
+   "decimals": 0,
+   "min_version": 20
   },
   {
    "name": "ExportCapacityLimitEnable",
@@ -4474,7 +4510,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 20
   },
   {
    "name": "PowerControlOverrideMode",
@@ -4500,7 +4537,8 @@
     "3": "Digital Control Input 3",
     "4": "Digital Control Input 4",
     "5": "Follow Backup Select"
-   }
+   },
+   "min_version": 20
   },
   {
    "name": "PowerControlOverrideInputEdge",
@@ -4529,7 +4567,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 20
   },
   {
    "name": "MarginForBackfeedProtection",
@@ -4663,7 +4702,8 @@
     "0": "Fixed AC Inverter p.f.",
     "1": "Fixed AC Source p.f.",
     "2": "Fixed Vars"
-   }
+   },
+   "min_version": 27
   },
   {
    "name": "KacoExportPreTripPowerLimit",
@@ -4747,7 +4787,8 @@
     "5": "Relay Output 2",
     "6": "Relay Output 3",
     "7": "Relay Output 4"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "InverterLockoutInput",
@@ -4764,7 +4805,8 @@
     "3": "Digital Control Input 3",
     "4": "Digital Control Input 4",
     "5": "Follow Backup Select"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "InverterLockoutInputEdge",
@@ -4777,7 +4819,8 @@
    "values": {
     "0": "Active High",
     "1": "Active Low"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "ResyncDelay",
@@ -7139,7 +7182,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[2 - 100 d]",
-   "unit": "d"
+   "unit": "d",
+   "min_version": 15
   },
   {
    "name": "UseZenBms",
@@ -7307,7 +7351,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[0.0 - 25.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 35
   },
   {
    "name": "AcCoupledHighBatteryTripScaleCurrent",
@@ -7323,7 +7368,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[0.0 - 25.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 35
   },
   {
    "name": "BMSBatteryFloatVoltageScale",
@@ -7339,7 +7385,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[-20.0 - 0.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 35
   },
   {
    "name": "BMSBatteryCurrentTargetScale",
@@ -7355,7 +7402,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[50.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 35
   },
   {
    "name": "InitialReturnSoC",
@@ -7371,7 +7419,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[0 - 99 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 38
   },
   {
    "name": "MaximumBatteryDischargeCurrent",
@@ -7450,7 +7499,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1Day",
@@ -7794,7 +7844,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2Day",
@@ -8138,7 +8189,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3Day",
@@ -8482,7 +8534,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4Day",
@@ -8826,7 +8879,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5Day",
@@ -9170,7 +9224,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6Day",
@@ -9514,7 +9569,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7Day",
@@ -9858,7 +9914,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8Day",
@@ -10202,7 +10259,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "SystemSchedule2ChargeOverrideACSource",
@@ -10215,7 +10273,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "SystemSchedule3ChargeOverrideACSource",
@@ -10228,7 +10287,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "SystemSchedule4ChargeOverrideACSource",
@@ -10241,7 +10301,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "SystemSchedule5ChargeOverrideACSource",
@@ -10254,7 +10315,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "SystemSchedule6ChargeOverrideACSource",
@@ -10267,7 +10329,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "SystemSchedule7ChargeOverrideACSource",
@@ -10280,7 +10343,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   },
   {
    "name": "SystemSchedule8ChargeOverrideACSource",
@@ -10293,7 +10357,8 @@
    "values": {
     "0": "Grid Input Limit",
     "1": "AC Source Power"
-   }
+   },
+   "min_version": 29
   }
  ]
 }

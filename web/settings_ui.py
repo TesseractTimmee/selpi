@@ -41,7 +41,7 @@ def layout():
     if _LAYOUT is None:
         keep = ('kind', 'values', 'unit', 'min', 'max', 'step', 'decimals', 'range_text', 'per_cell_min',
                 'per_cell_max', 'disabled', 'words', 'unnamed_in_splink', 'section', 'directions', 'pf_mode', 'offset',
-                'date_part', 'installer_only')
+                'date_part', 'installer_only', 'min_version')
         meta = {n: {k: e[k] for k in keep if k in e} for n, e in settings.META.items()}
         lay = settings._load('settings_layout.json')
         tabs, loose = [], []
@@ -101,14 +101,17 @@ def read(reader):
     memory = config.read_memory(reader)
     model = settings.model(reader)
     cells = settings.cells_for(model)
+    config_version = live.versions(reader).get('config_settings')
     raw = settings.raw_config(memory)
     rid = uuid.uuid4().hex[:12]
     with _LOCK:
         _forget_old()
-        READS[rid] = {'at': time.time(), 'memory': memory, 'model': model, 'cells': cells}
+        READS[rid] = {'at': time.time(), 'memory': memory, 'model': model, 'cells': cells,
+                      'config_version': config_version}
     problems = [p for p in settings.check(raw, cells, model) if p['severity'] != 'skipped']
     shown = {n: settings.to_display(n, v, cells)[0] for n, v in raw.items()}
-    return {'read_id': rid, 'model': model, 'cells': cells, 'values': _values(raw, cells), 'problems': problems,
+    return {'read_id': rid, 'model': model, 'cells': cells, 'config_version': config_version,
+            'values': _values(raw, cells), 'problems': problems,
             'limits': limits(cells, shown.get('BatteryType'), shown),
             'version_problems': live.version_problems(live.versions(reader)), 'writes_allowed': writes_allowed(),
             'writes_available': writes_available(),
@@ -135,8 +138,9 @@ def _unit_state(reader, raw_now, cells):
     return unit, {'port': buttons.port(reader)}
 
 
-def _evaluate(reader, s, changes):
+def _evaluate(reader, s_sess, changes):
     """Convert {name: text} and work out what the change would cause. Returns (result, raw_changes)."""
+    s = s_sess
     cells, model = s['cells'], s['model']
     raw_now = settings.raw_config(s['memory'])
     out, raw_changes = {}, {}
@@ -156,6 +160,9 @@ def _evaluate(reader, s, changes):
             if e.get('installer_only'):
                 raise settings.SettingError('%s is an installer-only setting; selpi keeps these read-only (change it '
                                             'in SP LINK)' % e['name'])
+            if not settings.available(e['name'], s_sess['config_version']):
+                raise settings.SettingError('%s needs SP PRO config version %d; this unit is %s'
+                                            % (e['name'], e['min_version'], s_sess['config_version']))
             raw, warnings = settings.from_display(e['name'], text, cells, shown.get('BatteryType'), shown)
             out[e['name']] = {'raw': raw, 'text': settings.to_display(e['name'], raw, cells)[1],
                               'old': raw_now.get(e['name']), 'warnings': warnings}

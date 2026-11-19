@@ -133,6 +133,21 @@ class TestRules(unittest.TestCase):
         self.assertTrue(S.installer_only('VoltVarLowVoltageStart'))
         self.assertFalse(S.installer_only('EqualiseV'))
 
+    def test_firmware_min_version(self):
+        self.assertEqual(S.min_version('AdvancedMultiPhaseStructure'), 38)   # Powerchain needs config v38
+        self.assertIsNone(S.min_version('EqualiseV'))                        # always present
+        self.assertTrue(S.available('AdvancedMultiPhaseStructure', 48))
+        self.assertFalse(S.available('AdvancedMultiPhaseStructure', 30))
+        self.assertTrue(S.available('AdvancedMultiPhaseStructure', None))    # unknown version: assume present
+
+    def test_powerchain_powador_rule(self):
+        kaco = int(next(k for k, v in S.META['KacoModeCommPort']['values'].items() if v == 'RS485 Port 1 Powador'))
+        ids = lambda cfg: {p['id'] for p in S.check(cfg, CELLS, 'SPMC482')}
+        self.assertIn('powador_single_inverter_only', ids({'KacoModeCommPort': kaco, 'AdvancedMultiphaseNumberOfWorkers': 1}))  # 2/phase
+        self.assertNotIn('powador_single_inverter_only', ids({'KacoModeCommPort': kaco, 'AdvancedMultiphaseNumberOfWorkers': 0}))  # 1/phase
+        # Powerchain workers shows stored+1
+        self.assertEqual(S.to_display('AdvancedMultiphaseNumberOfWorkers', 1, CELLS)[1], '2')
+
     def test_models(self):
         self.assertEqual(S.cells_for('SPMC482'), 24)
         self.assertEqual(S.cells_for('SPMC241'), 12)

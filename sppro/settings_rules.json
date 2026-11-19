@@ -195,10 +195,18 @@
    "severity": "warning",
    "confidence": "high",
    "source": "fclsMain::nudInitialReturnVoltage_CheckMaximumAndColour"
+  },
+  {
+   "id": "powador_single_inverter_only",
+   "when": "KacoModeCommPort is not None and 'Powador' in KacoModeCommPort",
+   "require": "AdvancedMultiphaseNumberOfWorkers is None or AdvancedMultiphaseNumberOfWorkers <= 1",
+   "message": "The string-inverter port cannot be a Powador mode when Powerchain Inverters per Phase is greater than 1.",
+   "severity": "error",
+   "confidence": "high",
+   "source": "fclsMain::CheckConfigurationIsOkBeforeSendingToInverter"
   }
  ],
  "not_yet": [
-  "three-phase solar inverters on L2/L3 need one on L1; Powador with multi-phase workers > 1 (multi-phase sites)",
   "AS4777.2:2020 not available on some models (model list)",
   "InhibitNewFunctionsIn*Area (settings hidden for older firmware)",
   "multi-phase structure / count must match the detected inverters (multi-phase sites only)",

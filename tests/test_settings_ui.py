@@ -63,6 +63,20 @@ class TestConfigurationPage(unittest.TestCase):
         c = settings_ui.check(r, d['read_id'], {'BatteryType': 'Custom'})
         self.assertEqual(c['limits']['FloatV'][:2], [48.0, 68.4])
 
+    def test_firmware_gated_setting_not_writable(self):
+        # a setting needing a higher config version than the unit has is refused
+        s, r = sim()
+        # our sim reports the verified version (48); temporarily pretend a setting needs 99 via META
+        from sppro import settings
+        settings.META['AdvancedMultiPhaseStructure']['min_version'] = 99
+        try:
+            rid = settings_ui.read(r)['read_id']
+            with self.assertRaises(ValueError) as e:
+                settings_ui.write(r, rid, {'AdvancedMultiPhaseStructure': 'Three Phase'}, '1234', out_dir=self.tmp.name)
+            self.assertIn('config version', str(e.exception))
+        finally:
+            settings.META['AdvancedMultiPhaseStructure']['min_version'] = 38
+
     def test_read_shows_splink_values(self):
         s, r = sim()
         d = settings_ui.read(r)
