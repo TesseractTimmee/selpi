@@ -19,6 +19,17 @@ from sppro import config, live
 DL_MODE, LOCK, CODE, UNLOCKED = 0xa251, 0xca14, 0xa001, 0xa002
 LOCKED_VALUE = 0xffff
 
+# Release gate: configuration writes have not yet been validated against a real SP PRO (only the simulator).
+# Until they are, the published build is read-only: set True after on-hardware validation, or set the environment
+# variable SELPI_ALLOW_UNVALIDATED_WRITES=true to write anyway (for that validation). This is separate from and
+# in addition to the user-facing allow_config_writes option.
+WRITES_VALIDATED = False
+
+
+def writes_available():
+    import os
+    return WRITES_VALIDATED or os.environ.get('SELPI_ALLOW_UNVALIDATED_WRITES', '').lower() in ('1', 'true', 'yes')
+
 
 class WriteError(Exception):
     pass
@@ -93,6 +104,9 @@ def write_settings(reader, values: dict, passcode: int, out_dir='config-writes',
     """Write several settings {name: raw} in one unlock session: preflight, full backup, unlock, every changed word,
     relock always, full read-back. expected: the configuration memory as read earlier in the session (e.g. by the
     web page); if the unit's configuration differs from it now, nothing is written."""
+    if not writes_available():
+        raise WriteError('configuration writes are not enabled in this release (not yet validated on a real SP PRO). '
+                         'This build is read-only.')
     settings_ = []
     for name, value in values.items():
         if not 0 <= value <= 0xffff:

@@ -201,6 +201,7 @@ function control(name) {
   const m = LAYOUT.settings[name] || {}, v = READ.values[name];
   if (!v) return '<span class="muted">not read</span>';
   if (m.installer_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind the installer code (AS4777 grid-protection / power quality). selpi shows it but keeps it read-only.">installer&nbsp;only &middot; read-only</span>`;
+  if (!READ.writes_available) return `<span>${esc(v.text)}</span>`;   // read-only release: viewer only
   const ed = EDITS[name], dis = m.words === 2 ? ' disabled title="spans two words"' : '';
   if (m.kind === 'enum') {
     const cur = ed !== undefined ? ed : v.value;
@@ -284,6 +285,7 @@ function problemsHtml(title, list) {
 }
 function drawWrite() {
   const names = Object.keys(EDITS);
+  if (!READ.writes_available) { $('#cfg-write').style.display = 'none'; return; }
   $('#cfg-write').style.display = names.length ? '' : 'none';
   if (!names.length) return;
   const probs = CHECK ? [...CHECK.problems, ...CHECK.send_problems] : [];
@@ -347,8 +349,9 @@ async function cfgRead(note) {
     READ = await api('api/config/read');
     READ.at = new Date();
     $('#cfg-at').textContent = `${READ.model || '?'} · read ${READ.at.toTimeString().slice(0, 8)}`;
+    const ro = !READ.writes_available ? `<div class="msg">Read-only release: selpi shows the configuration as SP LINK does but does not write it yet (configuration writes arrive after on-hardware validation).</div>` : '';
     const vp = READ.version_problems.length ? `<div class="msg">This unit differs from the verified map (${esc(READ.version_problems.join(', '))}): values may be wrong and writing is refused.</div>` : '';
-    $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + vp + problemsHtml("Already in the unit's configuration (SP LINK would flag these)", READ.problems);
+    $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + ro + vp + problemsHtml("Already in the unit's configuration (SP LINK would flag these)", READ.problems);
     EDITS = {}; NOTES = {}; CHECK = null;
     drawCfg();
   } catch (e) { $('#cfg-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }

@@ -13,6 +13,7 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, 'tools'))
 
 import sim_sppro  # noqa: E402
+os.environ.setdefault('SELPI_ALLOW_UNVALIDATED_WRITES', 'true')  # these exercise the write engine
 from commands import config as config_cmd  # noqa: E402
 from sppro import config, config_write, live  # noqa: E402
 from sppro.reader import Reader  # noqa: E402

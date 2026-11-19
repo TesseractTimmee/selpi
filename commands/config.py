@@ -184,6 +184,9 @@ def run_set(args, reader=None, passcode=None, fresh_reader=None):
         return
     if stop:
         raise SystemExit('not written: ' + '; '.join(stop))
+    if not config_write.writes_available():
+        raise SystemExit('configuration writes are not enabled in this release (not yet validated on a real SP PRO); '
+                         'this build is read-only. (The dry run above shows what would change.)')
     if passcode is None:
         text = sys.stdin.readline().strip() if args.passcode_stdin else getpass.getpass('SP LINK passcode: ')
         try:

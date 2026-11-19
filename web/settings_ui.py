@@ -30,6 +30,11 @@ def writes_allowed():
     return os.environ.get('SELPI_ALLOW_CONFIG_WRITES', '').lower() == 'true'
 
 
+def writes_available():
+    # the release gate (config_write.writes_available) AND the user-facing option
+    return config_write.writes_available() and writes_allowed()
+
+
 def layout():
     """Everything the page needs to draw SP LINK's screens (no unit access)."""
     global _LAYOUT
@@ -57,7 +62,7 @@ def layout():
                     g['rows'] = [dict(r, month=merged[r['setting']]) if r['setting'] in merged else r
                                  for r in g['rows'] if r['setting'] not in merged.values()]
         _LAYOUT = {'tabs': tabs, 'settings': meta, 'hidden_tabs': ['Factory Mode Settings']}
-    return dict(_LAYOUT, writes_allowed=writes_allowed())
+    return dict(_LAYOUT, writes_allowed=writes_allowed(), writes_available=writes_available())
 
 
 def limits(cells, battery=None, values=None):
@@ -106,6 +111,7 @@ def read(reader):
     return {'read_id': rid, 'model': model, 'cells': cells, 'values': _values(raw, cells), 'problems': problems,
             'limits': limits(cells, shown.get('BatteryType'), shown),
             'version_problems': live.version_problems(live.versions(reader)), 'writes_allowed': writes_allowed(),
+            'writes_available': writes_available(),
             'read_max_age': READ_MAX_AGE}
 
 
@@ -177,6 +183,9 @@ def check(reader, rid, changes):
 
 
 def write(reader, rid, changes, passcode, allow_out_of_range=False, ignore_rules=(), force=False, out_dir=None):
+    if not config_write.writes_available():
+        raise PermissionError('configuration writes are not enabled in this release (not yet validated on a real '
+                              'SP PRO); this build is read-only')
     if not writes_allowed():
         raise PermissionError('configuration writes are off (app option allow_config_writes)')
     s = _session(rid)
