@@ -2111,7 +2111,7 @@
         {
          "setting": "Region",
          "control": "tbChargePowerEndPercent",
-         "label": "Charge Power End Percent",
+         "label": "Region",
          "range": null,
          "pos": [
           8,

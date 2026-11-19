@@ -3525,13 +3525,14 @@
    "control": "tbChargePowerEndPercent",
    "load": "subUpdateRegionSetting",
    "save": "fnGetComboBoxValue",
+   "label_override": "Region",
    "kind": "enum",
    "values": {
     "0": "None",
-    "1": "20 %",
-    "2": "0 %",
-    "3": "20 %",
-    "4": "20 %"
+    "1": "Australia A",
+    "2": "Australia B",
+    "3": "Australia C",
+    "4": "New Zealand"
    },
    "installer_only": true
   },

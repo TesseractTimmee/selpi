@@ -72,7 +72,9 @@ class TestRules(unittest.TestCase):
     def test_as4777_needs_a_region(self):
         app = int(next(k for k, v in S.META['ApplicationType']['values'].items() if 'AS4777' in v))
         ids = lambda cfg: {p['id'] for p in S.check(cfg, CELLS, 'SPMC482')}
-        self.assertEqual(S.to_display('Region', 0, CELLS)[1], 'None')          # SP LINK's blank entry
+        self.assertEqual(S.to_display('Region', 0, CELLS)[1], 'None')          # not set
+        self.assertEqual(S.to_display('Region', 1, CELLS)[1], 'Australia A')   # real region word, not the percent box
+        self.assertIn('Region', S.where('Region'))
         self.assertIn('as4777_needs_region', ids({'ApplicationType': app, 'Region': 0}))
         self.assertNotIn('as4777_needs_region', ids({'ApplicationType': app, 'Region': 1}))
 
