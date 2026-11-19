@@ -274,78 +274,12 @@
          "hidden": false
         },
         {
-         "setting": "InverterLockoutSchedule2",
-         "control": "cbInverterLockOutSchedule2",
-         "label": "Schedule 2",
-         "range": null,
-         "pos": [
-          158,
-          35
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "InverterLockoutSchedule3",
-         "control": "cbInverterLockOutSchedule3",
-         "label": "Schedule 3",
-         "range": null,
-         "pos": [
-          310,
-          35
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "InverterLockoutSchedule4",
-         "control": "cbInverterLockOutSchedule4",
-         "label": "Schedule 4",
-         "range": null,
-         "pos": [
-          461,
-          35
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "InverterLockoutSchedule2Day",
-         "control": "cbInverterLockOutSchedule2Day",
-         "label": "Sched. 2 Day",
-         "range": null,
-         "pos": [
-          157,
-          84
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "InverterLockoutSchedule3Day",
-         "control": "cbInverterLockOutSchedule3Day",
-         "label": "Sched. 3 Day",
-         "range": null,
-         "pos": [
-          310,
-          84
-         ],
-         "hidden": false
-        },
-        {
          "setting": "InverterLockoutSchedule1Day",
          "control": "cbInverterLockOutSchedule1Day",
          "label": "Sched. 1 Day",
          "range": null,
          "pos": [
           6,
-          85
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "InverterLockoutSchedule4Day",
-         "control": "cbInverterLockOutSchedule4Day",
-         "label": "Sched. 4 Day",
-         "range": null,
-         "pos": [
-          461,
           85
          ],
          "hidden": false
@@ -362,39 +296,6 @@
          "hidden": false
         },
         {
-         "setting": "InverterLockoutSchedule2StartTime",
-         "control": "dtpInverterLockoutSchedule2StartTime",
-         "label": "Sched. 2 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          158,
-          143
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "InverterLockoutSchedule3StartTime",
-         "control": "dtpInverterLockoutSchedule3StartTime",
-         "label": "Sched. 3 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          311,
-          143
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "InverterLockoutSchedule4StartTime",
-         "control": "dtpInverterLockoutSchedule4StartTime",
-         "label": "Sched. 4 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          462,
-          144
-         ],
-         "hidden": false
-        },
-        {
          "setting": "InverterLockoutSchedule1StopTime",
          "control": "dtpInverterLockoutSchedule1StopTime",
          "label": "Sched. 1 Stop Time",
@@ -402,6 +303,39 @@
          "pos": [
           6,
           202
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule2",
+         "control": "cbInverterLockOutSchedule2",
+         "label": "Schedule 2",
+         "range": null,
+         "pos": [
+          158,
+          35
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule2Day",
+         "control": "cbInverterLockOutSchedule2Day",
+         "label": "Sched. 2 Day",
+         "range": null,
+         "pos": [
+          157,
+          84
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule2StartTime",
+         "control": "dtpInverterLockoutSchedule2StartTime",
+         "label": "Sched. 2 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          158,
+          143
          ],
          "hidden": false
         },
@@ -417,6 +351,39 @@
          "hidden": false
         },
         {
+         "setting": "InverterLockoutSchedule3",
+         "control": "cbInverterLockOutSchedule3",
+         "label": "Schedule 3",
+         "range": null,
+         "pos": [
+          310,
+          35
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule3Day",
+         "control": "cbInverterLockOutSchedule3Day",
+         "label": "Sched. 3 Day",
+         "range": null,
+         "pos": [
+          310,
+          84
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule3StartTime",
+         "control": "dtpInverterLockoutSchedule3StartTime",
+         "label": "Sched. 3 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          311,
+          143
+         ],
+         "hidden": false
+        },
+        {
          "setting": "InverterLockoutSchedule3StopTime",
          "control": "dtpInverterLockoutSchedule3StopTime",
          "label": "Sched. 3 Stop Time",
@@ -424,6 +391,39 @@
          "pos": [
           311,
           202
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule4",
+         "control": "cbInverterLockOutSchedule4",
+         "label": "Schedule 4",
+         "range": null,
+         "pos": [
+          461,
+          35
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule4Day",
+         "control": "cbInverterLockOutSchedule4Day",
+         "label": "Sched. 4 Day",
+         "range": null,
+         "pos": [
+          461,
+          85
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "InverterLockoutSchedule4StartTime",
+         "control": "dtpInverterLockoutSchedule4StartTime",
+         "label": "Sched. 4 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          462,
+          144
          ],
          "hidden": false
         },
@@ -1489,78 +1489,12 @@
          "hidden": false
         },
         {
-         "setting": "AcInputCapacityLockout2",
-         "control": "cbAcInputSchedule2",
-         "label": "Schedule 2",
-         "range": null,
-         "pos": [
-          153,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLockout3",
-         "control": "cbAcInputSchedule3",
-         "label": "Schedule 3",
-         "range": null,
-         "pos": [
-          300,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLockout4",
-         "control": "cbAcInputSchedule4",
-         "label": "Schedule 4",
-         "range": null,
-         "pos": [
-          447,
-          33
-         ],
-         "hidden": false
-        },
-        {
          "setting": "AcInputCapacityLevel1",
          "control": "nudAcInputSchedule1Power",
          "label": "AC Source Power 1",
          "range": "[0 - 100 %]",
          "pos": [
           6,
-          86
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLevel2",
-         "control": "nudAcInputSchedule2Power",
-         "label": "AC Source Power 2",
-         "range": "[0 - 100 %]",
-         "pos": [
-          153,
-          86
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLevel3",
-         "control": "nudAcInputSchedule3Power",
-         "label": "AC Source Power 3",
-         "range": "[0 - 100 %]",
-         "pos": [
-          300,
-          86
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLevel4",
-         "control": "nudAcInputSchedule4Power",
-         "label": "AC Source Power 4",
-         "range": "[0 - 100 %]",
-         "pos": [
-          447,
           86
          ],
          "hidden": false
@@ -1577,78 +1511,12 @@
          "hidden": false
         },
         {
-         "setting": "AcInputCapacityLockout2Day",
-         "control": "cbAcInputSchedule2Day",
-         "label": "Sched. 2 Day",
-         "range": null,
-         "pos": [
-          153,
-          127
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLockout3Day",
-         "control": "cbAcInputSchedule3Day",
-         "label": "Sched. 3 Day",
-         "range": null,
-         "pos": [
-          300,
-          127
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLockout4Day",
-         "control": "cbAcInputSchedule4Day",
-         "label": "Sched. 4 Day",
-         "range": null,
-         "pos": [
-          447,
-          127
-         ],
-         "hidden": false
-        },
-        {
          "setting": "AcInputCapacityLockout1StartTime",
          "control": "dtpAcInputSchedule1StartTime",
          "label": "Sched. 1 Start Time",
          "range": "[00:00 - 23:59]",
          "pos": [
           7,
-          184
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLockout2StartTime",
-         "control": "dtpAcInputSchedule2StartTime",
-         "label": "Sched. 2 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          154,
-          184
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLockout3StartTime",
-         "control": "dtpAcInputSchedule3StartTime",
-         "label": "Sched. 3 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          300,
-          184
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputCapacityLockout4StartTime",
-         "control": "dtpAcInputSchedule4StartTime",
-         "label": "Sched. 4 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          448,
           184
          ],
          "hidden": false
@@ -1665,6 +1533,50 @@
          "hidden": false
         },
         {
+         "setting": "AcInputCapacityLockout2",
+         "control": "cbAcInputSchedule2",
+         "label": "Schedule 2",
+         "range": null,
+         "pos": [
+          153,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLevel2",
+         "control": "nudAcInputSchedule2Power",
+         "label": "AC Source Power 2",
+         "range": "[0 - 100 %]",
+         "pos": [
+          153,
+          86
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLockout2Day",
+         "control": "cbAcInputSchedule2Day",
+         "label": "Sched. 2 Day",
+         "range": null,
+         "pos": [
+          153,
+          127
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLockout2StartTime",
+         "control": "dtpAcInputSchedule2StartTime",
+         "label": "Sched. 2 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          154,
+          184
+         ],
+         "hidden": false
+        },
+        {
          "setting": "AcInputCapacityLockout2StopTime",
          "control": "dtpAcInputSchedule2StopTime",
          "label": "Sched. 2 Stop Time",
@@ -1676,6 +1588,50 @@
          "hidden": false
         },
         {
+         "setting": "AcInputCapacityLockout3",
+         "control": "cbAcInputSchedule3",
+         "label": "Schedule 3",
+         "range": null,
+         "pos": [
+          300,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLevel3",
+         "control": "nudAcInputSchedule3Power",
+         "label": "AC Source Power 3",
+         "range": "[0 - 100 %]",
+         "pos": [
+          300,
+          86
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLockout3Day",
+         "control": "cbAcInputSchedule3Day",
+         "label": "Sched. 3 Day",
+         "range": null,
+         "pos": [
+          300,
+          127
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLockout3StartTime",
+         "control": "dtpAcInputSchedule3StartTime",
+         "label": "Sched. 3 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          300,
+          184
+         ],
+         "hidden": false
+        },
+        {
          "setting": "AcInputCapacityLockout3StopTime",
          "control": "dtpAcInputSchedule3StopTime",
          "label": "Sched. 3 Stop Time",
@@ -1683,6 +1639,50 @@
          "pos": [
           300,
           243
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLockout4",
+         "control": "cbAcInputSchedule4",
+         "label": "Schedule 4",
+         "range": null,
+         "pos": [
+          447,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLevel4",
+         "control": "nudAcInputSchedule4Power",
+         "label": "AC Source Power 4",
+         "range": "[0 - 100 %]",
+         "pos": [
+          447,
+          86
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLockout4Day",
+         "control": "cbAcInputSchedule4Day",
+         "label": "Sched. 4 Day",
+         "range": null,
+         "pos": [
+          447,
+          127
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputCapacityLockout4StartTime",
+         "control": "dtpAcInputSchedule4StartTime",
+         "label": "Sched. 4 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          448,
+          184
          ],
          "hidden": false
         },
@@ -1721,89 +1721,12 @@
          "hidden": false
         },
         {
-         "setting": "AcInputChargerLockout2",
-         "control": "cbAcChargerLockoutSchedule2",
-         "label": "Schedule 2",
-         "range": null,
-         "pos": [
-          156,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockout3",
-         "control": "cbAcChargerLockoutSchedule3",
-         "label": "Schedule 3",
-         "range": null,
-         "pos": [
-          303,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockout4",
-         "control": "cbAcChargerLockoutSchedule4",
-         "label": "Schedule 4",
-         "range": null,
-         "pos": [
-          450,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockoutMode",
-         "control": "cbAcChargerLockoutScheduleMode",
-         "label": "Lockout AC only",
-         "range": null,
-         "pos": [
-          597,
-          33
-         ],
-         "hidden": false
-        },
-        {
          "setting": "AcInputChargerLockout1Day",
          "control": "cbAcChargerLockoutSchedule1Day",
          "label": "Sched. 1 Day",
          "range": null,
          "pos": [
           9,
-          83
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockout2Day",
-         "control": "cbAcChargerLockoutSchedule2Day",
-         "label": "Sched. 2 Day",
-         "range": null,
-         "pos": [
-          156,
-          83
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockout3Day",
-         "control": "cbAcChargerLockoutSchedule3Day",
-         "label": "Sched. 3 Day",
-         "range": null,
-         "pos": [
-          303,
-          83
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockout4Day",
-         "control": "cbAcChargerLockoutSchedule4Day",
-         "label": "Sched. 4 Day",
-         "range": null,
-         "pos": [
-          450,
           83
          ],
          "hidden": false
@@ -1820,39 +1743,6 @@
          "hidden": false
         },
         {
-         "setting": "AcInputChargerLockout2StartTime",
-         "control": "dtpAcChargerLockoutSchedule2StartTime",
-         "label": "Sched. 2 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          157,
-          142
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockout3StartTime",
-         "control": "dtpAcChargerLockoutSchedule3StartTime",
-         "label": "Sched. 3 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          303,
-          142
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "AcInputChargerLockout4StartTime",
-         "control": "dtpAcChargerLockoutSchedule4StartTime",
-         "label": "Sched. 4 Start Time",
-         "range": "[00:00 - 23:59]",
-         "pos": [
-          451,
-          142
-         ],
-         "hidden": false
-        },
-        {
          "setting": "AcInputChargerLockout1StopTime",
          "control": "dtpAcChargerLockoutSchedule1StopTime",
          "label": "Sched. 1 Stop Time",
@@ -1860,6 +1750,39 @@
          "pos": [
           10,
           201
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockout2",
+         "control": "cbAcChargerLockoutSchedule2",
+         "label": "Schedule 2",
+         "range": null,
+         "pos": [
+          156,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockout2Day",
+         "control": "cbAcChargerLockoutSchedule2Day",
+         "label": "Sched. 2 Day",
+         "range": null,
+         "pos": [
+          156,
+          83
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockout2StartTime",
+         "control": "dtpAcChargerLockoutSchedule2StartTime",
+         "label": "Sched. 2 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          157,
+          142
          ],
          "hidden": false
         },
@@ -1875,6 +1798,39 @@
          "hidden": false
         },
         {
+         "setting": "AcInputChargerLockout3",
+         "control": "cbAcChargerLockoutSchedule3",
+         "label": "Schedule 3",
+         "range": null,
+         "pos": [
+          303,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockout3Day",
+         "control": "cbAcChargerLockoutSchedule3Day",
+         "label": "Sched. 3 Day",
+         "range": null,
+         "pos": [
+          303,
+          83
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockout3StartTime",
+         "control": "dtpAcChargerLockoutSchedule3StartTime",
+         "label": "Sched. 3 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          303,
+          142
+         ],
+         "hidden": false
+        },
+        {
          "setting": "AcInputChargerLockout3StopTime",
          "control": "dtpAcChargerLockoutSchedule3StopTime",
          "label": "Sched. 3 Stop Time",
@@ -1886,6 +1842,39 @@
          "hidden": false
         },
         {
+         "setting": "AcInputChargerLockout4",
+         "control": "cbAcChargerLockoutSchedule4",
+         "label": "Schedule 4",
+         "range": null,
+         "pos": [
+          450,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockout4Day",
+         "control": "cbAcChargerLockoutSchedule4Day",
+         "label": "Sched. 4 Day",
+         "range": null,
+         "pos": [
+          450,
+          83
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockout4StartTime",
+         "control": "dtpAcChargerLockoutSchedule4StartTime",
+         "label": "Sched. 4 Start Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          451,
+          142
+         ],
+         "hidden": false
+        },
+        {
          "setting": "AcInputChargerLockout4StopTime",
          "control": "dtpAcChargerLockoutSchedule4StopTime",
          "label": "Sched. 4 Stop Time",
@@ -1893,6 +1882,17 @@
          "pos": [
           453,
           201
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "AcInputChargerLockoutMode",
+         "control": "cbAcChargerLockoutScheduleMode",
+         "label": "Lockout AC only",
+         "range": null,
+         "pos": [
+          597,
+          33
          ],
          "hidden": false
         }
@@ -2798,39 +2798,6 @@
          "hidden": false
         },
         {
-         "setting": "GeneratorSchedule2",
-         "control": "cbGeneratorSchedule2",
-         "label": "Schedule 2",
-         "range": null,
-         "pos": [
-          153,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "GeneratorSchedule3",
-         "control": "cbGeneratorSchedule3",
-         "label": "Schedule 3",
-         "range": null,
-         "pos": [
-          300,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "GeneratorSchedule4",
-         "control": "cbGeneratorSchedule4",
-         "label": "Schedule 4",
-         "range": null,
-         "pos": [
-          447,
-          33
-         ],
-         "hidden": false
-        },
-        {
          "setting": "GeneratorSchedule1Day",
          "control": "cbGeneratorSchedule1Day",
          "label": "Sched. 1 Day",
@@ -2838,39 +2805,6 @@
          "pos": [
           6,
           82
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "GeneratorSchedule2Day",
-         "control": "cbGeneratorSchedule2Day",
-         "label": "Sched. 2 Day",
-         "range": null,
-         "pos": [
-          153,
-          82
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "GeneratorSchedule3Day",
-         "control": "cbGeneratorSchedule3Day",
-         "label": "Sched. 3 Day",
-         "range": null,
-         "pos": [
-          300,
-          83
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "GeneratorSchedule4Day",
-         "control": "cbGeneratorSchedule4Day",
-         "label": "Sched. 4 Day",
-         "range": null,
-         "pos": [
-          447,
-          83
          ],
          "hidden": false
         },
@@ -2886,39 +2820,6 @@
          "hidden": false
         },
         {
-         "setting": "GeneratorSchedule2StartTime",
-         "control": "dtpGeneratorSchedule2StartTime",
-         "label": "Sched. 2 Start Time",
-         "range": null,
-         "pos": [
-          154,
-          141
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "GeneratorSchedule3StartTime",
-         "control": "dtpGeneratorSchedule3StartTime",
-         "label": "Sched. 3 Start Time",
-         "range": null,
-         "pos": [
-          300,
-          142
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "GeneratorSchedule4StartTime",
-         "control": "dtpGeneratorSchedule4StartTime",
-         "label": "Sched. 4 Start Time",
-         "range": null,
-         "pos": [
-          448,
-          142
-         ],
-         "hidden": false
-        },
-        {
          "setting": "GeneratorSchedule1StopTime",
          "control": "cbGeneratorSchedule1StopTime",
          "label": "Sched. 1 Stop Time",
@@ -2926,6 +2827,39 @@
          "pos": [
           72,
           198
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule2",
+         "control": "cbGeneratorSchedule2",
+         "label": "Schedule 2",
+         "range": null,
+         "pos": [
+          153,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule2Day",
+         "control": "cbGeneratorSchedule2Day",
+         "label": "Sched. 2 Day",
+         "range": null,
+         "pos": [
+          153,
+          82
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule2StartTime",
+         "control": "dtpGeneratorSchedule2StartTime",
+         "label": "Sched. 2 Start Time",
+         "range": null,
+         "pos": [
+          154,
+          141
          ],
          "hidden": false
         },
@@ -2941,6 +2875,39 @@
          "hidden": false
         },
         {
+         "setting": "GeneratorSchedule3",
+         "control": "cbGeneratorSchedule3",
+         "label": "Schedule 3",
+         "range": null,
+         "pos": [
+          300,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule3Day",
+         "control": "cbGeneratorSchedule3Day",
+         "label": "Sched. 3 Day",
+         "range": null,
+         "pos": [
+          300,
+          83
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule3StartTime",
+         "control": "dtpGeneratorSchedule3StartTime",
+         "label": "Sched. 3 Start Time",
+         "range": null,
+         "pos": [
+          300,
+          142
+         ],
+         "hidden": false
+        },
+        {
          "setting": "GeneratorSchedule3StopTime",
          "control": "cbGeneratorSchedule3StopTime",
          "label": "Sched. 3 Stop Time",
@@ -2948,6 +2915,39 @@
          "pos": [
           366,
           200
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule4",
+         "control": "cbGeneratorSchedule4",
+         "label": "Schedule 4",
+         "range": null,
+         "pos": [
+          447,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule4Day",
+         "control": "cbGeneratorSchedule4Day",
+         "label": "Sched. 4 Day",
+         "range": null,
+         "pos": [
+          447,
+          83
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "GeneratorSchedule4StartTime",
+         "control": "dtpGeneratorSchedule4StartTime",
+         "label": "Sched. 4 Start Time",
+         "range": null,
+         "pos": [
+          448,
+          142
          ],
          "hidden": false
         },
@@ -2985,78 +2985,12 @@
          "hidden": false
         },
         {
-         "setting": "ShutdownTimeSchedule2",
-         "control": "cbShutdownTimeSchedule2",
-         "label": "Schedule 2",
-         "range": null,
-         "pos": [
-          153,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ShutdownTimeSchedule3",
-         "control": "cbShutdownTimeSchedule3",
-         "label": "Schedule 3",
-         "range": null,
-         "pos": [
-          300,
-          33
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ShutdownTimeSchedule4",
-         "control": "cbShutdownTimeSchedule4",
-         "label": "Schedule 4",
-         "range": null,
-         "pos": [
-          447,
-          33
-         ],
-         "hidden": false
-        },
-        {
          "setting": "ShutdownTimeSchedule1Day",
          "control": "cbShutdownTimeSchedule1Day",
          "label": "Sched. 1 Day",
          "range": null,
          "pos": [
           6,
-          84
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ShutdownTimeSchedule2Day",
-         "control": "cbShutdownTimeSchedule2Day",
-         "label": "Sched. 2 Day",
-         "range": null,
-         "pos": [
-          153,
-          84
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ShutdownTimeSchedule3Day",
-         "control": "cbShutdownTimeSchedule3Day",
-         "label": "Sched. 3 Day",
-         "range": null,
-         "pos": [
-          300,
-          84
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ShutdownTimeSchedule4Day",
-         "control": "cbShutdownTimeSchedule4Day",
-         "label": "Sched. 4 Day",
-         "range": null,
-         "pos": [
-          447,
           84
          ],
          "hidden": false
@@ -3073,34 +3007,45 @@
          "hidden": false
         },
         {
+         "setting": "ShutdownTimeSchedule1StopTime",
+         "control": "dtpShutdownTimeSchedule1StopTime",
+         "label": "Sched. 1 Stop Time",
+         "range": "[00:00 - 23:59]",
+         "pos": [
+          9,
+          202
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ShutdownTimeSchedule2",
+         "control": "cbShutdownTimeSchedule2",
+         "label": "Schedule 2",
+         "range": null,
+         "pos": [
+          153,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ShutdownTimeSchedule2Day",
+         "control": "cbShutdownTimeSchedule2Day",
+         "label": "Sched. 2 Day",
+         "range": null,
+         "pos": [
+          153,
+          84
+         ],
+         "hidden": false
+        },
+        {
          "setting": "ShutdownTimeSchedule2StartTime",
          "control": "dtpShutdownTimeSchedule2StartTime",
          "label": "Sched. 2 Start Time",
          "range": null,
          "pos": [
           154,
-          143
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ShutdownTimeSchedule3StartTime",
-         "control": "dtpShutdownTimeSchedule3StartTime",
-         "label": "Sched. 3 Start Time",
-         "range": null,
-         "pos": [
-          301,
-          143
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ShutdownTimeSchedule4StartTime",
-         "control": "dtpShutdownTimeSchedule4StartTime",
-         "label": "Sched. 4 Start Time",
-         "range": null,
-         "pos": [
-          448,
           143
          ],
          "hidden": false
@@ -3117,13 +3062,35 @@
          "hidden": false
         },
         {
-         "setting": "ShutdownTimeSchedule1StopTime",
-         "control": "dtpShutdownTimeSchedule1StopTime",
-         "label": "Sched. 1 Stop Time",
-         "range": "[00:00 - 23:59]",
+         "setting": "ShutdownTimeSchedule3",
+         "control": "cbShutdownTimeSchedule3",
+         "label": "Schedule 3",
+         "range": null,
          "pos": [
-          9,
-          202
+          300,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ShutdownTimeSchedule3Day",
+         "control": "cbShutdownTimeSchedule3Day",
+         "label": "Sched. 3 Day",
+         "range": null,
+         "pos": [
+          300,
+          84
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ShutdownTimeSchedule3StartTime",
+         "control": "dtpShutdownTimeSchedule3StartTime",
+         "label": "Sched. 3 Start Time",
+         "range": null,
+         "pos": [
+          301,
+          143
          ],
          "hidden": false
         },
@@ -3135,6 +3102,39 @@
          "pos": [
           301,
           202
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ShutdownTimeSchedule4",
+         "control": "cbShutdownTimeSchedule4",
+         "label": "Schedule 4",
+         "range": null,
+         "pos": [
+          447,
+          33
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ShutdownTimeSchedule4Day",
+         "control": "cbShutdownTimeSchedule4Day",
+         "label": "Sched. 4 Day",
+         "range": null,
+         "pos": [
+          447,
+          84
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ShutdownTimeSchedule4StartTime",
+         "control": "dtpShutdownTimeSchedule4StartTime",
+         "label": "Sched. 4 Start Time",
+         "range": null,
+         "pos": [
+          448,
+          143
          ],
          "hidden": false
         },
@@ -6400,17 +6400,6 @@
          "hidden": false
         },
         {
-         "setting": "ModbusRtuPort",
-         "control": "cbModbusRtuPort",
-         "label": "Modbus RTU Port",
-         "range": null,
-         "pos": [
-          152,
-          34
-         ],
-         "hidden": false
-        },
-        {
          "setting": "Port1DTRDCD",
          "control": "cbPort1DTRDCD",
          "label": "Port 1 DTR/DCD",
@@ -6418,17 +6407,6 @@
          "pos": [
           6,
           83
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "ModbusRtuAddress",
-         "control": "nudModbusRtuAddress",
-         "label": "Modbus RTU Address",
-         "range": "[1 - 252]",
-         "pos": [
-          152,
-          94
          ],
          "hidden": false
         },
@@ -6462,6 +6440,28 @@
          "pos": [
           6,
           233
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ModbusRtuPort",
+         "control": "cbModbusRtuPort",
+         "label": "Modbus RTU Port",
+         "range": null,
+         "pos": [
+          152,
+          34
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "ModbusRtuAddress",
+         "control": "nudModbusRtuAddress",
+         "label": "Modbus RTU Address",
+         "range": "[1 - 252]",
+         "pos": [
+          152,
+          94
          ],
          "hidden": false
         }
@@ -7608,56 +7608,12 @@
        "outer": [],
        "rows": [
         {
-         "setting": "TimedAssertOutput",
-         "control": "cbTimedAssertOutput",
-         "label": "Timed Assert Output",
-         "range": null,
-         "pos": [
-          6,
-          37
-         ],
-         "hidden": false
-        },
-        {
          "setting": "TimeSchedule1",
          "control": "cbTimeSchedule1",
          "label": "Schedule 1",
          "range": null,
          "pos": [
           156,
-          37
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule2",
-         "control": "cbTimeSchedule2",
-         "label": "Schedule 2",
-         "range": null,
-         "pos": [
-          306,
-          37
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule3",
-         "control": "cbTimeSchedule3",
-         "label": "Schedule 3",
-         "range": null,
-         "pos": [
-          456,
-          37
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule4",
-         "control": "cbTimeSchedule4",
-         "label": "Schedule 4",
-         "range": null,
-         "pos": [
-          606,
           37
          ],
          "hidden": false
@@ -7674,78 +7630,12 @@
          "hidden": false
         },
         {
-         "setting": "TimeSchedule2Day",
-         "control": "cbTimeSchedule2Day",
-         "label": "Sched. 2 Day",
-         "range": null,
-         "pos": [
-          306,
-          87
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule3Day",
-         "control": "cbTimeSchedule3Day",
-         "label": "Sched. 3 Day",
-         "range": null,
-         "pos": [
-          456,
-          87
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule4Day",
-         "control": "cbTimeSchedule4Day",
-         "label": "Sched. 4 Day",
-         "range": null,
-         "pos": [
-          606,
-          87
-         ],
-         "hidden": false
-        },
-        {
          "setting": "TimeSchedule1AssertTime",
          "control": "dtpTimeSchedule1AssertTime",
          "label": "Sched. 1 Start Time",
          "range": null,
          "pos": [
           156,
-          149
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule2AssertTime",
-         "control": "dtpTimeSchedule2AssertTime",
-         "label": "Sched. 2 Start Time",
-         "range": null,
-         "pos": [
-          306,
-          149
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule3AssertTime",
-         "control": "dtpTimeSchedule3AssertTime",
-         "label": "Sched. 3 Start Time",
-         "range": null,
-         "pos": [
-          456,
-          149
-         ],
-         "hidden": false
-        },
-        {
-         "setting": "TimeSchedule4AssertTime",
-         "control": "dtpTimeSchedule4AssertTime",
-         "label": "Sched. 4 Start Time",
-         "range": null,
-         "pos": [
-          606,
           149
          ],
          "hidden": false
@@ -7762,6 +7652,39 @@
          "hidden": false
         },
         {
+         "setting": "TimeSchedule2",
+         "control": "cbTimeSchedule2",
+         "label": "Schedule 2",
+         "range": null,
+         "pos": [
+          306,
+          37
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimeSchedule2Day",
+         "control": "cbTimeSchedule2Day",
+         "label": "Sched. 2 Day",
+         "range": null,
+         "pos": [
+          306,
+          87
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimeSchedule2AssertTime",
+         "control": "dtpTimeSchedule2AssertTime",
+         "label": "Sched. 2 Start Time",
+         "range": null,
+         "pos": [
+          306,
+          149
+         ],
+         "hidden": false
+        },
+        {
          "setting": "TimeSchedule2DeassertTime",
          "control": "dtpTimeSchedule2DeassertTime",
          "label": "Sched. 2 Stop Time",
@@ -7769,6 +7692,39 @@
          "pos": [
           306,
           209
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimeSchedule3",
+         "control": "cbTimeSchedule3",
+         "label": "Schedule 3",
+         "range": null,
+         "pos": [
+          456,
+          37
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimeSchedule3Day",
+         "control": "cbTimeSchedule3Day",
+         "label": "Sched. 3 Day",
+         "range": null,
+         "pos": [
+          456,
+          87
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimeSchedule3AssertTime",
+         "control": "dtpTimeSchedule3AssertTime",
+         "label": "Sched. 3 Start Time",
+         "range": null,
+         "pos": [
+          456,
+          149
          ],
          "hidden": false
         },
@@ -7784,6 +7740,39 @@
          "hidden": false
         },
         {
+         "setting": "TimeSchedule4",
+         "control": "cbTimeSchedule4",
+         "label": "Schedule 4",
+         "range": null,
+         "pos": [
+          606,
+          37
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimeSchedule4Day",
+         "control": "cbTimeSchedule4Day",
+         "label": "Sched. 4 Day",
+         "range": null,
+         "pos": [
+          606,
+          87
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimeSchedule4AssertTime",
+         "control": "dtpTimeSchedule4AssertTime",
+         "label": "Sched. 4 Start Time",
+         "range": null,
+         "pos": [
+          606,
+          149
+         ],
+         "hidden": false
+        },
+        {
          "setting": "TimeSchedule4DeassertTime",
          "control": "dtpTimeSchedule4DeassertTime",
          "label": "Sched. 4 Stop Time",
@@ -7791,6 +7780,17 @@
          "pos": [
           606,
           209
+         ],
+         "hidden": false
+        },
+        {
+         "setting": "TimedAssertOutput",
+         "control": "cbTimedAssertOutput",
+         "label": "Timed Assert Output",
+         "range": null,
+         "pos": [
+          6,
+          37
          ],
          "hidden": false
         }

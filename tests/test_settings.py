@@ -144,6 +144,12 @@ class TestRules(unittest.TestCase):
         self.assertTrue(S.installer_only('VoltVarLowVoltageStart'))
         self.assertFalse(S.installer_only('EqualiseV'))
 
+    def test_log_interval_enum_offset(self):
+        # SP LINK switches on (value-1); raw = minutes directly
+        self.assertEqual(S.to_display('DetailedDataLogInterval', 15, CELLS)[1], '15 min')
+        self.assertEqual(S.to_display('DetailedDataLogInterval', 1, CELLS)[1], '1 min')
+        self.assertEqual(S.from_display('DetailedDataLogInterval', '30 min', CELLS)[0], 30)
+
     def test_firmware_min_version(self):
         self.assertEqual(S.min_version('AdvancedMultiPhaseStructure'), 38)   # Powerchain needs config v38
         self.assertIsNone(S.min_version('EqualiseV'))                        # always present

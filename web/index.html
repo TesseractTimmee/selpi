@@ -219,18 +219,16 @@ function control(name) {
   }
   if (m.kind === 'pf') {      // a number + Lagging / Leading, stored as one signed word
     const [num, dir] = String(ed !== undefined ? ed : v.value).split(' ');
-    const [mn, mx] = lim(name);
-    const bounds = (mn != null ? ` min="${mn}"` : '') + (mx != null ? ` max="${mx}"` : '');
-    return `<input type="number" data-s="${esc(name)}" data-part="num" value="${esc(num)}" step="${m.step || 0.01}"${bounds}>` +
+    return `<input type="number" data-s="${esc(name)}" data-part="num" value="${esc(num)}" step="${m.step || 0.01}">` +
       `${m.unit ? `<span class="unit">${esc(m.unit)}</span>` : ''} <select data-s="${esc(name)}" data-part="dir">${m.directions.map(d =>
       `<option${d === dir ? ' selected' : ''}>${esc(d)}</option>`).join('')}</select>`;
   }
   if (m.kind === 'number') {
     const cur = ed !== undefined ? ed : v.value;
     const step = m.step || (m.decimals ? Math.pow(10, -m.decimals) : 1);
-    const [mn, mx] = lim(name);
-    const bounds = (mn != null ? ` min="${mn}"` : '') + (mx != null ? ` max="${mx}"` : '');
-    return `<input type="number" data-s="${esc(name)}" value="${esc(cur)}" step="${step}"${bounds}${dis}><span class="unit">${esc(m.unit || '')}</span>`;
+    // no hard min/max on the element: a pre-existing value below SP LINK's editable minimum (e.g. an equalise time
+    // from a BMS open-loop doc) is valid and must display cleanly; held() still pulls an *edit* into range.
+    return `<input type="number" data-s="${esc(name)}" value="${esc(cur)}" step="${step}"${dis}><span class="unit">${esc(m.unit || '')}</span>`;
   }
   const cur = ed !== undefined ? ed : (m.kind === 'daymonth' ? v.text : v.raw);
   return `<input data-s="${esc(name)}" value="${esc(cur)}" size="10"${dis}>${m.kind === 'raw' ? '<span class="unit">raw</span>' : ''}`;
