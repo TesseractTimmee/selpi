@@ -56,6 +56,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
 .cfg td.rng { color: var(--muted); font-size: 12px; }
 #cfg-out .grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
 .cfg input[type=number] { width: 7.5em; text-align: right; }
+.cfg .date input[type=number] { width: 4.5em; }
 .cfg tr.changed td { background: var(--warn-bg); }
 .cfg .unit { color: var(--muted); font-size: 12px; margin-left: 4px; }
 .cfg .fieldmsg { display: block; font-size: 12px; }
@@ -191,7 +192,7 @@ $('#live-go').onclick = loadLive; $('#screens').onchange = loadLive;
 setInterval(() => { if ($('#auto').checked && $('#live').classList.contains('on') && !document.hidden) loadLive(); }, 15000);
 
 // ---- configuration (SP LINK's Configuration Settings screens)
-let LAYOUT = null, READ = null, EDITS = {}, CHECK = null, curTab = null, curSub = null, checkTimer = null;
+let LAYOUT = null, READ = null, EDITS = {}, NOTES = {}, CHECK = null, curTab = null, curSub = null, checkTimer = null;
 async function cfgLayout() { if (!LAYOUT) LAYOUT = await api('api/config/layout'); return LAYOUT; }
 const visTabs = () => LAYOUT.tabs.filter(t => (t.title || t.id) && ($('#cfg-factory').checked || !LAYOUT.hidden_tabs.includes(t.title)));
 function currentText(name) { const v = READ && READ.values[name]; return v ? v.text : ''; }
@@ -213,18 +214,24 @@ function control(name) {
   if (m.kind === 'number') {
     const cur = ed !== undefined ? ed : v.value;
     const step = m.step || (m.decimals ? Math.pow(10, -m.decimals) : 1);
-    return `<input type="number" data-s="${esc(name)}" value="${esc(cur)}" step="${step}"${dis}><span class="unit">${esc(m.unit || '')}</span>`;
+    const [mn, mx] = lim(name);
+    const bounds = (mn != null ? ` min="${mn}"` : '') + (mx != null ? ` max="${mx}"` : '');
+    return `<input type="number" data-s="${esc(name)}" value="${esc(cur)}" step="${step}"${bounds}${dis}><span class="unit">${esc(m.unit || '')}</span>`;
   }
   const cur = ed !== undefined ? ed : (m.kind === 'daymonth' ? v.text : v.raw);
   return `<input data-s="${esc(name)}" value="${esc(cur)}" size="10"${dis}>${m.kind === 'raw' ? '<span class="unit">raw</span>' : ''}`;
 }
 function rowHtml(r, where) {
-  const name = r.setting, c = CHECK && CHECK.changes[name];
-  const msgs = c ? [...(c.warnings || []).map(w => `<span class="fieldmsg" style="color:var(--warn)">${esc(w)}</span>`),
-                    c.error ? `<span class="fieldmsg err">${esc(c.error)}</span>` : ''].join('') : '';
-  const was = EDITS[name] !== undefined ? `<span class="fieldmsg muted">was ${esc(currentText(name))}</span>` : '';
-  return `<tr class="${EDITS[name] !== undefined ? 'changed' : ''}"><td class="lbl">${esc(r.label || name)}${where ? `<div class="muted">${esc(where)}</div>` : ''}</td>` +
-    `<td>${control(name)}${was}${msgs}</td><td class="rng">${esc(r.range || '')}</td></tr>`;
+  const names = r.month ? [r.setting, r.month] : [r.setting];      // a day/month date: two settings, one row
+  const msgs = names.map(n => CHECK && CHECK.changes[n]).filter(Boolean).map(c =>
+    [...(c.warnings || []).map(w => `<span class="fieldmsg" style="color:var(--warn)">${esc(w)}</span>`),
+     c.error ? `<span class="fieldmsg err">${esc(c.error)}</span>` : ''].join('')).join('');
+  const held = names.filter(n => NOTES[n]).map(n => `<span class="fieldmsg" style="color:var(--warn)">${esc(NOTES[n])}</span>`).join('');
+  const changed = names.some(n => EDITS[n] !== undefined);
+  const was = changed ? `<span class="fieldmsg muted">was ${esc(names.map(currentText).join(' '))}</span>` : '';
+  const ctl = r.month ? `<span class="date">${control(r.setting)} ${control(r.month)}</span>` : control(r.setting);
+  return `<tr class="${changed ? 'changed' : ''}"><td class="lbl">${esc(r.label || r.setting)}${where ? `<div class="muted">${esc(where)}</div>` : ''}</td>` +
+    `<td>${ctl}${was}${held}${msgs}</td><td class="rng">${esc(r.month ? '' : (r.range || ''))}</td></tr>`;
 }
 function drawCfg() {
   if ($('#cfg-rawview').checked) return drawRaw();
@@ -271,7 +278,6 @@ function drawWrite() {
   if (!names.length) return;
   const probs = CHECK ? [...CHECK.problems, ...CHECK.send_problems] : [];
   const errors = probs.filter(p => p.severity === 'error');
-  const ranged = CHECK && Object.values(CHECK.changes).some(c => (c.warnings || []).length);
   const bad = CHECK && Object.values(CHECK.changes).some(c => c.error);
   const off = !READ.writes_allowed;
   $('#cfg-write-in').innerHTML = `<b>${names.length} change${names.length > 1 ? 's' : ''}</b><table class="cfg">${names.map(n =>
@@ -279,13 +285,12 @@ function drawWrite() {
     (CHECK ? problemsHtml("SP LINK's checks on these changes", probs) || '<p class="ok">SP LINK\'s checks: no problems.</p>' : '<p class="note">checking…</p>') +
     (off ? '<p class="note">Writing is off: turn on the app option <b>allow_config_writes</b> to write from here.</p>' : `
     <div class="bar">
-      ${ranged ? '<label><input type="checkbox" id="cfg-oor"> write values outside SP LINK\'s range</label>' : ''}
       ${errors.length ? '<label class="err"><input type="checkbox" id="cfg-ign"> write although SP LINK would refuse</label>' : ''}
       <input type="password" id="cfg-pass" placeholder="SP LINK passcode" autocomplete="off" size="14">
       <button class="act" id="cfg-do"${bad || !CHECK ? ' disabled' : ''}>Write to SP PRO</button>
       <button id="cfg-undo">Discard changes</button>
     </div><div id="cfg-res"></div>`) + (off ? '<button id="cfg-undo">Discard changes</button>' : '');
-  $('#cfg-undo').onclick = () => { EDITS = {}; CHECK = null; drawCfg(); };
+  $('#cfg-undo').onclick = () => { EDITS = {}; NOTES = {}; CHECK = null; drawCfg(); };
   if (!off) $('#cfg-do').onclick = doWrite;
 }
 function edited(name, text) {
@@ -314,7 +319,7 @@ async function doWrite() {
   try {
     const r = await api('api/config/write', {method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({read_id: READ.read_id, changes: EDITS, passcode: pass,
-                            allow_out_of_range: !!($('#cfg-oor') && $('#cfg-oor').checked), ignore_rules: ignore})});
+                            ignore_rules: ignore})});
     const others = Object.keys(r.other_changes || {});
     const note = `<div class="msg">Written: ${esc(r.changes.map(c => `${c.setting} ${c.old} → ${c.new}${c.confirmed ? '' : ' (NOT confirmed)'}`).join('; '))}.` +
       ` Backup ${esc(r.backup)}.${others.length ? ' Other words changed: ' + esc(others.join(', ')) : ''}</div>`;
@@ -334,7 +339,7 @@ async function cfgRead(note) {
     $('#cfg-at').textContent = `${READ.model || '?'} · read ${READ.at.toTimeString().slice(0, 8)}`;
     const vp = READ.version_problems.length ? `<div class="msg">This unit differs from the verified map (${esc(READ.version_problems.join(', '))}): values may be wrong and writing is refused.</div>` : '';
     $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + vp + problemsHtml("Already in the unit's configuration (SP LINK would flag these)", READ.problems);
-    EDITS = {}; CHECK = null;
+    EDITS = {}; NOTES = {}; CHECK = null;
     drawCfg();
   } catch (e) { $('#cfg-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
   clearInterval(timer);
@@ -351,8 +356,28 @@ $('#cfg-subtabs').onclick = e => { const b = e.target.closest('button'); if (b) 
 $('#cfg-out').addEventListener('change', e => {
   const t = e.target;
   if (t.dataset.off) { edited(t.dataset.off, t.checked ? 'Disabled' : (currentText(t.dataset.off) === 'Disabled' ? '00:00' : currentText(t.dataset.off))); drawCfg(); return; }
-  if (t.dataset.s) edited(t.dataset.s, t.value);
+  if (!t.dataset.s) return;
+  if (t.type === 'number') t.value = held(t.dataset.s, t.value);
+  edited(t.dataset.s, t.value);
+  drawCfg();
 });
+// SP LINK's number boxes (WinForms NumericUpDown) hold a typed value to their minimum / maximum and round it to their
+// decimals; the same here, with a note. Limits set by another setting are left to the rule check.
+// the limits after the pending changes (Battery Type, Float...) once checked; until then those from the read
+const lim = name => ((CHECK && CHECK.limits) || READ.limits || {})[name] || [null, null, 0];
+function held(name, text) {
+  delete NOTES[name];
+  const [mn, mx, dec] = lim(name);
+  let v = parseFloat(text);
+  if (!isFinite(v)) { NOTES[name] = 'not a number: kept the current value'; return READ.values[name].value; }
+  let note = '';
+  if (mn != null && v < mn) { v = mn; note = `held to SP LINK's minimum ${mn}`; }
+  if (mx != null && v > mx) { v = mx; note = `held to SP LINK's maximum ${mx}`; }
+  const r = Number(v.toFixed(dec));
+  if (!note && r !== v) note = `rounded to ${dec} decimal${dec === 1 ? '' : 's'}, as SP LINK does`;
+  if (note) NOTES[name] = note;
+  return String(r);
+}
 
 // ---- jobs
 async function waitJob(job, out, done) {

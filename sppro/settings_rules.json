@@ -187,6 +187,14 @@
    "severity": "error",
    "confidence": "high",
    "note": "SP LINK's GetACSourceDifferenceInkW: input - (0 - export), both in kW (A x 240 / 1000, kVA x 0.8); both are stored >= 0, so this only catches an invalid negative value"
+  },
+  {
+   "id": "initial_return_near_float",
+   "require": "InitialReturnVoltage <= min(FloatV, FloatReturn) * (0.98 if BatteryType in ('Lithium LiFePO4', 'Lithium genZ', 'Custom', 'Lithium PowerPlus', 'BMS - Cegasa 48V', 'BMS - Cegasa/SelectCell 144V') else 0.95)",
+   "message": "Initial Return Voltage is close to the Float / Float Return voltage (SP LINK shows it in the warning colour).",
+   "severity": "warning",
+   "confidence": "high",
+   "source": "fclsMain::nudInitialReturnVoltage_CheckMaximumAndColour"
   }
  ],
  "not_yet": [

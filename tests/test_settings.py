@@ -82,6 +82,32 @@ class TestRules(unittest.TestCase):
                  for x in [g.get('title')] + [r.get('label') for r in g['rows']] if x]
         self.assertFalse([x for x in texts if '"' in x or '  ' in x or x != x.strip()])
 
+    def test_rollover_date(self):
+        self.assertIn(('YearToDateRollOverDay', 'YearToDateRollOverMonth'), S.date_pairs())
+        self.assertEqual(S.from_display('YearToDateRollOverMonth', 'jul', CELLS)[0], 7)
+        ids = lambda d, m: {p['id'] for p in S.check({'YearToDateRollOverDay': d, 'YearToDateRollOverMonth': m})}
+        self.assertIn('date_valid', ids(31, 4))
+        self.assertIn('date_leap_day', ids(29, 2))
+        self.assertFalse({'date_valid', 'date_leap_day'} & ids(1, 7))
+
+    def test_dc_limits_follow_battery_type(self):
+        self.assertEqual(S.limits('EqualiseV', CELLS, 'BMS - Discover'), (48.0, 64.8))
+        self.assertEqual(S.limits('FloatV', CELLS, 'Lithium LiFePO4'), (48.0, 62.4))
+        self.assertEqual(S.limits('FloatV', CELLS, 'Custom'), (48.0, 68.4))
+        self.assertEqual(S.limits('LowDcShutDownRecovery', CELLS, 'Lead Acid Sealed'), (45.6, 52.8))
+        # Initial Return: SP LINK's maximum is min(Float, Float Return) x 0.995
+        self.assertEqual(S.limits('InitialReturnVoltage', CELLS, 'BMS - Discover', {'FloatV': 55.8, 'FloatReturn': 54.0}),
+                         (45.6, 53.7))
+        warn = S.from_display('FloatV', '61', CELLS, 'Lead Acid Sealed')[1]
+        self.assertTrue(warn)
+        self.assertFalse(S.from_display('FloatV', '61', CELLS, 'Custom')[1])
+
+    def test_battery_type_change_flags_voltages(self):
+        cfg = {'BatteryType': 17, 'LowDcShutDownRecovery': 2208}          # 53.0 V: fine for BMS - Discover
+        self.assertNotIn('dc_voltage_range', {p['id'] for p in S.check(cfg, CELLS, 'SPMC482')})
+        cfg['BatteryType'] = 0                                              # Lead Acid Sealed: max 52.8 V
+        self.assertIn('dc_voltage_range', {p['id'] for p in S.check(cfg, CELLS, 'SPMC482')})
+
     def test_models(self):
         self.assertEqual(S.cells_for('SPMC482'), 24)
         self.assertEqual(S.cells_for('SPMC241'), 12)

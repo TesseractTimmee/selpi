@@ -50,6 +50,18 @@ class TestConfigurationPage(unittest.TestCase):
         self.assertEqual(lay['settings']['GeneratorRemoteStart']['kind'], 'enum')
         self.assertTrue(lay['writes_allowed'])
 
+    def test_date_is_one_row(self):
+        rows = [r for t in settings_ui.layout()['tabs'] for st in t['subtabs'] for g in st['groups'] for r in g['rows']]
+        ytd = [r for r in rows if r['setting'].startswith('YearToDate')]
+        self.assertEqual([(r['setting'], r.get('month')) for r in ytd], [('YearToDateRollOverDay', 'YearToDateRollOverMonth')])
+
+    def test_limits_come_with_the_read_and_checks(self):
+        s, r = sim()
+        d = settings_ui.read(r)
+        self.assertEqual(d['limits']['EqualiseV'][:2], [48.0, 64.8])        # battery type 0 here: Lead Acid Sealed
+        c = settings_ui.check(r, d['read_id'], {'BatteryType': 'Custom'})
+        self.assertEqual(c['limits']['FloatV'][:2], [48.0, 68.4])
+
     def test_read_shows_splink_values(self):
         s, r = sim()
         d = settings_ui.read(r)

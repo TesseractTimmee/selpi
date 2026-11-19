@@ -1311,9 +1311,83 @@
    "decimals": 1,
    "per_cell_min": 0.0,
    "per_cell_max": 2.917,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models)",
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[0.0 - 68.4 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     0.0,
+     2.917
+    ],
+    "Lead Acid Flooded": [
+     0.0,
+     2.917
+    ],
+    "Lithium LiFePO4": [
+     0.0,
+     2.917
+    ],
+    "Custom": [
+     0.0,
+     2.917
+    ],
+    "BMS - LG Energy Solutions": [
+     0.0,
+     2.917
+    ],
+    "BMS - BYD": [
+     0.0,
+     2.917
+    ],
+    "BMS - Sonnenschein": [
+     0.0,
+     2.917
+    ],
+    "BMS - RedFlow ZBM2": [
+     0.0,
+     2.917
+    ],
+    "BMS - Pylontech": [
+     0.0,
+     2.917
+    ],
+    "Lithium genZ": [
+     0.0,
+     2.917
+    ],
+    "Lithium PowerPlus": [
+     0.0,
+     2.917
+    ],
+    "BMS - Cegasa 48V": [
+     0.0,
+     2.917
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     0.0,
+     2.917
+    ],
+    "BMS - Ecoult": [
+     0.0,
+     2.917
+    ],
+    "BMS - Murata": [
+     0.0,
+     2.917
+    ],
+    "BMS - ZYC": [
+     0.0,
+     2.917
+    ],
+    "BMS - Dyness": [
+     0.0,
+     2.917
+    ],
+    "BMS - Discover": [
+     0.0,
+     2.917
+    ]
+   }
   },
   {
    "name": "BatteryVoltageDeassertLevel",
@@ -1330,9 +1404,83 @@
    "decimals": 1,
    "per_cell_min": 0.0,
    "per_cell_max": 2.917,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models)",
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[0.0 - 68.4 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     0.0,
+     2.917
+    ],
+    "Lead Acid Flooded": [
+     0.0,
+     2.917
+    ],
+    "Lithium LiFePO4": [
+     0.0,
+     2.917
+    ],
+    "Custom": [
+     0.0,
+     2.917
+    ],
+    "BMS - LG Energy Solutions": [
+     0.0,
+     2.917
+    ],
+    "BMS - BYD": [
+     0.0,
+     2.917
+    ],
+    "BMS - Sonnenschein": [
+     0.0,
+     2.917
+    ],
+    "BMS - RedFlow ZBM2": [
+     0.0,
+     2.917
+    ],
+    "BMS - Pylontech": [
+     0.0,
+     2.917
+    ],
+    "Lithium genZ": [
+     0.0,
+     2.917
+    ],
+    "Lithium PowerPlus": [
+     0.0,
+     2.917
+    ],
+    "BMS - Cegasa 48V": [
+     0.0,
+     2.917
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     0.0,
+     2.917
+    ],
+    "BMS - Ecoult": [
+     0.0,
+     2.917
+    ],
+    "BMS - Murata": [
+     0.0,
+     2.917
+    ],
+    "BMS - ZYC": [
+     0.0,
+     2.917
+    ],
+    "BMS - Dyness": [
+     0.0,
+     2.917
+    ],
+    "BMS - Discover": [
+     0.0,
+     2.917
+    ]
+   }
   },
   {
    "name": "SoCOutput",
@@ -2258,11 +2406,12 @@
    "load": null,
    "save": "fnGetDayFromDayMonthDTPWBC",
    "kind": "number",
-   "scale": "raw (day of a day/month date)",
+   "scale": "day of the month (with the matching ...Month word)",
    "min": 1,
    "max": 31,
    "step": 1,
    "decimals": 0,
+   "date_part": "day",
    "range_text": "[dd/mm]",
    "unit": null
   },
@@ -2273,12 +2422,23 @@
    "control": "dtpYearToDateRollOverDate",
    "load": "subUpdateDayMonthSetting",
    "save": "fnGetMonthFromDayMonthDTPWBC",
-   "kind": "number",
-   "scale": "raw (day of a day/month date)",
-   "min": 1,
-   "max": 31,
-   "step": 1,
-   "decimals": 0,
+   "kind": "enum",
+   "values": {
+    "1": "Jan",
+    "2": "Feb",
+    "3": "Mar",
+    "4": "Apr",
+    "5": "May",
+    "6": "Jun",
+    "7": "Jul",
+    "8": "Aug",
+    "9": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec"
+   },
+   "scale": "month 1 - 12 (with the matching ...Day word)",
+   "date_part": "month",
    "range_text": "[dd/mm]",
    "unit": null
   },
@@ -5075,10 +5235,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 1.65,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.35,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[39.6 - 48.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     1.65,
+     2.0
+    ],
+    "Lead Acid Flooded": [
+     1.65,
+     2.0
+    ],
+    "Lithium LiFePO4": [
+     1.65,
+     2.2
+    ],
+    "Custom": [
+     1.65,
+     2.2
+    ],
+    "BMS - LG Energy Solutions": [
+     1.65,
+     2.2
+    ],
+    "BMS - BYD": [
+     1.65,
+     2.2
+    ],
+    "BMS - Sonnenschein": [
+     1.65,
+     2.2
+    ],
+    "BMS - RedFlow ZBM2": [
+     1.65,
+     2.2
+    ],
+    "BMS - Pylontech": [
+     1.65,
+     2.2
+    ],
+    "Lithium genZ": [
+     1.65,
+     2.2
+    ],
+    "Lithium PowerPlus": [
+     1.65,
+     2.2
+    ],
+    "BMS - Cegasa 48V": [
+     1.65,
+     2.2
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     1.65,
+     2.35
+    ],
+    "BMS - Ecoult": [
+     1.65,
+     2.2
+    ],
+    "BMS - Murata": [
+     1.65,
+     2.2
+    ],
+    "BMS - ZYC": [
+     1.65,
+     2.2
+    ],
+    "BMS - Dyness": [
+     1.65,
+     2.2
+    ],
+    "BMS - Discover": [
+     1.65,
+     2.2
+    ]
+   }
   },
   {
    "name": "LowDcShutDown100PercentLoad",
@@ -5094,10 +5328,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 1.65,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.35,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[39.6 - 48.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     1.65,
+     2.0
+    ],
+    "Lead Acid Flooded": [
+     1.65,
+     2.0
+    ],
+    "Lithium LiFePO4": [
+     1.65,
+     2.2
+    ],
+    "Custom": [
+     1.65,
+     2.2
+    ],
+    "BMS - LG Energy Solutions": [
+     1.65,
+     2.2
+    ],
+    "BMS - BYD": [
+     1.65,
+     2.2
+    ],
+    "BMS - Sonnenschein": [
+     1.65,
+     2.2
+    ],
+    "BMS - RedFlow ZBM2": [
+     1.65,
+     2.2
+    ],
+    "BMS - Pylontech": [
+     1.65,
+     2.2
+    ],
+    "Lithium genZ": [
+     1.65,
+     2.2
+    ],
+    "Lithium PowerPlus": [
+     1.65,
+     2.2
+    ],
+    "BMS - Cegasa 48V": [
+     1.65,
+     2.2
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     1.65,
+     2.35
+    ],
+    "BMS - Ecoult": [
+     1.65,
+     2.2
+    ],
+    "BMS - Murata": [
+     1.65,
+     2.2
+    ],
+    "BMS - ZYC": [
+     1.65,
+     2.2
+    ],
+    "BMS - Dyness": [
+     1.65,
+     2.2
+    ],
+    "BMS - Discover": [
+     1.65,
+     2.2
+    ]
+   }
   },
   {
    "name": "LowDcShutDownRecovery",
@@ -5113,10 +5421,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 1.9,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.45,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[45.6 - 52.8 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     1.9,
+     2.2
+    ],
+    "Lead Acid Flooded": [
+     1.9,
+     2.2
+    ],
+    "Lithium LiFePO4": [
+     1.9,
+     2.3
+    ],
+    "Custom": [
+     1.9,
+     2.45
+    ],
+    "BMS - LG Energy Solutions": [
+     1.9,
+     2.3
+    ],
+    "BMS - BYD": [
+     1.9,
+     2.3
+    ],
+    "BMS - Sonnenschein": [
+     1.9,
+     2.3
+    ],
+    "BMS - RedFlow ZBM2": [
+     1.9,
+     2.3
+    ],
+    "BMS - Pylontech": [
+     1.9,
+     2.3
+    ],
+    "Lithium genZ": [
+     1.9,
+     2.3
+    ],
+    "Lithium PowerPlus": [
+     1.9,
+     2.3
+    ],
+    "BMS - Cegasa 48V": [
+     1.9,
+     2.3
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     1.9,
+     2.45
+    ],
+    "BMS - Ecoult": [
+     1.9,
+     2.3
+    ],
+    "BMS - Murata": [
+     1.9,
+     2.3
+    ],
+    "BMS - ZYC": [
+     1.9,
+     2.3
+    ],
+    "BMS - Dyness": [
+     1.9,
+     2.3
+    ],
+    "BMS - Discover": [
+     1.9,
+     2.3
+    ]
+   }
   },
   {
    "name": "HighDcAlert",
@@ -5131,11 +5513,85 @@
    "max": null,
    "step": 0.1,
    "decimals": 1,
-   "per_cell_min": 2.25,
+   "per_cell_min": 2.2,
    "per_cell_max": 2.85,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models)",
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[54.0 - 67.9 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.25,
+     2.85
+    ],
+    "Lead Acid Flooded": [
+     2.25,
+     2.85
+    ],
+    "Lithium LiFePO4": [
+     2.25,
+     2.85
+    ],
+    "Custom": [
+     2.25,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.25,
+     2.85
+    ],
+    "BMS - BYD": [
+     2.25,
+     2.85
+    ],
+    "BMS - Sonnenschein": [
+     2.25,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.25,
+     2.85
+    ],
+    "BMS - Pylontech": [
+     2.25,
+     2.85
+    ],
+    "Lithium genZ": [
+     2.25,
+     2.85
+    ],
+    "Lithium PowerPlus": [
+     2.25,
+     2.85
+    ],
+    "BMS - Cegasa 48V": [
+     2.2,
+     2.85
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.25,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.25,
+     2.85
+    ],
+    "BMS - Murata": [
+     2.25,
+     2.85
+    ],
+    "BMS - ZYC": [
+     2.25,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.25,
+     2.85
+    ],
+    "BMS - Discover": [
+     2.25,
+     2.85
+    ]
+   }
   },
   {
    "name": "HighDcAlertClear",
@@ -5150,11 +5606,85 @@
    "max": null,
    "step": 0.1,
    "decimals": 1,
-   "per_cell_min": 2.25,
+   "per_cell_min": 2.2,
    "per_cell_max": 2.85,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models)",
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[54.0 - 67.9 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.25,
+     2.85
+    ],
+    "Lead Acid Flooded": [
+     2.25,
+     2.85
+    ],
+    "Lithium LiFePO4": [
+     2.25,
+     2.85
+    ],
+    "Custom": [
+     2.25,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.25,
+     2.85
+    ],
+    "BMS - BYD": [
+     2.25,
+     2.85
+    ],
+    "BMS - Sonnenschein": [
+     2.25,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.25,
+     2.85
+    ],
+    "BMS - Pylontech": [
+     2.25,
+     2.85
+    ],
+    "Lithium genZ": [
+     2.25,
+     2.85
+    ],
+    "Lithium PowerPlus": [
+     2.25,
+     2.85
+    ],
+    "BMS - Cegasa 48V": [
+     2.2,
+     2.85
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.25,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.25,
+     2.85
+    ],
+    "BMS - Murata": [
+     2.25,
+     2.85
+    ],
+    "BMS - ZYC": [
+     2.25,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.25,
+     2.85
+    ],
+    "BMS - Discover": [
+     2.25,
+     2.85
+    ]
+   }
   },
   {
    "name": "InitialReturnVoltage",
@@ -5170,10 +5700,85 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 1.9,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.85,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[45.6 V - < Float V]",
-   "unit": null
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     1.9,
+     2.375
+    ],
+    "Lead Acid Flooded": [
+     1.9,
+     2.375
+    ],
+    "Lithium LiFePO4": [
+     1.9,
+     2.4
+    ],
+    "Custom": [
+     1.9,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     1.9,
+     2.375
+    ],
+    "BMS - BYD": [
+     1.9,
+     2.375
+    ],
+    "BMS - Sonnenschein": [
+     1.9,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     1.9,
+     2.375
+    ],
+    "BMS - Pylontech": [
+     1.9,
+     2.375
+    ],
+    "Lithium genZ": [
+     1.9,
+     2.4
+    ],
+    "Lithium PowerPlus": [
+     1.9,
+     2.375
+    ],
+    "BMS - Cegasa 48V": [
+     1.9,
+     2.375
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     1.9,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     1.9,
+     2.375
+    ],
+    "BMS - Murata": [
+     1.9,
+     2.375
+    ],
+    "BMS - ZYC": [
+     1.9,
+     2.85
+    ],
+    "BMS - Dyness": [
+     1.9,
+     2.375
+    ],
+    "BMS - Discover": [
+     1.9,
+     2.375
+    ]
+   },
+   "max_from": "round(min(FloatV, FloatReturn) * 0.995, 1)"
   },
   {
    "name": "MaximumChargeCapability",
@@ -5205,10 +5810,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 2.0,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.85,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 60.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     2.5
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     2.5
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     2.6
+    ],
+    "Custom": [
+     2.0,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     2.5
+    ],
+    "BMS - BYD": [
+     2.0,
+     2.5
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     2.5
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     2.5
+    ],
+    "Lithium genZ": [
+     2.0,
+     2.6
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     2.5
+    ],
+    "BMS - Murata": [
+     2.0,
+     2.5
+    ],
+    "BMS - ZYC": [
+     2.0,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.0,
+     2.5
+    ],
+    "BMS - Discover": [
+     2.0,
+     2.5
+    ]
+   }
   },
   {
    "name": "InitialChargeI",
@@ -5254,10 +5933,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 2.0,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.85,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 60.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     2.5
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     2.5
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     2.6
+    ],
+    "Custom": [
+     2.0,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     2.5
+    ],
+    "BMS - BYD": [
+     2.0,
+     2.5
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     2.5
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     2.5
+    ],
+    "Lithium genZ": [
+     2.0,
+     2.6
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     2.5
+    ],
+    "BMS - Murata": [
+     2.0,
+     2.5
+    ],
+    "BMS - ZYC": [
+     2.0,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.0,
+     2.5
+    ],
+    "BMS - Discover": [
+     2.0,
+     2.5
+    ]
+   }
   },
   {
    "name": "BulkChargeI",
@@ -5303,10 +6056,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 2.0,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.85,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 60.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     2.6
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     2.6
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     2.6
+    ],
+    "Custom": [
+     2.0,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     2.6
+    ],
+    "BMS - BYD": [
+     2.0,
+     2.6
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     2.6
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     2.6
+    ],
+    "Lithium genZ": [
+     2.0,
+     2.6
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     2.6
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     2.6
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     2.6
+    ],
+    "BMS - Murata": [
+     2.0,
+     2.6
+    ],
+    "BMS - ZYC": [
+     2.0,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.0,
+     2.6
+    ],
+    "BMS - Discover": [
+     2.0,
+     2.6
+    ]
+   }
   },
   {
    "name": "AbsorbChargeI",
@@ -5382,10 +6209,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 2.0,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.85,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 60.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     2.5
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     2.5
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     2.6
+    ],
+    "Custom": [
+     2.0,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     2.5
+    ],
+    "BMS - BYD": [
+     2.0,
+     2.5
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     2.5
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     2.5
+    ],
+    "Lithium genZ": [
+     2.0,
+     2.6
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     2.5
+    ],
+    "BMS - Murata": [
+     2.0,
+     2.5
+    ],
+    "BMS - ZYC": [
+     2.0,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.0,
+     2.5
+    ],
+    "BMS - Discover": [
+     2.0,
+     2.5
+    ]
+   }
   },
   {
    "name": "FloatI",
@@ -5417,10 +6318,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 2.0,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.85,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 60.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     2.5
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     2.5
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     2.6
+    ],
+    "Custom": [
+     2.0,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     2.5
+    ],
+    "BMS - BYD": [
+     2.0,
+     2.5
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     2.5
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     2.5
+    ],
+    "Lithium genZ": [
+     2.0,
+     2.6
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     2.5
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     2.5
+    ],
+    "BMS - Murata": [
+     2.0,
+     2.5
+    ],
+    "BMS - ZYC": [
+     2.0,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.0,
+     2.5
+    ],
+    "BMS - Discover": [
+     2.0,
+     2.5
+    ]
+   }
   },
   {
    "name": "EqualiseV",
@@ -5436,10 +6411,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 2.0,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.85,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 64.8 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     2.7
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     2.7
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     2.7
+    ],
+    "Custom": [
+     2.0,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     2.7
+    ],
+    "BMS - BYD": [
+     2.0,
+     2.7
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     2.7
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     2.7
+    ],
+    "Lithium genZ": [
+     2.0,
+     2.7
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     2.7
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     2.7
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     2.7
+    ],
+    "BMS - Murata": [
+     2.0,
+     2.7
+    ],
+    "BMS - ZYC": [
+     2.0,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.0,
+     2.7
+    ],
+    "BMS - Discover": [
+     2.0,
+     2.7
+    ]
+   }
   },
   {
    "name": "EqualiseI",
@@ -5634,9 +6683,83 @@
    "decimals": 1,
    "per_cell_min": 2.0,
    "per_cell_max": 2.85,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models)",
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 68.4 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     2.85
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     2.85
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     2.85
+    ],
+    "Custom": [
+     2.0,
+     2.85
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     2.85
+    ],
+    "BMS - BYD": [
+     2.0,
+     2.85
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     2.85
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     2.85
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     2.85
+    ],
+    "Lithium genZ": [
+     2.0,
+     2.85
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     2.85
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     2.85
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     2.85
+    ],
+    "BMS - Murata": [
+     2.0,
+     2.85
+    ],
+    "BMS - ZYC": [
+     2.0,
+     2.85
+    ],
+    "BMS - Dyness": [
+     2.0,
+     2.85
+    ],
+    "BMS - Discover": [
+     2.0,
+     2.85
+    ]
+   }
   },
   {
    "name": "BackOffTemperature",
@@ -5700,10 +6823,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 1.65,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.4,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[39.6 - 48.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     1.65,
+     2.0
+    ],
+    "Lead Acid Flooded": [
+     1.65,
+     2.0
+    ],
+    "Lithium LiFePO4": [
+     1.65,
+     2.3
+    ],
+    "Custom": [
+     1.65,
+     2.3
+    ],
+    "BMS - LG Energy Solutions": [
+     1.65,
+     2.3
+    ],
+    "BMS - BYD": [
+     1.65,
+     2.3
+    ],
+    "BMS - Sonnenschein": [
+     1.65,
+     2.3
+    ],
+    "BMS - RedFlow ZBM2": [
+     1.65,
+     2.3
+    ],
+    "BMS - Pylontech": [
+     1.65,
+     2.3
+    ],
+    "Lithium genZ": [
+     1.65,
+     2.3
+    ],
+    "Lithium PowerPlus": [
+     1.65,
+     2.3
+    ],
+    "BMS - Cegasa 48V": [
+     1.65,
+     2.3
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     1.65,
+     2.4
+    ],
+    "BMS - Ecoult": [
+     1.65,
+     2.3
+    ],
+    "BMS - Murata": [
+     1.65,
+     2.3
+    ],
+    "BMS - ZYC": [
+     1.65,
+     2.3
+    ],
+    "BMS - Dyness": [
+     1.65,
+     2.3
+    ],
+    "BMS - Discover": [
+     1.65,
+     2.3
+    ]
+   }
   },
   {
    "name": "LowBatteryToStartGenFullLoad",
@@ -5719,10 +6916,84 @@
    "step": 0.1,
    "decimals": 1,
    "per_cell_min": 1.65,
-   "per_cell_max": null,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); maximum = the Float voltage",
+   "per_cell_max": 2.4,
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[39.6 - 48.0 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     1.65,
+     2.0
+    ],
+    "Lead Acid Flooded": [
+     1.65,
+     2.0
+    ],
+    "Lithium LiFePO4": [
+     1.65,
+     2.3
+    ],
+    "Custom": [
+     1.65,
+     2.3
+    ],
+    "BMS - LG Energy Solutions": [
+     1.65,
+     2.3
+    ],
+    "BMS - BYD": [
+     1.65,
+     2.3
+    ],
+    "BMS - Sonnenschein": [
+     1.65,
+     2.3
+    ],
+    "BMS - RedFlow ZBM2": [
+     1.65,
+     2.3
+    ],
+    "BMS - Pylontech": [
+     1.65,
+     2.3
+    ],
+    "Lithium genZ": [
+     1.65,
+     2.3
+    ],
+    "Lithium PowerPlus": [
+     1.65,
+     2.3
+    ],
+    "BMS - Cegasa 48V": [
+     1.65,
+     2.3
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     1.65,
+     2.4
+    ],
+    "BMS - Ecoult": [
+     1.65,
+     2.3
+    ],
+    "BMS - Murata": [
+     1.65,
+     2.3
+    ],
+    "BMS - ZYC": [
+     1.65,
+     2.3
+    ],
+    "BMS - Dyness": [
+     1.65,
+     2.3
+    ],
+    "BMS - Discover": [
+     1.65,
+     2.3
+    ]
+   }
   },
   {
    "name": "PeukertsExponent",
@@ -5844,9 +7115,83 @@
    "decimals": 1,
    "per_cell_min": 2.0,
    "per_cell_max": 3.0,
-   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models)",
+   "range_note": "pack V = per cell x cell count (12 / 24 / 60 for 24 / 48 / 120 V models); per cell limits by Battery Type (SP LINK subChangeBatteryVoltageSubservienciesInConfigTab)",
    "range_text": "[48.0 - 68.4 V]",
-   "unit": "V"
+   "unit": "V",
+   "per_cell_by_battery": {
+    "Lead Acid Sealed": [
+     2.0,
+     3.0
+    ],
+    "Lead Acid Flooded": [
+     2.0,
+     3.0
+    ],
+    "Lithium LiFePO4": [
+     2.0,
+     3.0
+    ],
+    "Custom": [
+     2.0,
+     3.0
+    ],
+    "BMS - LG Energy Solutions": [
+     2.0,
+     3.0
+    ],
+    "BMS - BYD": [
+     2.0,
+     3.0
+    ],
+    "BMS - Sonnenschein": [
+     2.0,
+     3.0
+    ],
+    "BMS - RedFlow ZBM2": [
+     2.0,
+     3.0
+    ],
+    "BMS - Pylontech": [
+     2.0,
+     3.0
+    ],
+    "Lithium genZ": [
+     2.0,
+     3.0
+    ],
+    "Lithium PowerPlus": [
+     2.0,
+     3.0
+    ],
+    "BMS - Cegasa 48V": [
+     2.0,
+     3.0
+    ],
+    "BMS - Cegasa/SelectCell 144V": [
+     2.0,
+     3.0
+    ],
+    "BMS - Ecoult": [
+     2.0,
+     3.0
+    ],
+    "BMS - Murata": [
+     2.0,
+     3.0
+    ],
+    "BMS - ZYC": [
+     2.0,
+     3.0
+    ],
+    "BMS - Dyness": [
+     2.0,
+     3.0
+    ],
+    "BMS - Discover": [
+     2.0,
+     3.0
+    ]
+   }
   },
   {
    "name": "SoftBattery",

@@ -32,6 +32,36 @@ class SettingError(ValueError):
     pass
 
 
+def date_pairs():
+    """[(day setting, month setting)] for SP LINK's day/month date pickers that store two words
+    (YearToDateRollOverDay / ...Month)."""
+    days = {e['control']: n for n, e in META.items() if e.get('date_part') == 'day'}
+    return [(days[e['control']], n) for n, e in META.items() if e.get('date_part') == 'month' and e['control'] in days]
+
+
+_MONTH_DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+
+def _date_problems(raw_config):
+    """SP LINK builds these dates in the current year and shows 1 Jan when that fails."""
+    out = []
+    for d, m in date_pairs():
+        day, month = raw_config.get(d), raw_config.get(m)
+        if day is None or month is None:
+            continue
+        w = where(d)
+        what = w.split(': ', 1)[1] if w else d[:-len('Day')]          # SP LINK's label: 'Year to Date Rollover Date'
+        if not 1 <= month <= 12 or not 1 <= day <= _MONTH_DAYS[month - 1]:
+            text = '%d %s' % (day, MONTHS[month - 1]) if 1 <= month <= 12 else 'day %d, month %d' % (day, month)
+            out.append({'id': 'date_valid', 'severity': 'error', 'settings': [d, m],
+                        'message': '%s: %s is not a date (SP LINK would show it as 1 Jan).' % (what, text)})
+        elif month == 2 and day == 29:
+            out.append({'id': 'date_leap_day', 'severity': 'warning', 'settings': [d, m],
+                        'message': '%s: 29 Feb exists only in leap years; in other years SP LINK shows it as '
+                                   '1 Jan.' % what})
+    return out
+
+
 SECTION_TITLES = {'Common': 'COMMON SETTINGS:', 'AppType': 'APPLICATION TYPE SETTINGS:',
                   'BattType': 'BATTERY TYPE SETTINGS:', 'SystemScheduler': 'SYSTEM SCHEDULER SETTINGS:'}
 _ADDR = None
@@ -111,13 +141,27 @@ _NUM = {
 }
 
 
-def _limits(e, cells):
-    """(min, max) in display units, None where SP LINK sets it from another setting."""
+def _limits(e, cells, battery=None, values=None):
+    """(min, max) in display units as SP LINK sets its box: DC voltages per cell x cells, per Battery Type (without one:
+    the widest range of any type), and a maximum taken from other settings where SP LINK does that (max_from,
+    evaluated over values = {name: display value}). None = not known."""
     if 'per_cell_min' in e:
-        mn = e['per_cell_min'] * cells if e.get('per_cell_min') is not None and cells else None
-        mx = e['per_cell_max'] * cells if e.get('per_cell_max') is not None and cells else None
-        return mn, mx
-    return e.get('min'), e.get('max')
+        lo, hi = (e.get('per_cell_by_battery') or {}).get(battery) or (e.get('per_cell_min'), e.get('per_cell_max'))
+        mn = round(lo * cells, 3) if lo is not None and cells else None
+        mx = round(hi * cells, 3) if hi is not None and cells else None
+    else:
+        mn, mx = e.get('min'), e.get('max')
+    if e.get('max_from') and values:
+        try:
+            dyn = eval(e['max_from'], {'__builtins__': {}}, dict(values, min=min, max=max, round=round))
+            mx = dyn if mx is None else min(mx, dyn)
+        except (NameError, TypeError):
+            pass
+    return mn, mx
+
+
+def limits(name, cells, battery=None, values=None):
+    return _limits(entry(name), cells, battery, values)
 
 
 def to_display(name, raw, cells=None):
@@ -147,9 +191,10 @@ def to_display(name, raw, cells=None):
     return raw, str(raw)
 
 
-def from_display(name, text, cells=None):
+def from_display(name, text, cells=None, battery=None, values=None):
     """Raw word for a value as SP LINK shows it (label, number in its unit, HH:MM, 'D Mon', 'Disabled'), and a
-    list of warnings (outside SP LINK's range). Raises SettingError if it can't be converted."""
+    list of warnings (outside SP LINK's range: battery = the Battery Type label, values = the other settings' display
+    values, for limits that depend on them). Raises SettingError if it can't be converted."""
     e = entry(name)
     k = e['kind']
     s = str(text).strip()
@@ -180,7 +225,7 @@ def from_display(name, text, cells=None):
             d = float(s2)
         except ValueError:
             raise SettingError('%s: %r is not a number' % (e['name'], s))
-        mn, mx = _limits(e, cells)
+        mn, mx = _limits(e, cells, battery, values)
         if (mn is not None and d < mn - 1e-9) or (mx is not None and d > mx + 1e-9):
             warnings.append('%s %g is outside SP LINK\'s range %s' % (e['name'], d, e.get('range_text') or '%s - %s' % (mn, mx)))
         raw = round(_NUM[e['save']][1](d, cells))
@@ -206,7 +251,7 @@ def _values(raw_config, cells):
 
 def _env(values, model_name):
     env = dict(values)
-    env.update(max=max, min=min, any=any, all=all, int=int, abs=abs,
+    env.update(max=max, min=min, any=any, all=all, int=int, abs=abs, round=round,
                is_managed_bms=lambda t: str(t).startswith('BMS'),
                kw=lambda v: v,           # input power settings are already in kW
                models=MODELS, model=model_name,
@@ -263,7 +308,29 @@ def _run(rules, env, values, extra=None):
 def check(raw_config, cells=None, model_name=None):
     """SP LINK's configuration rules over a whole configuration {name: raw}. Returns [{id, severity, message}]."""
     values = _values(raw_config, cells)
-    return _run(RULES['rules'], _env(values, model_name), values)
+    return (_run(RULES['rules'], _env(values, model_name), values) + _date_problems(raw_config)
+            + _dc_problems(values, cells))
+
+
+def _dc_problems(values, cells):
+    """DC voltages outside the range SP LINK's box allows for this Battery Type. SP LINK pulls the values into the
+    new range when the battery type changes, so it never sends one outside it."""
+    out = []
+    battery = values.get('BatteryType')
+    if not cells or battery is None:
+        return out
+    for n, e in META.items():
+        if 'per_cell_min' not in e or n not in values:
+            continue
+        mn, mx = _limits(e, cells, battery, values)
+        v = values[n]
+        if (mn is not None and v < mn - 1e-6) or (mx is not None and v > mx + 1e-6):
+            w = where(n)
+            out.append({'id': 'dc_voltage_range', 'severity': 'error', 'settings': [n],
+                        'message': '%s: %s V is outside %s V that SP LINK allows with Battery Type %s.'
+                                   % (w or n, round(v, 1),
+                                      '%.1f - %.1f' % (mn if mn is not None else 0, mx if mx is not None else 0), battery)})
+    return out
 
 
 def send_check(raw_new, raw_old, unit, link, cells=None, model_name=None):

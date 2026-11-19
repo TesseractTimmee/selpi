@@ -134,12 +134,16 @@ def run_set(args, reader=None, passcode=None, fresh_reader=None):
     model, cells = _unit(reader)
     memory = config.read_memory(reader)
     raw_now = settings.raw_config(memory)
-    current = memory.get(setting['address'], reader.words(setting['address'], 1)[0])
+    current = memory[setting['address']] if setting['address'] in memory else reader.words(setting['address'], 1)[0]
+    shown = {n: settings.to_display(n, v, cells)[0] for n, v in raw_now.items()}
     try:
         if args.raw:
             new, warnings = int(args.value, 0), []
+            if e['kind'] == 'number':      # still say when the stored number is outside SP LINK's range
+                _, warnings = settings.from_display(setting['name'], str(settings.to_display(setting['name'], new, cells)[0]),
+                                                    cells, shown.get('BatteryType'), shown)
         else:
-            new, warnings = settings.from_display(setting['name'], args.value, cells)
+            new, warnings = settings.from_display(setting['name'], args.value, cells, shown.get('BatteryType'), shown)
     except (ValueError, settings.SettingError) as ex:
         raise SystemExit(str(ex))
     if e.get('words') == 2:

@@ -46,8 +46,30 @@ def layout():
                 tabs.append(t)
         at = next((i + 1 for i, t in enumerate(tabs) if t['id'] == 'tabBattery'), len(tabs))
         tabs[at:at] = loose
+        # SP LINK's day/month date pickers store two words: one row (day box + month list) instead of two
+        months = dict(settings.date_pairs())
+        for t in tabs:
+            for st in t['subtabs']:
+                for g in st['groups']:
+                    names = {r['setting'] for r in g['rows']}
+                    merged = {d: m for d, m in months.items() if d in names and m in names}
+                    g['rows'] = [dict(r, month=merged[r['setting']]) if r['setting'] in merged else r
+                                 for r in g['rows'] if r['setting'] not in merged.values()]
         _LAYOUT = {'tabs': tabs, 'settings': meta, 'hidden_tabs': ['Factory Mode Settings']}
     return dict(_LAYOUT, writes_allowed=writes_allowed())
+
+
+def limits(cells, battery=None, values=None):
+    """{name: [min, max, decimals]} for the number settings, in SP LINK's display units: the page's number boxes
+    hold values to these as SP LINK's do (DC voltages per cell x the unit's cells, by Battery Type; maximums SP LINK
+    takes from other settings; None = not known)."""
+    out = {}
+    for n, e in settings.META.items():
+        if e['kind'] == 'number':
+            dec = e.get('decimals') or 0
+            mn, mx = settings._limits(e, cells, battery, values)
+            out[n] = [None if mn is None else round(mn, dec), None if mx is None else round(mx, dec), dec]
+    return out
 
 
 def _forget_old():
@@ -79,7 +101,9 @@ def read(reader):
         _forget_old()
         READS[rid] = {'at': time.time(), 'memory': memory, 'model': model, 'cells': cells}
     problems = [p for p in settings.check(raw, cells, model) if p['severity'] != 'skipped']
+    shown = {n: settings.to_display(n, v, cells)[0] for n, v in raw.items()}
     return {'read_id': rid, 'model': model, 'cells': cells, 'values': _values(raw, cells), 'problems': problems,
+            'limits': limits(cells, shown.get('BatteryType'), shown),
             'version_problems': live.version_problems(live.versions(reader)), 'writes_allowed': writes_allowed(),
             'read_max_age': READ_MAX_AGE}
 
@@ -109,12 +133,20 @@ def _evaluate(reader, s, changes):
     cells, model = s['cells'], s['model']
     raw_now = settings.raw_config(s['memory'])
     out, raw_changes = {}, {}
+    # limits follow the Battery Type and other settings as they will be after the change
+    planned = dict(raw_now)
+    for name, text in (changes or {}).items():
+        try:
+            planned[settings.entry(name)['name']] = settings.from_display(name, text, cells)[0]
+        except settings.SettingError:
+            pass
+    shown = {n: settings.to_display(n, v, cells)[0] for n, v in planned.items()}
     for name, text in (changes or {}).items():
         try:
             e = settings.entry(name)
             if e.get('words') == 2:
                 raise settings.SettingError('%s spans two words: not writable here' % name)
-            raw, warnings = settings.from_display(e['name'], text, cells)
+            raw, warnings = settings.from_display(e['name'], text, cells, shown.get('BatteryType'), shown)
             out[e['name']] = {'raw': raw, 'text': settings.to_display(e['name'], raw, cells)[1],
                               'old': raw_now.get(e['name']), 'warnings': warnings}
             if raw != raw_now.get(e['name']):
@@ -129,7 +161,8 @@ def _evaluate(reader, s, changes):
     if raw_changes and reader is not None:
         unit, link = _unit_state(reader, raw_now, cells)
         send = [p for p in settings.send_check(raw_new, raw_now, unit, link, cells, model) if p['severity'] != 'skipped']
-    return {'changes': out, 'problems': caused, 'send_problems': send}, raw_changes
+    return {'changes': out, 'problems': caused, 'send_problems': send,
+            'limits': limits(cells, shown.get('BatteryType'), shown)}, raw_changes
 
 
 def check(reader, rid, changes):
