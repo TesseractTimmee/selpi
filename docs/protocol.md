@@ -297,6 +297,9 @@ codes, 18 raw such as serial numbers), matching SP LINK 15.40, memory map versio
 selpi adds four derived fields of its own (`"derived"` in the table, no SP LINK name): `ac_source_power_in/out`
 and `dc_battery_power_in/out`, the signed powers split into >= 0 parts (the SP PRO reports import and charging as
 negative), so averages and statistics don't net the two directions out.
+`grid_power_in/out` and `generator_power_in` split the AC source further: only while the inverter is synchronised to
+the AC source (Output Mode `0xa07d` = 3 Sync, the live side of the "AC Mode - Synchronised begin/end" events), and by
+Generator Status (`0xa096`): 10 (AC Source Present) = grid, 1 (Running) = generator; otherwise 0.
 `selpi live` reads them; values were checked against the SP PRO's Modbus map on 17 Nov 2026 (load, inverter, grid, solar
 power; reactive power; voltages; frequencies; battery V/SoC/power; today's energies; generator status; solar
 hybrid priority; run hours all agree).

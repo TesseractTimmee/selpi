@@ -56,6 +56,28 @@ class DerivedFields(unittest.TestCase):
             vi, vo = live.evaluate(BY_KEY[i], mem)[0], live.evaluate(BY_KEY[o], mem)[0]
             self.assertAlmostEqual(vo - vi, s)
 
+    def test_grid_and_generator_follow_status_and_sync(self):
+        src = BY_KEY['ac_source_power']
+        # (Generator Status, Output Mode) -> which of grid / generator gets the AC source power
+        cases = {(10, 3): 'grid', (1, 3): 'generator',
+                 (10, 2): None, (1, 2): None,          # not synchronised: nothing drawn from either
+                 (6, 3): None, (8, 3): None,           # starting / stopping
+                 (0, 3): None, (5, 2): None, (9, 0): None}
+        for (status, mode), who in cases.items():
+            for raw in (-1500, 1500):          # import, export
+                mem = mem_with(src, raw)
+                mem[0xa096], mem[0xa07d] = status, mode
+                v = {k: live.evaluate(BY_KEY[k], mem)[0]
+                     for k in ('ac_source_power_in', 'ac_source_power_out', 'grid_power_in', 'grid_power_out',
+                               'generator_power_in')}
+                self.assertAlmostEqual(v['grid_power_in'], v['ac_source_power_in'] if who == 'grid' else 0)
+                self.assertAlmostEqual(v['grid_power_out'], v['ac_source_power_out'] if who == 'grid' else 0)
+                self.assertAlmostEqual(v['generator_power_in'], v['ac_source_power_in'] if who == 'generator' else 0)
+
+    def test_grid_fields_need_the_status_word(self):
+        mem = mem_with(BY_KEY['ac_source_power'], -1500)   # no 0xa096 / 0xa07d
+        self.assertIsNone(live.evaluate(BY_KEY['grid_power_in'], mem)[0])
+
     def test_variable_create_still_works(self):
         from memory import variable
         self.assertNotIn(None, variable.live_names())
