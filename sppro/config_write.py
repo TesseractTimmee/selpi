@@ -28,6 +28,14 @@ def find_setting(name: str) -> dict:
     """The configuration setting with exactly this name (case-insensitive)."""
     hits = [s for s in config.settings({}) if s['section'] != 'Service' and s['name'].lower() == name.lower()]
     if not hits:
+        try:   # settings SP LINK shows but has no name for (e.g. Port1AccInput, 0xc087): from settings_meta
+            from sppro import settings
+            e = settings.entry(name)
+            a = settings.address(e['name'])
+            if a is not None and e['name'].lower() == name.lower():
+                return {'name': e['name'], 'section': e['section'], 'address': a, 'value': None}
+        except Exception:
+            pass
         near = [s['name'] for s in config.settings({}) if name.lower() in s['name'].lower()][:8]
         raise WriteError('no configuration setting called %r%s' % (name, ('; did you mean: ' + ', '.join(near)) if near else ''))
     if len(hits) > 1:

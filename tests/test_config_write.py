@@ -101,21 +101,59 @@ class TestConfigWrite(unittest.TestCase):
 
     def test_command_dry_run_and_write(self):
         s, r = sim()
-        args = argparse.Namespace(name='generatorremotestart', value=0, yes=False, passcode_stdin=False,
-                                  out=self.out, force=False)
+        args = argparse.Namespace(name='generatorremotestart', value='None', yes=False, passcode_stdin=False,
+                                  out=self.out, force=False, raw=False, allow_out_of_range=False, ignore_rule=[])
         buf = io.StringIO()
         with redirect_stdout(buf):
             config_cmd.run_set(args, reader=r)
         self.assertIn('dry run', buf.getvalue())
         self.assertIn('<passcode>', buf.getvalue())
+        self.assertIn('Digital Control Input 2 -> None   (raw 2 -> 0)', buf.getvalue())
         self.assertEqual(s.writes, [])
         args.yes = True
         buf = io.StringIO()
         with redirect_stdout(buf):
             config_cmd.run_set(args, reader=r, passcode=1234, fresh_reader=lambda: r)
-        self.assertIn('2 -> 0 (confirmed)', buf.getvalue())
-        self.assertIn('undo: selpi config set GeneratorRemoteStart 2 --yes', buf.getvalue())
+        self.assertIn('Digital Control Input 2 -> None (confirmed)', buf.getvalue())
+        self.assertIn('undo: selpi config set GeneratorRemoteStart "Digital Control Input 2" --yes', buf.getvalue())
         self.assertNotIn('1234', buf.getvalue())
+
+
+class TestSetChecks(unittest.TestCase):
+    """config set refuses out-of-range values and failing rules unless overridden."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_set(self, name, value, **kw):
+        s, r = sim()
+        args = argparse.Namespace(name=name, value=value, yes=True, passcode_stdin=False, out=self.tmp.name,
+                                  force=False, raw=False, allow_out_of_range=False, ignore_rule=[])
+        for k, v in kw.items():
+            setattr(args, k, v)
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            try:
+                config_cmd.run_set(args, reader=r, passcode=1234, fresh_reader=lambda: r)
+                err = None
+            except SystemExit as e:
+                err = str(e)
+        return s, buf.getvalue(), err
+
+    def test_out_of_range_needs_override(self):
+        s, out, err = self.run_set('EqualiseTime', '0.5')         # SP LINK: 1.0 - 10.0 hours
+        self.assertIn('outside SP LINK', err)
+        self.assertNotIn(config_write.find_setting('EqualiseTime')['address'], [a for a, _ in s.writes])
+        s, out, err = self.run_set('EqualiseTime', '0.5', allow_out_of_range=True)
+        self.assertIsNone(err)
+
+    def test_unknown_label_refused(self):
+        s, out, err = self.run_set('GeneratorRemoteStart', 'Digital Control Input 9')
+        self.assertIn('is not one of', err)
+        self.assertEqual(s.writes, [])
 
 
 if __name__ == '__main__':

@@ -1,0 +1,321 @@
+{
+ "source": "SP LINK 15.40 fclsMain::CheckConfigurationIsOkBeforeSavingToArray (read via selpi-private-tools/tools/splink/checks_dump.py); DRAFT 19 Nov 2026",
+ "notes": [
+  "Values are display values (sppro/settings_meta.json scaling); enums compare labels.",
+  "{N} in a rule expands to the eight Solar Hybrid priorities (SystemSchedule1..8).",
+  "'active(N)' = SystemScheduleNEnable is Enabled or SystemScheduleNDigitalInput is not None (SP LINK's test for a priority in use).",
+  "severity: error = SP LINK refuses to save; warning = SP LINK warns. confidence: high = read directly; check = constant or operand to confirm.",
+  "send_checks use the unit's live state as well as the configuration: unit.output_mode (Output Mode, 0xa07d), unit.hardware_revision, unit.comms_card_revision, unit.region (as configured now), unit.factory_export_limit, link.port (the SP PRO port selpi is talking through: low byte of 0xa000). 'changed(X)' = the write changes setting X.",
+  "models: per SP PRO model (SP LINK's list): battery cells (DC voltages are stored per cell), nominal V, and the minimum battery size for AC-coupled systems. 'model' = the unit's model (selpi reads it from the unit)."
+ ],
+ "rules": [
+  {
+   "id": "gen_low_batt_noload_ge_fullload",
+   "require": "LowBatteryToStartGenNoLoad >= LowBatteryToStartGenFullLoad",
+   "message": "Low battery to start generator (no load) must be higher or equal to the full load level.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "gen_low_soc_stop_above_start",
+   "when": "LowSoCToStartGen == 'Enabled'",
+   "require": "LowSoCToStartGenStopSoC >= LowSoCToStartGenStartSoC + 1",
+   "message": "Low SoC generator start: Stop SoC must be at least 1 % higher than Start SoC.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "soc_normal_stop_above_start",
+   "require": "NormalPeriodStopSoC >= NormalPeriodStartSoC + 1",
+   "message": "Normal period: Stop SoC must be at least 1 % higher than Start SoC.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "soc_night_assist_stop_above_start",
+   "when": "SoCNightAssistPeriod == 'Enabled'",
+   "require": "SoCNightAssistPeriodStopSoC >= SoCNightAssistPeriodStartSoC + 1",
+   "message": "Night assist period: Stop SoC must be at least 1 % higher than Start SoC.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "soc_renew_preferred_stop_above_start",
+   "when": "SoCRenewPrefferedPeriod == 'Enabled'",
+   "require": "SoCRenewPrefferedPeriodStopSoC >= SoCRenewPrefferedPeriodStartSoC + 1",
+   "message": "Renewable preferred period: Stop SoC must be at least 1 % higher than Start SoC.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "soc_renew_assist_stop_above_start",
+   "when": "SoCRenewAssistPeriod == 'Enabled'",
+   "require": "SoCRenewAssistPeriodStopSoC >= SoCRenewAssistPeriodStartSoC + 1",
+   "message": "Renewable assist period: Stop SoC must be at least 1 % higher than Start SoC.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "prio_disconnect_and_lockout",
+   "each": "N",
+   "when": "active(N)",
+   "require": "not (SystemSchedule{N}AcSourceDisconnect == 'Enabled' and SystemSchedule{N}InverterLockout == 'Enabled')",
+   "message": "Priority {N}: AC source disconnect and inverter lockout are both enabled, which is not a valid configuration.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "prio_min_soc_above_shutdown",
+   "each": "N",
+   "when": "StateOfChargeShutdown == 'Enabled' and active(N)",
+   "require": "SystemSchedule{N}MinSoCToSupportLoad >= StatOfChargeShutdownSoC + 2",
+   "message": "Priority {N}: minimum SoC to support load must be at least 2 % above the SoC shutdown level.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "prio_start_charging_above_shutdown",
+   "each": "N",
+   "when": "StateOfChargeShutdown == 'Enabled' and active(N)",
+   "require": "SystemSchedule{N}SoCStartCharging >= StatOfChargeShutdownSoC + 2",
+   "message": "Priority {N}: SoC start charging must be at least 2 % above the SoC shutdown level.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "prio_start_charging_le_stop",
+   "each": "N",
+   "when": "active(N)",
+   "require": "SystemSchedule{N}SoCStartCharging <= SystemSchedule{N}SoCStopCharging",
+   "message": "Priority {N}: SoC start charging must be at or below SoC stop charging.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "dc_shutdown_0_ge_100",
+   "require": "LowDcShutDown0PercentLoad >= LowDcShutDown100PercentLoad",
+   "message": "Low DC shutdown at 0 % load must be greater or equal to the 100 % load level.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "dc_high_alert_clear_vs_absolute",
+   "require": "AbsoluteVoltageLimit <= HighDcAlertClear < HighDcAlert",
+   "message": "High DC alert clear should be between the absolute voltage limit and the high DC alert level.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "dc_charge_voltages_max",
+   "require": "max(InitialChargeV, BulkChargeV, AbsorbChargeV, FloatV, FloatReturn, EqualiseV, AbsoluteVoltageLimit) <= 162",
+   "message": "Charge voltages and the absolute voltage limit should not exceed 162 V.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "bms_types_48v_only",
+   "when": "is_managed_bms(BatteryType) and BatteryType not in ('BMS - Cegasa/SelectCell 144V', 'BMS - ZYC')",
+   "require": "model_nominal_v == 48",
+   "message": "Battery type is only available for 48 V models.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "abb_needs_dco3",
+   "when": "KacoModeCommPort in ('ABB Solar on Port 1', 'ABB / FIMER')",
+   "require": "ZeroPercentAcCoupledOutput == 'Digital Control Output 3'",
+   "message": "With an ABB / FIMER solar inverter, the 0 % AC coupled output must be Digital Control Output 3 (check it isn't used by another control).",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "as4777_needs_region",
+   "when": "ApplicationType == 'Solar Hybrid (AS4777.2:2020)'",
+   "require": "Region != 'None'",
+   "message": "Region must be set when Application type is Solar Hybrid (AS4777.2:2020).",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "ac_coupling_with_disconnect",
+   "when": "AcCoupledInverterFrequencyControl != 'Disabled'",
+   "require": "not any(SystemSchedule{N}AcSourceDisconnect == 'Enabled' for N)",
+   "message": "AC source disconnect in a priority is not recommended when generic AC coupling is enabled.",
+   "severity": "warning",
+   "confidence": "high"
+  },
+  {
+   "id": "io_unique_digital_inputs",
+   "type": "unique",
+   "group": "load:subUpdateDigitalInputSelectionSetting",
+   "ignore": [
+    "None",
+    "Follow Backup Select"
+   ],
+   "message": "{value} is used by more than one function ({settings}); SP LINK allows one function per input.",
+   "severity": "error",
+   "confidence": "high",
+   "source": "fclsMain::CheckIfAnotherComboBoxUsingThisIO (via DoInputComboBoxValueChange)"
+  },
+  {
+   "id": "io_unique_outputs",
+   "type": "unique",
+   "group": "load:subUpdateOutputSelectionSetting",
+   "ignore": [
+    "None"
+   ],
+   "message": "{value} is used by more than one function ({settings}); SP LINK allows one function per output.",
+   "severity": "error",
+   "confidence": "high",
+   "source": "fclsMain::CheckIfAnotherComboBoxUsingThisIO (via DoOutputComboBoxValueChange)"
+  },
+  {
+   "id": "ac_coupled_min_battery",
+   "when": "KacoModeCommPort != 'Disabled' or AcCoupledInverterFrequencyControl != 'Disabled'",
+   "require": "BatterySize >= (models[model].min_ah_lead_acid if BatteryType in ('Lead Acid Sealed', 'Lead Acid Flooded') else models[model].min_ah_lithium_custom if BatteryType in ('Lithium LiFePO4', 'Custom', 'Lithium genZ') else 0)",
+   "message": "For AC coupled systems, Battery Size needs to be at least {min} Ah for this model and battery type.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "BMS battery types are not checked (SP LINK checks only lead acid, LiFePO4, custom, genZ; batteryless = 0)"
+  },
+  {
+   "id": "prio_input_export_spacing",
+   "each": "N",
+   "when": "active(N)",
+   "require": "kw(SystemSchedule{N}AcInputCapacity) + kw(SystemSchedule{N}AcExportCapacity) >= 0",
+   "message": "Priority {N}: AC input and export capacities are set too close to each other (they should be at least 0 kW apart).",
+   "severity": "error",
+   "confidence": "high",
+   "note": "SP LINK's GetACSourceDifferenceInkW: input - (0 - export), both in kW (A x 240 / 1000, kVA x 0.8); both are stored >= 0, so this only catches an invalid negative value"
+  }
+ ],
+ "not_yet": [
+  "three-phase solar inverters on L2/L3 need one on L1; Powador with multi-phase workers > 1 (multi-phase sites)",
+  "AS4777.2:2020 not available on some models (model list)",
+  "InhibitNewFunctionsIn*Area (settings hidden for older firmware)",
+  "multi-phase structure / count must match the detected inverters (multi-phase sites only)"
+ ],
+ "send_checks": [
+  {
+   "id": "frequency_needs_idle",
+   "when": "changed(NominalFrequency)",
+   "require": "unit.output_mode == 'Idle'",
+   "message": "Cannot change Nominal Frequency unless the inverter's output mode is Idle.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "region_locked",
+   "when": "unit.region != 'None' and changed(Region)",
+   "require": "False",
+   "message": "The SP PRO is already configured for Solar Hybrid (AS4777.2:2020) with a region; changing it needs the installer-only code (selpi refuses).",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "baud_needs_hw20",
+   "when": "unit.hardware_revision < 20",
+   "require": "int(Port1Baudrate) <= 57600 and int(Port2Baudrate) <= 57600 and 'Auto' not in (Port1Baudrate, Port2Baudrate)",
+   "message": "This inverter cannot communicate at rates higher than 57600 baud.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "baud codes: 0 1200 ... 6 57600, 7 115200, 8 128000, 9 230400, 10 Auto"
+  },
+  {
+   "id": "no_rs232_powador",
+   "require": "KacoModeCommPort not in ('RS232 Port 1 Powador', 'RS232 Port 2 Powador')",
+   "message": "The firmware in the SP PRO no longer supports RS232 mode.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "bms_needs_comms_card_2017",
+   "when": "is_managed_bms(BatteryType)",
+   "require": "unit.comms_card_revision >= 1",
+   "message": "The inverter needs the Comms Card 2017 for this battery type.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "export_pretrip_above_factory_limit",
+   "when": "ApplicationType in ('Solar Hybrid (On Grid)', 'Solar Hybrid (AS4777.2:2020)') and unit.factory_export_limit",
+   "require": "KacoExportPreTripPowerLimit > unit.factory_export_limit",
+   "message": "This inverter is export limited; the export pre-trip power limit must be set above that limit.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "export_pretrip_above_priorities",
+   "when": "ApplicationType in ('Solar Hybrid (On Grid)', 'Solar Hybrid (AS4777.2:2020)') and KacoExportPreTripDirection == 'Export'",
+   "require": "KacoExportPreTripPowerLimit > max(SystemSchedule{N}AcExportCapacity for active N)",
+   "message": "The export pre-trip power limit must be above the highest export limit of the active priorities.",
+   "severity": "error",
+   "confidence": "high"
+  },
+  {
+   "id": "port_reassign_warning",
+   "when": "changed(KacoModeCommPort) or changed(Port1AccInput)",
+   "require": "not ((KacoModeCommPort in ('RS232 Port 1 Powador', 'RS485 Port 1 Powador') and link.port == 1) or (KacoModeCommPort == 'RS232 Port 2 Powador' and link.port == 2) or (KacoModeCommPort not in ('Disabled', 'RS232 Port 1 Powador', 'RS232 Port 2 Powador', 'RS485 Port 1 Powador') and link.port == 2 and not unit.comms_card_attached) or (changed(Port1AccInput) and link.port == 1 and unit.comms_card_attached))",
+   "message": "This configuration reassigns the SP PRO / comms card port selpi is connected through: communication may be lost.",
+   "severity": "warning",
+   "confidence": "high",
+   "note": "SP LINK: KacoModeCommPort 1 / 3 use SP PRO port 1, 2 uses port 2, 4+ use port 2 without a comms card; the comms card accessory port (0xc087) reassigns port 1 on log out"
+  }
+ ],
+ "models": {
+  "SPMC482": {
+   "cells": 24,
+   "nominal_v": 48,
+   "min_ah_lead_acid": 180,
+   "min_ah_lithium_custom": 50
+  },
+  "SPMC481": {
+   "cells": 24,
+   "nominal_v": 48,
+   "min_ah_lead_acid": 180,
+   "min_ah_lithium_custom": 50
+  },
+  "SPMC241": {
+   "cells": 12,
+   "nominal_v": 24,
+   "min_ah_lead_acid": 180,
+   "min_ah_lithium_custom": 60
+  },
+  "SPLC1202": {
+   "cells": 60,
+   "nominal_v": 120,
+   "min_ah_lead_acid": 250,
+   "min_ah_lithium_custom": 80
+  },
+  "SPMC1201": {
+   "cells": 60,
+   "nominal_v": 120,
+   "min_ah_lead_acid": 100,
+   "min_ah_lithium_custom": 30
+  },
+  "SPMC240": {
+   "cells": 12,
+   "nominal_v": 24,
+   "min_ah_lead_acid": 180,
+   "min_ah_lithium_custom": 60
+  },
+  "SPLC1201": {
+   "cells": 60,
+   "nominal_v": 120,
+   "min_ah_lead_acid": 250,
+   "min_ah_lithium_custom": 80
+  },
+  "SPLC1200": {
+   "cells": 60,
+   "nominal_v": 120,
+   "min_ah_lead_acid": 250,
+   "min_ah_lithium_custom": 80
+  },
+  "SPMC480": {
+   "cells": 24,
+   "nominal_v": 48,
+   "min_ah_lead_acid": 180,
+   "min_ah_lithium_custom": 50
+  }
+ }
+}
