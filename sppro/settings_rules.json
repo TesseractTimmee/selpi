@@ -210,7 +210,8 @@
   "AS4777.2:2020 not available on some models (model list)",
   "InhibitNewFunctionsIn*Area (settings hidden for older firmware)",
   "multi-phase structure / count must match the detected inverters (multi-phase sites only)",
-  "String Inverter model not supported by the SP PRO firmware (firmware-version gated, like the Inhibit* checks)"
+  "String Inverter model not supported by the SP PRO firmware (firmware-version gated, like the Inhibit* checks)",
+  "factory export limit (export_pretrip_above_factory_limit send-check) is not read from the unit; the check self-gates (only applies to export-limited units) so it is inert without it"
  ],
  "send_checks": [
   {

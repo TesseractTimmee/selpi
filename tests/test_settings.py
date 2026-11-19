@@ -58,6 +58,17 @@ class TestRules(unittest.TestCase):
         cfg = {'AcInputPowerLevelInput': 5, 'ExportModeControlInput': 5}       # Follow Backup Select: shared is fine
         self.assertFalse([p for p in S.check(cfg, CELLS, 'SPMC482') if p['id'] == 'io_unique_digital_inputs'])
 
+    def test_baud_needs_hw20(self):
+        b115 = int(next(k for k, v in S.META['Port1Baudrate']['values'].items() if v == '115200'))
+        b576 = int(next(k for k, v in S.META['Port1Baudrate']['values'].items() if v == '57600'))
+        new = {'Port1Baudrate': b115, 'Port2Baudrate': b576}
+        unit = dict(output_mode='Idle', hardware_revision=15, comms_card_revision=1, comms_card_attached=True,
+                    region='None', factory_export_limit=None)
+        err = lambda u: {p['id'] for p in S.send_check(new, {'Port1Baudrate': b576}, u, {'port': 1}, CELLS, 'SPMC482')
+                         if p['severity'] == 'error'}
+        self.assertIn('baud_needs_hw20', err(unit))               # old hardware: >57600 refused
+        self.assertNotIn('baud_needs_hw20', err(dict(unit, hardware_revision=24)))  # rev >= 20: fine
+
     def test_send_checks(self):
         old = {'NominalFrequency': 0}
         unit = dict(output_mode='Sync', hardware_revision=20, comms_card_revision=1, comms_card_attached=True,

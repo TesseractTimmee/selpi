@@ -121,7 +121,7 @@ def _unit_state(reader, raw_now, cells):
     v = live.versions(reader)
     region = settings.to_display('Region', raw_now['Region'], cells)[0] if 'Region' in raw_now else 'None'
     app = settings.to_display('ApplicationType', raw_now['ApplicationType'], cells)[0] if 'ApplicationType' in raw_now else None
-    unit = {'output_mode': controls.output_state(reader)['mode'], 'hardware_revision': None,
+    unit = {'output_mode': controls.output_state(reader)['mode'], 'hardware_revision': reader.words(0xa060, 1)[0],
             'comms_card_revision': v.get('comms_card_revision'), 'comms_card_attached': bool(v.get('comms_card_attached')),
             'region': region if app == 'Solar Hybrid (AS4777.2:2020)' else 'None', 'factory_export_limit': None}
     return unit, {'port': buttons.port(reader)}
