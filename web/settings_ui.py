@@ -35,7 +35,8 @@ def layout():
     global _LAYOUT
     if _LAYOUT is None:
         keep = ('kind', 'values', 'unit', 'min', 'max', 'step', 'decimals', 'range_text', 'per_cell_min',
-                'per_cell_max', 'disabled', 'words', 'unnamed_in_splink', 'section')
+                'per_cell_max', 'disabled', 'words', 'unnamed_in_splink', 'section', 'directions', 'pf_mode', 'offset',
+                'date_part')
         meta = {n: {k: e[k] for k in keep if k in e} for n, e in settings.META.items()}
         lay = settings._load('settings_layout.json')
         tabs, loose = [], []
@@ -65,7 +66,7 @@ def limits(cells, battery=None, values=None):
     takes from other settings; None = not known)."""
     out = {}
     for n, e in settings.META.items():
-        if e['kind'] == 'number':
+        if e['kind'] in ('number', 'pf'):
             dec = e.get('decimals') or 0
             mn, mx = settings._limits(e, cells, battery, values)
             out[n] = [None if mn is None else round(mn, dec), None if mx is None else round(mx, dec), dec]

@@ -3229,7 +3229,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[1 - 4]",
-   "unit": null
+   "unit": null,
+   "offset": 1
   },
   {
    "name": "ExternalContactorPullInTime",
@@ -4593,9 +4594,19 @@
    "control": "cbSupportPowerFactor",
    "load": null,
    "save": "fnGetPowerFactorSettingValue",
-   "kind": "raw",
-   "range_text": "[0.500 - 1.000]",
-   "unit": null
+   "kind": "pf",
+   "pf_mode": "tan",
+   "directions": [
+    "Lagging",
+    "Leading"
+   ],
+   "min": 0.5,
+   "max": 1.0,
+   "decimals": 3,
+   "step": 0.01,
+   "number_control": "nudSupportPowerFactor",
+   "unit": null,
+   "range_text": "[0.500 - 1.000]"
   },
   {
    "name": "ChargePowerFactor",
@@ -4604,9 +4615,19 @@
    "control": "cbChargePowerFactor",
    "load": null,
    "save": "fnGetPowerFactorSettingValue",
-   "kind": "raw",
-   "range_text": "[0.500 - 1.000]",
-   "unit": null
+   "kind": "pf",
+   "pf_mode": "tan",
+   "directions": [
+    "Lagging",
+    "Leading"
+   ],
+   "min": 0.5,
+   "max": 1.0,
+   "decimals": 3,
+   "step": 0.01,
+   "number_control": "nudChargePowerFactor",
+   "unit": null,
+   "range_text": "[0.500 - 1.000]"
   },
   {
    "name": "SourceRmsVoltage10MinDisconnectTrip",
@@ -4850,9 +4871,14 @@
    "section": "AppType",
    "slot": 100,
    "control": "cbMpptModel",
-   "load": null,
+   "load": "UpdateMpptModelSetting",
    "save": "fnGetComboBoxValue",
-   "kind": "raw"
+   "kind": "enum",
+   "values": {
+    "0": "Disabled",
+    "1": "Morningstar",
+    "2": "AERL"
+   }
   },
   {
    "name": "MpptNumber",
@@ -5005,9 +5031,19 @@
    "control": "cbCosPowerFactorEnd",
    "load": null,
    "save": "fnGetCosPhiPowerFactorSettingValue",
-   "kind": "raw",
-   "range_text": "[0.800 - 1.000]",
-   "unit": null
+   "kind": "pf",
+   "pf_mode": "cos",
+   "directions": [
+    "Lagging",
+    "Leading"
+   ],
+   "min": 0.8,
+   "max": 1.0,
+   "decimals": 3,
+   "step": 0.01,
+   "number_control": "nudCosPowerFactorEnd",
+   "unit": null,
+   "range_text": "[0.800 - 1.000]"
   },
   {
    "name": "EnablePowerQualityModes",
@@ -5121,9 +5157,19 @@
    "control": "cbConstantVarPercent",
    "load": null,
    "save": "fnGetConstantVarSettingValue",
-   "kind": "raw",
-   "range_text": "[0.0 - 100.0 %]",
-   "unit": "%"
+   "kind": "pf",
+   "pf_mode": "var",
+   "directions": [
+    "Lagging",
+    "Leading"
+   ],
+   "min": 0.0,
+   "max": 100.0,
+   "decimals": 1,
+   "step": 0.1,
+   "number_control": "nudConstantVarPercent",
+   "unit": "%",
+   "range_text": "[0.0 - 100.0 %]"
   },
   {
    "name": "ChargeLowFrequencyRampEnd",

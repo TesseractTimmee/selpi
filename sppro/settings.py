@@ -10,6 +10,7 @@ SP LINK's validation (sppro/settings_rules.json). Shared by `selpi config show /
   model(reader)                     the unit's model (low byte of 0xa05d indexes SP LINK's model list)
 """
 import json
+import math
 import os
 import re
 from types import SimpleNamespace
@@ -180,15 +181,44 @@ def to_display(name, raw, cells=None):
         d, m = raw & 0xff, raw >> 8
         t = '%d %s' % (d, MONTHS[m - 1]) if 1 <= m <= 12 else 'raw %d' % raw
         return t, t
+    if k == 'pf':
+        v, direction = _pf_value(e, raw)
+        dec = e.get('decimals') or 0
+        return '%.*f %s' % (dec, v, direction), ('%.*f %s %s' % (dec, v, e.get('unit') or '', direction)).replace('  ', ' ')
     if k == 'number' and e.get('save') in _NUM:
         if e['save'] == 'fnGetDCVoltNumericalValue' and not cells:
             return raw, '%d (mV per cell)' % raw
-        v = _NUM[e['save']][0](raw, cells)
+        v = _NUM[e['save']][0](raw, cells) + (e.get('offset') or 0)     # offset: SP LINK shows stored + offset
         dec = e.get('decimals') or 0
         v = round(v, max(dec, 3))
         unit = e.get('unit') or ''
         return v, ('%.*f %s' % (dec, v, unit)).strip()
     return raw, str(raw)
+
+
+def _pf_value(e, raw):
+    """(magnitude, direction) of a power factor word, as SP LINK's subUpdate*Setting loads it."""
+    sv = _signed(raw)
+    direction = e['directions'][1 if sv < 0 else 0]
+    a = abs(sv)
+    if e['pf_mode'] == 'tan':
+        v = round(1 / math.sqrt(1 + (a / 4096) ** 2), 3)
+    elif e['pf_mode'] == 'cos':
+        v = round(1 - a / 4096, 3)
+    else:
+        v = a / 10
+    return v, direction
+
+
+def _pf_raw(e, v, direction):
+    """SP LINK's fnGet*SettingValue: magnitude -> signed word, the second direction (Leading) negative."""
+    if e['pf_mode'] == 'tan':
+        a = round(math.tan(math.acos(v)) * 4096)
+    elif e['pf_mode'] == 'cos':
+        a = round((1 - v) * 4096)
+    else:
+        a = round(v * 10)
+    return (-a if direction == e['directions'][1] else a) & 0xffff
 
 
 def from_display(name, text, cells=None, battery=None, values=None):
@@ -211,6 +241,20 @@ def from_display(name, text, cells=None, battery=None, values=None):
         if not m or int(m.group(1)) > 23 or int(m.group(2)) > 59:
             raise SettingError('%s: give a time as HH:MM%s' % (e['name'], ' or Disabled' if e.get('disabled') else ''))
         return int(m.group(1)) * 60 + int(m.group(2)), warnings
+    if k == 'pf':
+        m = re.fullmatch(r'([0-9.]+)\s*%?\s*([A-Za-z]*)', s)
+        dirs = {d.lower(): d for d in e['directions']}
+        if not m or (m.group(2) and m.group(2).lower() not in dirs):
+            raise SettingError('%s: give e.g. "%s %s"' % (e['name'], e.get('max') or 1, ' or '.join(e['directions'])))
+        try:
+            v = float(m.group(1))
+        except ValueError:
+            raise SettingError('%s: %r is not a number' % (e['name'], m.group(1)))
+        if (e.get('min') is not None and v < e['min'] - 1e-9) or (e.get('max') is not None and v > e['max'] + 1e-9):
+            warnings.append("%s %g is outside SP LINK's range %s" % (e['name'], v, e.get('range_text') or ''))
+        if e['pf_mode'] != 'var' and not 0 < v <= 1:
+            raise SettingError('%s: a power factor is above 0 and at most 1' % e['name'])
+        return _pf_raw(e, v, dirs.get(m.group(2).lower(), e['directions'][0])), warnings
     if k == 'daymonth':
         m = re.fullmatch(r'(\d{1,2})\s+([A-Za-z]{3})', s)
         if not m or m.group(2).title() not in MONTHS:
@@ -228,7 +272,7 @@ def from_display(name, text, cells=None, battery=None, values=None):
         mn, mx = _limits(e, cells, battery, values)
         if (mn is not None and d < mn - 1e-9) or (mx is not None and d > mx + 1e-9):
             warnings.append('%s %g is outside SP LINK\'s range %s' % (e['name'], d, e.get('range_text') or '%s - %s' % (mn, mx)))
-        raw = round(_NUM[e['save']][1](d, cells))
+        raw = round(_NUM[e['save']][1](d - (e.get('offset') or 0), cells))
         if not -32768 <= raw <= 65535:
             raise SettingError('%s: %g is out of range for the stored word' % (e['name'], d))
         return raw & 0xffff, warnings

@@ -211,6 +211,14 @@ function control(name) {
     return `<input type="time" data-s="${esc(name)}" value="${cur === 'Disabled' ? '' : esc(cur)}"${cur === 'Disabled' ? ' disabled' : ''}>` +
       (off ? ` <label class="muted"><input type="checkbox" data-off="${esc(name)}"${cur === 'Disabled' ? ' checked' : ''}> disabled</label>` : '');
   }
+  if (m.kind === 'pf') {      // a number + Lagging / Leading, stored as one signed word
+    const [num, dir] = String(ed !== undefined ? ed : v.value).split(' ');
+    const [mn, mx] = lim(name);
+    const bounds = (mn != null ? ` min="${mn}"` : '') + (mx != null ? ` max="${mx}"` : '');
+    return `<input type="number" data-s="${esc(name)}" data-part="num" value="${esc(num)}" step="${m.step || 0.01}"${bounds}>` +
+      `${m.unit ? `<span class="unit">${esc(m.unit)}</span>` : ''} <select data-s="${esc(name)}" data-part="dir">${m.directions.map(d =>
+      `<option${d === dir ? ' selected' : ''}>${esc(d)}</option>`).join('')}</select>`;
+  }
   if (m.kind === 'number') {
     const cur = ed !== undefined ? ed : v.value;
     const step = m.step || (m.decimals ? Math.pow(10, -m.decimals) : 1);
@@ -357,6 +365,14 @@ $('#cfg-out').addEventListener('change', e => {
   const t = e.target;
   if (t.dataset.off) { edited(t.dataset.off, t.checked ? 'Disabled' : (currentText(t.dataset.off) === 'Disabled' ? '00:00' : currentText(t.dataset.off))); drawCfg(); return; }
   if (!t.dataset.s) return;
+  if (t.dataset.part) {       // power factor: number + direction make one value
+    const td = t.closest('td'), num = td.querySelector('[data-part=num]'), dir = td.querySelector('[data-part=dir]');
+    const [, , dec] = lim(t.dataset.s);
+    num.value = held(t.dataset.s, num.value);
+    edited(t.dataset.s, `${Number(num.value).toFixed(dec)} ${dir.value}`);
+    drawCfg();
+    return;
+  }
   if (t.type === 'number') t.value = held(t.dataset.s, t.value);
   edited(t.dataset.s, t.value);
   drawCfg();
@@ -369,7 +385,7 @@ function held(name, text) {
   delete NOTES[name];
   const [mn, mx, dec] = lim(name);
   let v = parseFloat(text);
-  if (!isFinite(v)) { NOTES[name] = 'not a number: kept the current value'; return READ.values[name].value; }
+  if (!isFinite(v)) { NOTES[name] = 'not a number: kept the current value'; return String(parseFloat(READ.values[name].value)); }
   let note = '';
   if (mn != null && v < mn) { v = mn; note = `held to SP LINK's minimum ${mn}`; }
   if (mx != null && v > mx) { v = mx; note = `held to SP LINK's maximum ${mx}`; }

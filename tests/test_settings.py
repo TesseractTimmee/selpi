@@ -1,4 +1,5 @@
 """Settings meanings and SP LINK's rules (sppro/settings.py, settings_meta.json, settings_rules.json)."""
+import math
 import unittest
 
 from sppro import settings as S
@@ -107,6 +108,23 @@ class TestRules(unittest.TestCase):
         self.assertNotIn('dc_voltage_range', {p['id'] for p in S.check(cfg, CELLS, 'SPMC482')})
         cfg['BatteryType'] = 0                                              # Lead Acid Sealed: max 52.8 V
         self.assertIn('dc_voltage_range', {p['id'] for p in S.check(cfg, CELLS, 'SPMC482')})
+
+    def test_inverters_per_phase_and_mppt_model(self):
+        self.assertEqual(S.to_display('AdvancedMultiphaseNumberOfWorkers', 0, CELLS)[1], '1')    # stored = shown - 1
+        self.assertEqual(S.from_display('AdvancedMultiphaseNumberOfWorkers', '3', CELLS), (2, []))
+        self.assertTrue(S.from_display('AdvancedMultiphaseNumberOfWorkers', '5', CELLS)[1])      # SP LINK: 1 - 4
+        self.assertEqual(S.to_display('MpptModel', 1, CELLS)[1], 'Morningstar')
+        self.assertEqual(S.from_display('MpptModel', 'AERL', CELLS)[0], 2)
+
+    def test_power_factor(self):
+        r = S.from_display('SupportPowerFactor', '0.95 Leading', CELLS)[0]
+        self.assertEqual(r, (-round(math.tan(math.acos(0.95)) * 4096)) & 0xffff)
+        self.assertEqual(S.to_display('SupportPowerFactor', r, CELLS)[1], '0.950 Leading')
+        self.assertEqual(S.to_display('SupportPowerFactor', 0, CELLS)[1], '1.000 Lagging')
+        self.assertEqual(S.from_display('CosPowerFactorEnd', '0.9', CELLS)[0], 410)          # (1 - 0.9) x 4096
+        self.assertEqual(S.to_display('ConstantVarPercent', S.from_display('ConstantVarPercent', '12.5 leading')[0])[1],
+                         '12.5 % Leading')
+        self.assertTrue(S.from_display('SupportPowerFactor', '0.4', CELLS)[1])               # SP LINK: 0.500 - 1.000
 
     def test_models(self):
         self.assertEqual(S.cells_for('SPMC482'), 24)
