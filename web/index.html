@@ -323,7 +323,10 @@ async function doWrite() {
   } catch (e) { $('#cfg-res').innerHTML = `<p class="err">${esc(e.message)}</p>`; $('#cfg-do').disabled = false; }
 }
 async function cfgRead(note) {
-  $('#cfg-go').disabled = true; $('#cfg-at').textContent = 'reading…';
+  $('#cfg-go').disabled = true;
+  const t0 = Date.now(), tick = () => { const s = Math.round((Date.now() - t0) / 1000);
+    $('#cfg-at').textContent = `reading the configuration… ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} (over Select.Live this takes 1–3 min)`; };
+  tick(); const timer = setInterval(tick, 1000);
   try {
     await cfgLayout();
     READ = await api('api/config/read');
@@ -334,6 +337,7 @@ async function cfgRead(note) {
     EDITS = {}; CHECK = null;
     drawCfg();
   } catch (e) { $('#cfg-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  clearInterval(timer);
   $('#cfg-go').disabled = false;
 }
 setInterval(() => {   // a write needs a recent read (the server checks too)
