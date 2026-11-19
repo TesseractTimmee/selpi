@@ -3366,7 +3366,7 @@
    "save": "fnGetComboBoxValue",
    "kind": "enum",
    "values": {
-    "0": " ",
+    "0": "None",
     "1": "20 %",
     "2": "0 %",
     "3": "20 %",

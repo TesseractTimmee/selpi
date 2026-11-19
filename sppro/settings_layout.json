@@ -1346,7 +1346,7 @@
         {
          "setting": "AlternateMaxPower",
          "control": "nudAlternateMaxPower",
-         "label": "Alternate AC Source  Power",
+         "label": "Alternate AC Source Power",
          "range": "[0.1 - 50.0 kW]",
          "pos": [
           7,
@@ -3328,7 +3328,7 @@
         {
          "setting": "AcLoadHoldOn",
          "control": "nudAcLoadHoldOn",
-         "label": "AC load (50 - 100 %) of  rating",
+         "label": "AC load (50 - 100 %) of rating",
          "range": null,
          "pos": [
           5,
@@ -3340,7 +3340,7 @@
       },
       {
        "id": "gbGeneratorSignalTiming",
-       "title": "Signal Timing ",
+       "title": "Signal Timing",
        "pos": [
         748,
         3
@@ -3593,7 +3593,7 @@
         {
          "setting": "SystemSchedule1ChargeOverrideACSource",
          "control": "cbSystemSchedule1ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -3944,7 +3944,7 @@
         {
          "setting": "SystemSchedule2ChargeOverrideACSource",
          "control": "cbSystemSchedule2ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -4295,7 +4295,7 @@
         {
          "setting": "SystemSchedule3ChargeOverrideACSource",
          "control": "cbSystemSchedule3ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -4646,7 +4646,7 @@
         {
          "setting": "SystemSchedule4ChargeOverrideACSource",
          "control": "cbSystemSchedule4ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -4997,7 +4997,7 @@
         {
          "setting": "SystemSchedule5ChargeOverrideACSource",
          "control": "cbSystemSchedule5ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -5348,7 +5348,7 @@
         {
          "setting": "SystemSchedule6ChargeOverrideACSource",
          "control": "cbSystemSchedule6ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -5699,7 +5699,7 @@
         {
          "setting": "SystemSchedule7ChargeOverrideACSource",
          "control": "cbSystemSchedule7ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -6050,7 +6050,7 @@
         {
          "setting": "SystemSchedule8ChargeOverrideACSource",
          "control": "cbSystemSchedule8ChargeOverrideACSource",
-         "label": "AC Source limit during  Override",
+         "label": "AC Source limit during Override",
          "range": null,
          "pos": [
           6,
@@ -6253,7 +6253,7 @@
         {
          "setting": "GridFailBeeper",
          "control": "cbGridFailBeeper",
-         "label": "AC Source  Disconnect Beeper",
+         "label": "AC Source Disconnect Beeper",
          "range": null,
          "pos": [
           6,
@@ -6275,7 +6275,7 @@
         {
          "setting": "YearToDateRollOverDay",
          "control": "dtpYearToDateRollOverDate",
-         "label": "\"Year to Date",
+         "label": "Year to Date Rollover Date",
          "range": "[dd/mm]",
          "pos": [
           6,
@@ -6286,7 +6286,7 @@
         {
          "setting": "YearToDateRollOverMonth",
          "control": "dtpYearToDateRollOverDate",
-         "label": "\"Year to Date",
+         "label": "Year to Date Rollover Date",
          "range": "[dd/mm]",
          "pos": [
           6,
@@ -6297,7 +6297,7 @@
         {
          "setting": "DetailedDataLogInterval",
          "control": "cbDetailedDataLogInterval",
-         "label": "Detailed Data  Log Interval",
+         "label": "Detailed Data Log Interval",
          "range": null,
          "pos": [
           6,
@@ -7171,7 +7171,7 @@
         {
          "setting": "AcCoupledInverterControl",
          "control": "cbAcCoupledInverterControl",
-         "label": "AC Coupled Inverter  Output",
+         "label": "AC Coupled Inverter Output",
          "range": null,
          "pos": [
           6,
@@ -7529,7 +7529,7 @@
         {
          "setting": "HighBatteryAlert",
          "control": "cbHighBatteryAlert",
-         "label": "High Battery Alert  Output",
+         "label": "High Battery Alert Output",
          "range": null,
          "pos": [
           6,

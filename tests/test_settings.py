@@ -68,6 +68,20 @@ class TestRules(unittest.TestCase):
                if p['severity'] == 'error'}
         self.assertNotIn('frequency_needs_idle', ids)
 
+    def test_as4777_needs_a_region(self):
+        app = int(next(k for k, v in S.META['ApplicationType']['values'].items() if 'AS4777' in v))
+        ids = lambda cfg: {p['id'] for p in S.check(cfg, CELLS, 'SPMC482')}
+        self.assertEqual(S.to_display('Region', 0, CELLS)[1], 'None')          # SP LINK's blank entry
+        self.assertIn('as4777_needs_region', ids({'ApplicationType': app, 'Region': 0}))
+        self.assertNotIn('as4777_needs_region', ids({'ApplicationType': app, 'Region': 1}))
+
+    def test_labels_are_clean(self):
+        import json, os
+        lay = json.load(open(os.path.join(os.path.dirname(S.__file__), 'settings_layout.json')))
+        texts = [x for t in lay['tabs'] for st in t['subtabs'] for g in st['groups']
+                 for x in [g.get('title')] + [r.get('label') for r in g['rows']] if x]
+        self.assertFalse([x for x in texts if '"' in x or '  ' in x or x != x.strip()])
+
     def test_models(self):
         self.assertEqual(S.cells_for('SPMC482'), 24)
         self.assertEqual(S.cells_for('SPMC241'), 12)
