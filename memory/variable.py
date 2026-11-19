@@ -46,7 +46,8 @@ def _live_tables():
     if not _LIVE:
         from sppro import live
         for f in live.FIELDS:
-            _LIVE.setdefault(f['field'].lower(), f)
+            if f.get('field'):  # selpi's derived fields (e.g. ac_source_power_in) have only a key
+                _LIVE.setdefault(f['field'].lower(), f)
             _LIVE.setdefault(f['key'].lower(), f)
     return _LIVE
 
@@ -66,7 +67,7 @@ def live_field(name: str):
 
 def live_names() -> list:
     """Every SP LINK field name available through create()."""
-    return sorted({f['field'] for f in _live_tables().values()})
+    return sorted({f['field'] for f in _live_tables().values() if f.get('field')})
 
 ADDRESS = 'address'
 TYPE = 'type'
@@ -453,7 +454,7 @@ class LiveVariable(Variable):
                        | {int(a, 16) for a in field['words']})
         self.__first = words[0]
         self.__words = words[-1] - words[0] + 1
-        super().__init__(field['field'], self.__first, bytes if bytes is not None else b'\x00\x00' * self.__words)
+        super().__init__(field.get('field') or field['key'], self.__first, bytes if bytes is not None else b'\x00\x00' * self.__words)
 
     @property
     def range(self):

@@ -294,6 +294,9 @@ matching SP LINK 15.40's texts; the codes below were seen on a real unit.
 
 `sppro/live_fields.json` lists every value SP LINK's data screens show (288 fields: 249 numbers, 21 status
 codes, 18 raw such as serial numbers), matching SP LINK 15.40, memory map version 31.
+selpi adds four derived fields of its own (`"derived"` in the table, no SP LINK name): `ac_source_power_in/out`
+and `dc_battery_power_in/out`, the signed powers split into >= 0 parts (the SP PRO reports import and charging as
+negative), so averages and statistics don't net the two directions out.
 `selpi live` reads them; values were checked against the SP PRO's Modbus map on 17 Nov 2026 (load, inverter, grid, solar
 power; reactive power; voltages; frequencies; battery V/SoC/power; today's energies; generator status; solar
 hybrid priority; run hours all agree).
