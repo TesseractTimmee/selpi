@@ -117,7 +117,9 @@ def read(reader):
     return {'read_id': rid, 'model': model, 'cells': cells, 'config_version': config_version,
             'values': _values(raw, cells), 'problems': problems,
             'limits': limits(cells, shown.get('BatteryType'), shown),
-            'version_problems': live.version_problems(live.versions(reader)), 'writes_allowed': writes_allowed(),
+            'version_problems': live.version_problems(live.versions(reader)),
+            'map_mismatch': live.versions(reader).get('memory_map') != live.VERIFIED['memory_map'],
+            'writes_allowed': writes_allowed(),
             'writes_available': writes_available(),
             'read_max_age': READ_MAX_AGE}
 

@@ -74,11 +74,15 @@ class TestConfigWrite(unittest.TestCase):
         s.mem[0xa251] = struct.pack('<H', 1)                   # a log download in progress
         with self.assertRaises(config_write.WriteError):
             self.write(s, r, 0)
-        s, r = sim(versions={'config_settings': 49})
+        # memory-map mismatch refuses writes (addresses may differ)
+        s, r = sim(versions={'memory_map': 30})
         with self.assertRaises(config_write.WriteError) as e:
             self.write(s, r, 0)
-        self.assertIn('verified', str(e.exception))
+        self.assertIn('memory map', str(e.exception))
         self.assertEqual(s.writes, [])
+        # but a config-version-only mismatch (map OK) is allowed
+        s, r = sim(versions={'config_settings': 45})
+        self.assertTrue(self.write(s, r, 0)['written'])
 
     def test_names_and_values_are_checked(self):
         s, r = sim()

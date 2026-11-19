@@ -46,14 +46,20 @@ class VersionMismatch(Exception):
 
 
 def check_versions(reader, writes=False, force=False):
-    """Compare the unit's version block with the verified map. Reading commands get a warning on stderr;
-    commands that write raise VersionMismatch unless force. Returns the problems (empty = matches)."""
+    """Compare the unit's version block with the verified map. Reading commands warn on stderr. Writes require only
+    the MEMORY-MAP version to match (that is the setting-address layout; this build carries one map's addresses) --
+    config/service/log-format differences only change which settings are meaningful, which the per-setting
+    availability check (settings.available) and the rules already handle. --force overrides even a map mismatch.
+    Returns the problems (empty = matches)."""
     import sys
-    problems = version_problems(versions(reader))
+    v = versions(reader)
+    problems = version_problems(v)
     if problems:
         text = 'this unit differs from the verified map (%s)' % ', '.join(problems)
-        if writes and not force:
-            raise VersionMismatch(text + ': not writing (--force to override)')
+        if writes and not force and v.get('memory_map') != VERIFIED['memory_map']:
+            raise VersionMismatch("this unit's memory map is %s but this build maps version %d; the setting addresses "
+                                  "may differ, so not writing (--force to override)"
+                                  % (v.get('memory_map'), VERIFIED['memory_map']))
         print('WARNING: %s; values may be wrong' % text, file=sys.stderr)
     return problems
 

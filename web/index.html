@@ -356,7 +356,7 @@ async function cfgRead(note) {
     READ.at = new Date();
     $('#cfg-at').textContent = `${READ.model || '?'} · read ${READ.at.toTimeString().slice(0, 8)}`;
     const ro = !READ.writes_available ? `<div class="msg">Read-only release: selpi shows the configuration as SP LINK does but does not write it yet (configuration writes arrive after on-hardware validation).</div>` : '';
-    const vp = READ.version_problems.length ? `<div class="msg">This unit differs from the verified map (${esc(READ.version_problems.join(', '))}): values may be wrong and writing is refused.</div>` : '';
+    const vp = READ.version_problems.length ? `<div class="msg">This unit differs from the verified versions (${esc(READ.version_problems.join(', '))}). ${READ.map_mismatch ? 'Its memory map differs, so setting addresses may be wrong and writing is refused.' : 'The addresses still match (same memory map); firmware-specific settings are flagged, and writing works for the settings your firmware has.'}</div>` : '';
     $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + ro + vp + problemsHtml("Already in the unit's configuration (SP LINK would flag these)", READ.problems);
     EDITS = {}; NOTES = {}; CHECK = null;
     drawCfg();
