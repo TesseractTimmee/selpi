@@ -101,10 +101,10 @@ def run_show(args, reader=None):
         _report(settings.check(raw, cells, model))
 
 
-def _report(problems):
+def _report(problems, what="SP LINK's rules"):
     real = [p for p in problems if p['severity'] != 'skipped']
     if not real:
-        print("SP LINK's rules: no problems")
+        print("%s: no problems" % what)
     for p in real:
         print("  %-7s %s  [%s]" % (p['severity'].upper(), p['message'], p['id']))
     skipped = [p['id'] for p in problems if p['severity'] == 'skipped']
@@ -161,7 +161,7 @@ def run_set(args, reader=None, passcode=None, fresh_reader=None):
     print("SP LINK's checks on this change:")
     problems = _report(new_problems + [p for p in after if p['severity'] == 'skipped'])
     unit, link = _unit_state(reader, raw_now, cells)
-    problems += _report(settings.send_check(raw_new, raw_now, unit, link, cells, model))
+    problems += _report(settings.send_check(raw_new, raw_now, unit, link, cells, model), "SP LINK's send checks")
     blocking = [p for p in problems if p['severity'] == 'error' and p['id'] not in args.ignore_rule]
     stop = []
     if warnings and not args.allow_out_of_range:
