@@ -46,6 +46,23 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
 .err { color: var(--bad); }
 .ok { color: var(--good); }
 .note { color: var(--muted); font-size: 12px; }
+/* configuration page */
+.subnav { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+.subnav button { border: 1px solid var(--line); background: var(--panel); color: var(--muted); padding: 4px 10px; border-radius: 6px; font: inherit; cursor: pointer; }
+.subnav button.on { background: var(--chip); color: var(--text); font-weight: 600; }
+.subnav.small button { font-size: 12px; padding: 3px 8px; }
+.cfg td { vertical-align: middle; }
+.cfg td.lbl { width: 42%; }
+.cfg td.rng { color: var(--muted); font-size: 12px; }
+#cfg-out .grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); }
+.cfg input[type=number] { width: 7.5em; text-align: right; }
+.cfg tr.changed td { background: var(--warn-bg); }
+.cfg .unit { color: var(--muted); font-size: 12px; margin-left: 4px; }
+.cfg .fieldmsg { display: block; font-size: 12px; }
+.problems { margin: 0 0 12px; padding: 10px 12px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); }
+.problems li { margin-left: 16px; }
+#cfg-write { position: sticky; bottom: 0; }
+#cfg-write .inner { padding: 12px; }
 </style>
 </head>
 <body>
@@ -53,7 +70,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
   <h1>SP PRO</h1>
   <nav id="tabs">
     <button data-tab="live" class="on">Live</button>
-    <button data-tab="settings">Settings</button>
+    <button data-tab="settings">Configuration</button>
     <button data-tab="backups">Backups</button>
     <button data-tab="logs">Logs</button>
     <button data-tab="status">Status</button>
@@ -82,12 +99,17 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
 
   <section id="settings">
     <div class="bar">
-      <input id="filter" placeholder="Search settings" class="grow">
-      <span class="note" id="set-at"></span>
-      <button class="act" id="set-go">Read from SP PRO</button>
+      <input id="cfg-filter" placeholder="Search settings" class="grow">
+      <label class="muted"><input type="checkbox" id="cfg-factory"> factory settings</label>
+      <label class="muted"><input type="checkbox" id="cfg-rawview"> raw list</label>
+      <span class="note" id="cfg-at"></span>
+      <button class="act" id="cfg-go">Read from SP PRO</button>
     </div>
-    <p class="note">Raw values as stored in the SP PRO. Read-only: changes go through SP LINK for now.</p>
-    <div id="set-out"></div>
+    <div id="cfg-msg"></div>
+    <div id="cfg-tabs" class="subnav"></div>
+    <div id="cfg-subtabs" class="subnav small"></div>
+    <div id="cfg-out"><p class="note">Read the configuration to see it as SP LINK shows it.</p></div>
+    <div class="card" id="cfg-write" style="display:none"><div class="inner" id="cfg-write-in"></div></div>
   </section>
 
   <section id="backups">
@@ -139,7 +161,9 @@ async function api(path, opts) {
 function show(tab) {
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === tab));
+  if (tab === 'settings' && !READ) cfgRead();
   if (tab === 'backups') loadBackups();
+  history.replaceState(null, '', '#' + tab + (tab === 'settings' && curTab ? '/' + curTab : ''));
   if (tab === 'status') loadStatus();
 }
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => show(b.dataset.tab));
@@ -166,25 +190,165 @@ async function loadLive() {
 $('#live-go').onclick = loadLive; $('#screens').onchange = loadLive;
 setInterval(() => { if ($('#auto').checked && $('#live').classList.contains('on') && !document.hidden) loadLive(); }, 15000);
 
-// ---- settings
-let settings = [];
-function drawSettings() {
-  const f = $('#filter').value.toLowerCase();
-  const groups = {};
-  settings.filter(s => !f || s.name.toLowerCase().includes(f) || s.section.toLowerCase().includes(f) || s.address.includes(f))
-    .forEach(s => (groups[s.section] = groups[s.section] || []).push(s));
-  $('#set-out').innerHTML = Object.entries(groups).map(([sec, rows]) =>
-    `<div class="card"><h2>${esc(sec)} (${rows.length})</h2><div class="scroll"><table>${rows.map(s =>
-      `<tr><td>${esc(s.name)}</td><td class="addr">${esc(s.address)}</td><td class="num">${esc(s.value)}</td></tr>`).join('')}</table></div></div>`).join('')
-    || '<p class="note">Nothing to show yet.</p>';
+// ---- configuration (SP LINK's Configuration Settings screens)
+let LAYOUT = null, READ = null, EDITS = {}, CHECK = null, curTab = null, curSub = null, checkTimer = null;
+async function cfgLayout() { if (!LAYOUT) LAYOUT = await api('api/config/layout'); return LAYOUT; }
+const visTabs = () => LAYOUT.tabs.filter(t => (t.title || t.id) && ($('#cfg-factory').checked || !LAYOUT.hidden_tabs.includes(t.title)));
+function currentText(name) { const v = READ && READ.values[name]; return v ? v.text : ''; }
+function control(name) {
+  const m = LAYOUT.settings[name] || {}, v = READ.values[name];
+  if (!v) return '<span class="muted">not read</span>';
+  const ed = EDITS[name], dis = m.words === 2 ? ' disabled title="spans two words"' : '';
+  if (m.kind === 'enum') {
+    const cur = ed !== undefined ? ed : v.value;
+    return `<select data-s="${esc(name)}"${dis}>${Object.entries(m.values).map(([c, l]) =>
+      `<option${l === cur ? ' selected' : ''}>${esc(l)}</option>`).join('')}${Object.values(m.values).includes(cur) ? '' : `<option selected>${esc(cur)}</option>`}</select>`;
+  }
+  if (m.kind === 'time') {
+    const cur = ed !== undefined ? ed : v.value;
+    const off = m.disabled !== undefined;
+    return `<input type="time" data-s="${esc(name)}" value="${cur === 'Disabled' ? '' : esc(cur)}"${cur === 'Disabled' ? ' disabled' : ''}>` +
+      (off ? ` <label class="muted"><input type="checkbox" data-off="${esc(name)}"${cur === 'Disabled' ? ' checked' : ''}> disabled</label>` : '');
+  }
+  if (m.kind === 'number') {
+    const cur = ed !== undefined ? ed : v.value;
+    const step = m.step || (m.decimals ? Math.pow(10, -m.decimals) : 1);
+    return `<input type="number" data-s="${esc(name)}" value="${esc(cur)}" step="${step}"${dis}><span class="unit">${esc(m.unit || '')}</span>`;
+  }
+  const cur = ed !== undefined ? ed : (m.kind === 'daymonth' ? v.text : v.raw);
+  return `<input data-s="${esc(name)}" value="${esc(cur)}" size="10"${dis}>${m.kind === 'raw' ? '<span class="unit">raw</span>' : ''}`;
 }
-$('#filter').oninput = drawSettings;
-$('#set-go').onclick = async () => {
-  $('#set-go').disabled = true; $('#set-at').textContent = 'reading…';
-  try { const d = await api('api/settings'); settings = d.settings; $('#set-at').textContent = 'read ' + d.at.slice(11); drawSettings(); }
-  catch (e) { $('#set-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
-  $('#set-go').disabled = false;
-};
+function rowHtml(r, where) {
+  const name = r.setting, c = CHECK && CHECK.changes[name];
+  const msgs = c ? [...(c.warnings || []).map(w => `<span class="fieldmsg" style="color:var(--warn)">${esc(w)}</span>`),
+                    c.error ? `<span class="fieldmsg err">${esc(c.error)}</span>` : ''].join('') : '';
+  const was = EDITS[name] !== undefined ? `<span class="fieldmsg muted">was ${esc(currentText(name))}</span>` : '';
+  return `<tr class="${EDITS[name] !== undefined ? 'changed' : ''}"><td class="lbl">${esc(r.label || name)}${where ? `<div class="muted">${esc(where)}</div>` : ''}</td>` +
+    `<td>${control(name)}${was}${msgs}</td><td class="rng">${esc(r.range || '')}</td></tr>`;
+}
+function drawCfg() {
+  if ($('#cfg-rawview').checked) return drawRaw();
+  if (!LAYOUT || !READ) return;
+  const f = $('#cfg-filter').value.trim().toLowerCase();
+  const tabs = visTabs();
+  if (f) {   // search across every tab
+    $('#cfg-tabs').innerHTML = ''; $('#cfg-subtabs').innerHTML = '';
+    const rows = [];
+    tabs.forEach(t => t.subtabs.forEach(st => st.groups.forEach(g => g.rows.forEach(r => {
+      const where = [t.title, st.title, g.title].filter(Boolean).join(' › ');
+      if ((r.label || '').toLowerCase().includes(f) || r.setting.toLowerCase().includes(f) || where.toLowerCase().includes(f)) rows.push([r, where]);
+    }))));
+    $('#cfg-out').innerHTML = rows.length ? `<div class="card"><div class="scroll"><table class="cfg">${rows.map(([r, w]) => rowHtml(r, w)).join('')}</table></div></div>`
+      : '<p class="note">No setting matches.</p>';
+  } else {
+    if (!tabs.find(t => t.id === curTab)) curTab = tabs[0].id;
+    $('#cfg-tabs').innerHTML = tabs.map(t => `<button data-t="${esc(t.id)}" class="${t.id === curTab ? 'on' : ''}">${esc(t.title || t.id)}</button>`).join('');
+    const tab = tabs.find(t => t.id === curTab);
+    if (!tab.subtabs.find(st => st.id === curSub)) curSub = tab.subtabs[0].id;
+    $('#cfg-subtabs').innerHTML = tab.subtabs.length > 1 ? tab.subtabs.map(st =>
+      `<button data-st="${esc(st.id)}" class="${st.id === curSub ? 'on' : ''}">${esc(st.title || '-')}</button>`).join('') : '';
+    const sub = tab.subtabs.find(st => st.id === curSub);
+    $('#cfg-out').innerHTML = '<div class="grid">' + sub.groups.map(g => `<div class="card"><h2>${esc(g.title || tab.title)}</h2>` +
+      `<table class="cfg">${g.rows.filter(r => !r.hidden || $('#cfg-factory').checked).map(r => rowHtml(r)).join('')}</table></div>`).join('') + '</div>';
+  }
+  drawWrite();
+}
+function drawRaw() {
+  $('#cfg-tabs').innerHTML = ''; $('#cfg-subtabs').innerHTML = '';
+  if (!READ) return;
+  const f = $('#cfg-filter').value.toLowerCase();
+  const rows = Object.entries(READ.values).filter(([n]) => !f || n.toLowerCase().includes(f)).sort();
+  $('#cfg-out').innerHTML = `<div class="card"><div class="scroll"><table>${rows.map(([n, v]) =>
+    `<tr><td>${esc(n)}</td><td>${esc(v.text)}</td><td class="num">${esc(v.raw)}</td></tr>`).join('')}</table></div></div>`;
+}
+function problemsHtml(title, list) {
+  return list.length ? `<div class="problems"><b>${esc(title)}</b><ul>${list.map(p =>
+    `<li><span class="${p.severity === 'error' ? 'err' : ''}">${esc(p.severity)}</span>: ${esc(p.message)} <span class="muted">[${esc(p.id)}]</span></li>`).join('')}</ul></div>` : '';
+}
+function drawWrite() {
+  const names = Object.keys(EDITS);
+  $('#cfg-write').style.display = names.length ? '' : 'none';
+  if (!names.length) return;
+  const probs = CHECK ? [...CHECK.problems, ...CHECK.send_problems] : [];
+  const errors = probs.filter(p => p.severity === 'error');
+  const ranged = CHECK && Object.values(CHECK.changes).some(c => (c.warnings || []).length);
+  const bad = CHECK && Object.values(CHECK.changes).some(c => c.error);
+  const off = !READ.writes_allowed;
+  $('#cfg-write-in').innerHTML = `<b>${names.length} change${names.length > 1 ? 's' : ''}</b><table class="cfg">${names.map(n =>
+    `<tr><td>${esc(n)}</td><td>${esc(currentText(n))} → <b>${esc(CHECK && CHECK.changes[n] && CHECK.changes[n].text || EDITS[n])}</b></td></tr>`).join('')}</table>` +
+    (CHECK ? problemsHtml("SP LINK's checks on these changes", probs) || '<p class="ok">SP LINK\'s checks: no problems.</p>' : '<p class="note">checking…</p>') +
+    (off ? '<p class="note">Writing is off: turn on the app option <b>allow_config_writes</b> to write from here.</p>' : `
+    <div class="bar">
+      ${ranged ? '<label><input type="checkbox" id="cfg-oor"> write values outside SP LINK\'s range</label>' : ''}
+      ${errors.length ? '<label class="err"><input type="checkbox" id="cfg-ign"> write although SP LINK would refuse</label>' : ''}
+      <input type="password" id="cfg-pass" placeholder="SP LINK passcode" autocomplete="off" size="14">
+      <button class="act" id="cfg-do"${bad || !CHECK ? ' disabled' : ''}>Write to SP PRO</button>
+      <button id="cfg-undo">Discard changes</button>
+    </div><div id="cfg-res"></div>`) + (off ? '<button id="cfg-undo">Discard changes</button>' : '');
+  $('#cfg-undo').onclick = () => { EDITS = {}; CHECK = null; drawCfg(); };
+  if (!off) $('#cfg-do').onclick = doWrite;
+}
+function edited(name, text) {
+  if (text === currentText(name) || (READ.values[name] && String(READ.values[name].value) === String(text))) delete EDITS[name];
+  else EDITS[name] = text;
+  clearTimeout(checkTimer);
+  checkTimer = setTimeout(runCheck, 400);
+  drawWrite();
+}
+async function runCheck() {
+  if (!Object.keys(EDITS).length) { CHECK = null; drawCfg(); return; }
+  try {
+    CHECK = await api('api/config/check', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({read_id: READ.read_id, changes: EDITS})});
+  } catch (e) { CHECK = null; $('#cfg-msg').innerHTML = `<div class="msg">${esc(e.message)}</div>`; }
+  drawCfg();
+}
+async function doWrite() {
+  const pass = $('#cfg-pass').value;
+  if (!pass) { $('#cfg-res').innerHTML = '<p class="err">Enter the SP LINK passcode.</p>'; return; }
+  const list = Object.keys(EDITS).map(n => `${n}: ${currentText(n)} → ${CHECK.changes[n].text}`).join('\n');
+  if (!confirm(`Write ${Object.keys(EDITS).length} setting(s) to the SP PRO?\n\n${list}\n\nA full backup is saved first; the configuration is read back afterwards.`)) return;
+  const errors = [...CHECK.problems, ...CHECK.send_problems].filter(p => p.severity === 'error');
+  const ignore = $('#cfg-ign') && $('#cfg-ign').checked ? errors.map(p => p.id) : [];
+  $('#cfg-do').disabled = true; $('#cfg-res').innerHTML = '<p class="note">writing…</p>';
+  try {
+    const r = await api('api/config/write', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({read_id: READ.read_id, changes: EDITS, passcode: pass,
+                            allow_out_of_range: !!($('#cfg-oor') && $('#cfg-oor').checked), ignore_rules: ignore})});
+    const others = Object.keys(r.other_changes || {});
+    const note = `<div class="msg">Written: ${esc(r.changes.map(c => `${c.setting} ${c.old} → ${c.new}${c.confirmed ? '' : ' (NOT confirmed)'}`).join('; '))}.` +
+      ` Backup ${esc(r.backup)}.${others.length ? ' Other words changed: ' + esc(others.join(', ')) : ''}</div>`;
+    EDITS = {}; CHECK = null;
+    await cfgRead(note);
+  } catch (e) { $('#cfg-res').innerHTML = `<p class="err">${esc(e.message)}</p>`; $('#cfg-do').disabled = false; }
+}
+async function cfgRead(note) {
+  $('#cfg-go').disabled = true; $('#cfg-at').textContent = 'reading…';
+  try {
+    await cfgLayout();
+    READ = await api('api/config/read');
+    READ.at = new Date();
+    $('#cfg-at').textContent = `${READ.model || '?'} · read ${READ.at.toTimeString().slice(0, 8)}`;
+    const vp = READ.version_problems.length ? `<div class="msg">This unit differs from the verified map (${esc(READ.version_problems.join(', '))}): values may be wrong and writing is refused.</div>` : '';
+    $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + vp + problemsHtml("Already in the unit's configuration (SP LINK would flag these)", READ.problems);
+    EDITS = {}; CHECK = null;
+    drawCfg();
+  } catch (e) { $('#cfg-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  $('#cfg-go').disabled = false;
+}
+setInterval(() => {   // a write needs a recent read (the server checks too)
+  if (READ && READ.at && (Date.now() - READ.at) / 1000 > READ.read_max_age - 60)
+    $('#cfg-at').innerHTML = '<span class="err">read is old: read again before writing</span>';
+}, 30000);
+$('#cfg-go').onclick = cfgRead;
+$('#cfg-filter').oninput = drawCfg; $('#cfg-factory').onchange = drawCfg; $('#cfg-rawview').onchange = drawCfg;
+$('#cfg-tabs').onclick = e => { const b = e.target.closest('button'); if (b) { curTab = b.dataset.t; curSub = null; history.replaceState(null, '', '#settings/' + curTab); drawCfg(); } };
+$('#cfg-subtabs').onclick = e => { const b = e.target.closest('button'); if (b) { curSub = b.dataset.st; drawCfg(); } };
+$('#cfg-out').addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.off) { edited(t.dataset.off, t.checked ? 'Disabled' : (currentText(t.dataset.off) === 'Disabled' ? '00:00' : currentText(t.dataset.off))); drawCfg(); return; }
+  if (t.dataset.s) edited(t.dataset.s, t.value);
+});
 
 // ---- jobs
 async function waitJob(job, out, done) {
@@ -268,6 +432,7 @@ async function loadStatus() {
   ].map(([k, val]) => `<tr><th>${k}</th><td>${typeof val === 'string' && val.includes('<span') ? val : esc(val)}</td></tr>`).join('') + '</table>';
   $('#state').textContent = s.busy ? s.busy + '…' : (s.last_error ? 'error' : '');
 }
+{ const [t, sub] = location.hash.slice(1).split('/'); if (sub) curTab = sub; if (t && t !== 'live' && document.getElementById(t)) show(t); }
 loadLive();
 </script>
 </body>

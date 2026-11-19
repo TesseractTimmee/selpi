@@ -75,21 +75,48 @@ def _save(out_dir, stamp, label, memory):
 
 def write_setting(reader, name: str, value: int, passcode: int, out_dir='config-writes', force=False,
                   fresh_reader=None, log=print) -> dict:
-    """Write one setting. fresh_reader(): a new connection for relocking if this one fails mid-way."""
-    if not 0 <= value <= 0xffff:
-        raise WriteError('value %r out of range (raw 16-bit: 0..65535)' % value)
-    setting = find_setting(name)
+    """Write one setting (see write_settings). fresh_reader(): a new connection for relocking if this one fails."""
+    r = write_settings(reader, {name: value}, passcode, out_dir=out_dir, force=force, fresh_reader=fresh_reader, log=log)
+    c = r['changes'][0]
+    out = {'setting': c['setting'], 'address': c['address'], 'old': c['old'], 'new': c['new'], 'written': r['written'],
+           'backup': r['backup']}
+    if not r['written']:
+        out['note'] = 'already %d: nothing written' % c['old']
+        return out
+    out.update(confirmed=c['confirmed'], other_changes=r['other_changes'], after=r['after'],
+               undo='selpi config set %s %d --yes' % (c['setting'], c['old']))
+    return out
+
+
+def write_settings(reader, values: dict, passcode: int, out_dir='config-writes', force=False, fresh_reader=None,
+                   expected=None, log=print) -> dict:
+    """Write several settings {name: raw} in one unlock session: preflight, full backup, unlock, every changed word,
+    relock always, full read-back. expected: the configuration memory as read earlier in the session (e.g. by the
+    web page); if the unit's configuration differs from it now, nothing is written."""
+    settings_ = []
+    for name, value in values.items():
+        if not 0 <= value <= 0xffff:
+            raise WriteError('%s: value %r out of range (raw 16-bit: 0..65535)' % (name, value))
+        settings_.append((find_setting(name), value))
     preflight(reader, force=force)
     before = config.read_memory(reader)
-    old = before.get(setting['address'])
+    if expected is not None:
+        moved = sorted(a for a in set(before) | set(expected) if before.get(a) != expected.get(a))
+        if moved:
+            names = {a: n for _, _, n, a in config.slots() if n}
+            raise WriteError('the configuration changed on the unit since it was read (%s): read it again first'
+                             % ', '.join('0x%x %s' % (a, names.get(a, '')) for a in moved[:8]))
     stamp = time.strftime('%Y-%m-%d_%H-%M-%S')
-    backup = _save(out_dir, stamp, 'before_%s' % setting['name'], before)
-    log('backup: %s.SPLC / .json (%d words); %s now %s' % (backup, len(before), setting['name'], old))
-    if old == value:
-        return {'setting': setting['name'], 'address': setting['address'], 'old': old, 'new': old,
-                'written': False, 'note': 'already %d: nothing written' % value, 'backup': backup}
+    label = settings_[0][0]['name'] if len(settings_) == 1 else '%d-settings' % len(settings_)
+    backup = _save(out_dir, stamp, 'before_%s' % label, before)
+    log('backup: %s.SPLC / .json (%d words)' % (backup, len(before)))
+    todo = [(st, v) for st, v in settings_ if before.get(st['address']) != v]
+    changes = [{'setting': st['name'], 'address': st['address'], 'old': before.get(st['address']), 'new': v}
+               for st, v in settings_]
+    if not todo:
+        return {'written': False, 'changes': changes, 'backup': backup}
 
-    steps = plan(setting, value)
+    steps = plan(todo[0][0], todo[0][1])
     written = False
     try:
         for what, addr, val in steps[:4]:
@@ -98,10 +125,11 @@ def write_setting(reader, name: str, value: int, passcode: int, out_dir='config-
         state = reader.words(UNLOCKED, 1)[0]
         if state != 1:
             raise WriteError('not unlocked (0xa002 = %d: wrong passcode, or this passcode level may not '
-                             'change settings): %s NOT written' % (state, setting['name']))
-        reader.write(setting['address'], struct.pack('<H', value))
-        written = True
-        log('  ok %s = %d' % (setting['name'], value))
+                             'change settings): nothing written' % state)
+        for st, v in todo:
+            reader.write(st['address'], struct.pack('<H', v))
+            written = True
+            log('  ok %s = %d' % (st['name'], v))
     finally:
         for what, addr, val in steps[5:]:
             try:
@@ -115,12 +143,13 @@ def write_setting(reader, name: str, value: int, passcode: int, out_dir='config-
                 log('  ok %s (fresh connection)' % what)
 
     after = config.read_memory(fresh_reader() if fresh_reader else reader)
-    after_path = _save(out_dir, stamp, 'after_%s' % setting['name'], after)
+    after_path = _save(out_dir, stamp, 'after_%s' % label, after)
     names = {a: n for _, _, n, a in config.slots() if n}
-    changed = {a: (before.get(a), v) for a, v in after.items() if before.get(a) != v}
-    others = {('0x%x %s' % (a, names.get(a, ''))).strip(): ov for a, ov in sorted(changed.items())
-              if a != setting['address']}
-    return {'setting': setting['name'], 'address': setting['address'], 'old': old,
-            'new': after.get(setting['address']), 'written': written, 'confirmed': after.get(setting['address']) == value,
-            'other_changes': others, 'backup': backup, 'after': after_path,
-            'undo': 'selpi config set %s %d --yes' % (setting['name'], old)}
+    mine = {st['address'] for st, _ in settings_}
+    others = {('0x%x %s' % (a, names.get(a, ''))).strip(): (before.get(a), v) for a, v in sorted(after.items())
+              if before.get(a) != v and a not in mine}
+    for c, (st, v) in zip(changes, settings_):
+        c['new'] = after.get(st['address'])
+        c['confirmed'] = c['new'] == v
+    return {'written': written, 'changes': changes, 'other_changes': others, 'backup': backup, 'after': after_path,
+            'memory': after}

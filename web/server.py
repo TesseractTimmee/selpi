@@ -1,6 +1,7 @@
 """
 selpi web UI: live values, all settings, config backups + diffs, log downloads. Read-only towards the
-SP PRO except what a log download needs (download mode 0xa251 and the log search ranges).
+SP PRO except what a log download needs (download mode 0xa251 and the log search ranges), and configuration
+writes from the Configuration page when the app option allow_config_writes is on (web/settings_ui.py).
 
 Runs as the Home Assistant add-on (ingress) or locally:
     SELPI_DATA_DIR=/tmp/selpi .venv/bin/python -m web.server --port 8099
@@ -22,7 +23,7 @@ from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from sppro import clock, config, live, logs
+from sppro import clock, config, config_write, live, logs
 from sppro.reader import Reader
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -331,6 +332,12 @@ class Handler(BaseHTTPRequestHandler):
                 memory = SPPRO.use('settings read', config.read_memory)
                 return self._send(200, {'settings': config.settings(memory),
                                         'at': datetime.now().isoformat(timespec='seconds')})
+            if path == '/api/config/layout':
+                from web import settings_ui
+                return self._send(200, settings_ui.layout())
+            if path == '/api/config/read':
+                from web import settings_ui
+                return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=60))
             if path == '/api/backups':
                 return self._send(200, {'backups': list_backups()})
             m = re.fullmatch(r'/api/backups/([0-9_-]+)/([A-Za-z0-9_.-]+)', path)
@@ -367,6 +374,24 @@ class Handler(BaseHTTPRequestHandler):
             body = self._body()
             if path == '/api/backups':
                 return self._send(200, start_job('backup', lambda job: backup_now('manual')))
+            if path == '/api/config/check':
+                from web import settings_ui
+                return self._send(200, SPPRO.use('configuration check', lambda r: settings_ui.check(
+                    r, body.get('read_id'), body.get('changes') or {}), wait=30))
+            if path == '/api/config/write':
+                from web import settings_ui
+                logging.warning('configuration write from the web UI: %s', ', '.join(sorted((body.get('changes') or {}))))
+                try:
+                    out = SPPRO.use('configuration write', lambda r: settings_ui.write(
+                        r, body.get('read_id'), body.get('changes') or {}, body.get('passcode', ''),
+                        allow_out_of_range=bool(body.get('allow_out_of_range')),
+                        ignore_rules=body.get('ignore_rules') or [],
+                        out_dir=os.path.join(DATA, 'config-writes')), wait=60)
+                except PermissionError as e:
+                    return self._send(403, {'error': str(e)})
+                except config_write.WriteError as e:
+                    return self._send(409, {'error': str(e)})
+                return self._send(200, out)
             if path == '/api/logs':
                 since = datetime.fromisoformat(body['since'])
                 until = datetime.fromisoformat(body['until'])
