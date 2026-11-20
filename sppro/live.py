@@ -10,9 +10,19 @@ import math
 import os
 import re
 
+from . import field_meta
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 TABLE = json.load(open(os.path.join(_HERE, 'live_fields.json')))
+
+# Field display names, HA/ESP hints and the drop list live in field_meta (shared verbatim with the ESPHome
+# component via tools/sync_fields.sh) so the app, the HA integration and the ESP firmware present fields the
+# same way. The clean name is: override > curated default (default_fields.json) > SP LINK label, Title-cased.
+_DEFAULT_NAMES = json.load(open(os.path.join(_HERE, 'default_fields.json')))
+
 FIELDS = TABLE['fields']
+for _f in FIELDS:
+    _f['name'] = field_meta.field_name(_f['key'], _f['name'], _DEFAULT_NAMES.get(_f['key']))
 # keys renamed in 0.4.7 (SP LINK's "DaystoEqualise" split badly into daysto_...): old key -> new key
 KEY_ALIASES = {'daysto_recharge': 'days_to_recharge', 'daysto_equalise': 'days_to_equalise'}
 BLOCKS = {screen: [(int(a, 16), n) for a, n in v] for screen, v in TABLE['blocks'].items()}

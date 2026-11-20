@@ -40,7 +40,7 @@ class TestCatalog(unittest.TestCase):
         cat = api.catalog()
         defaults = json.load(open(os.path.join(os.path.dirname(api.__file__), '..', 'sppro', 'default_fields.json')))
         self.assertEqual([f['key'] for f in cat[:len(defaults)]], list(defaults))
-        self.assertEqual(cat[0]['name'], 'Load power')
+        self.assertEqual(cat[0]['name'], 'Load Power')
         names = [f['name'] for f in cat]
         self.assertEqual(len(names), len(set(names)))
         by = {f['key']: f for f in cat}

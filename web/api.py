@@ -31,7 +31,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from sppro import live
+from sppro import field_meta, live
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULTS = json.load(open(os.path.join(HERE, '..', 'sppro', 'default_fields.json'), encoding='utf-8'))
@@ -39,12 +39,6 @@ SCREEN_NAMES = {
     'NowSubTab': 'now', 'TodaySubTab': 'today', 'TechnicalDataSubTab': 'tech', 'DCHistorySubTab': 'DC history',
     'ACHistorySubTab': 'AC history', 'ACHistorySubTab2': 'AC history 2', 'ServiceReadings1': 'service',
     'ServiceSettings': 'service settings', 'Now_Today_Tech_KacoModelsCapacityAndOEM': 'unit',
-}
-# unit -> (HA device class, display precision); same choices as the ESPHome component
-UNITS = {
-    'kW': ('power', 3), 'kWh': ('energy', 2), 'kvar': ('reactive_power', 3), 'kVA': ('apparent_power', 3),
-    'V': ('voltage', 1), 'A': ('current', 1), 'Hz': ('frequency', 2), '°C': ('temperature', 1),
-    'h': ('duration', 1), '%': (None, 1), '': (None, 2),
 }
 VALUE_WAIT = 20        # seconds a values request waits for the link before answering from cache
 STALE_AFTER = 600      # cache older than this isn't served
@@ -54,37 +48,21 @@ def _slug(name):
     return re.sub(r'[^a-z0-9]+', '_', name.lower()).strip('_')
 
 
-def _hints(f):
-    """HA entity hints for a field: device_class, state_class, precision, category."""
-    if f['kind'] == 'enum':
-        return {'device_class': 'enum', 'state_class': None, 'precision': None, 'category': None}
-    if f['kind'] == 'raw':
-        return {'device_class': None, 'state_class': 'measurement', 'precision': 0, 'category': 'diagnostic'}
-    dc, prec = UNITS.get(f['unit'], (None, 2))
-    if f['unit'] == '%' and 'soc' in f['key']:
-        dc = 'battery'
-    sc = 'measurement'
-    if f['unit'] == 'kWh':
-        net = 'net' in f['key']
-        sc = 'total_increasing' if ('today' in f['key'] or f['key'].endswith('_acc')) and not net else 'total'
-    elif f['unit'] == 'h' and f['key'].endswith('_acc'):
-        sc = 'total_increasing'
-    return {'device_class': dc, 'state_class': sc, 'precision': prec, 'category': None}
-
-
 def catalog():
-    """Every field once (exact repeats on other screens dropped), defaults first with their HA names."""
+    """Every field once (exact repeats + same-quantity twins dropped), defaults first with their HA names."""
     by_key = {f['key']: f for f in live.FIELDS}
     order = [k for k in DEFAULTS if k in by_key] + [f['key'] for f in live.FIELDS if f['key'] not in DEFAULTS]
     seen, names, out = set(), set(), []
     tables = live.tables()
     for k in order:
+        if k in field_meta.HA_DROP:
+            continue
         f = by_key[k]
         sig = (tuple(f['words']), f['formula'])
         if sig in seen:
             continue
         seen.add(sig)
-        name = DEFAULTS.get(k) or f['name']
+        name = f['name']        # single source (overrides > curated default > SP LINK), already Title Case
         if _slug(name) in names:
             name = '%s (%s)' % (name, SCREEN_NAMES.get(f['screen'], f['screen']))
         if _slug(name) in names:
@@ -92,7 +70,7 @@ def catalog():
         names.add(_slug(name))
         entry = {'key': k, 'name': name, 'unit': f['unit'], 'kind': f['kind'], 'screen': f['screen'],
                  'default': k in DEFAULTS, 'note': f.get('note', '')}
-        entry.update(_hints(f))
+        entry.update(field_meta.hints(f))
         if f['kind'] == 'enum':
             entry['options'] = sorted(set(tables.get(f['table'], {}).values()))
         out.append(entry)
