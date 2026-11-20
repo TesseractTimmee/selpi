@@ -153,12 +153,19 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-async function api(path, opts) {
-  const r = await fetch(path, opts);
-  const ct = r.headers.get('content-type') || '';
-  const body = ct.includes('json') ? await r.json() : null;
-  if (!r.ok) throw new Error((body && body.error) || r.statusText);
-  return body;
+async function api(path, opts = {}) {
+  const ctrl = new AbortController();                 // give up rather than spin forever if the link is wedged
+  const t = setTimeout(() => ctrl.abort(), opts.timeout || 90000);
+  try {
+    const r = await fetch(path, {...opts, signal: ctrl.signal});
+    const ct = r.headers.get('content-type') || '';
+    const body = ct.includes('json') ? await r.json() : null;
+    if (!r.ok) throw new Error((body && body.error) || r.statusText);
+    return body;
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('timed out — the SP PRO link may be busy; try again');
+    throw e;
+  } finally { clearTimeout(t); }
 }
 function show(tab) {
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
@@ -343,11 +350,15 @@ async function doWrite() {
     await cfgRead(note);
   } catch (e) { $('#cfg-res').innerHTML = `<p class="err">${esc(e.message)}</p>`; $('#cfg-do').disabled = false; }
 }
+let cfgBusy = false, cfgTimer = null;
 async function cfgRead(note) {
+  if (cfgBusy) return;          // a read is already in flight: don't start a second (two timers + both fight the link)
+  cfgBusy = true;
   $('#cfg-go').disabled = true;
   const t0 = Date.now(), tick = () => { const s = Math.round((Date.now() - t0) / 1000);
     $('#cfg-at').textContent = `reading the configuration… ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
-  tick(); const timer = setInterval(tick, 1000);
+  clearInterval(cfgTimer);      // never leave a previous timer running
+  tick(); cfgTimer = setInterval(tick, 1000);
   try {
     await cfgLayout();
     READ = await api('api/config/read');
@@ -359,8 +370,11 @@ async function cfgRead(note) {
     EDITS = {}; NOTES = {}; CHECK = null;
     drawCfg();
   } catch (e) { $('#cfg-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
-  clearInterval(timer);
-  $('#cfg-go').disabled = false;
+  finally {
+    clearInterval(cfgTimer); cfgTimer = null;
+    $('#cfg-go').disabled = false;
+    cfgBusy = false;
+  }
 }
 setInterval(() => {   // a write needs a recent read (the server checks too)
   if (READ && READ.at && (Date.now() - READ.at) / 1000 > READ.read_max_age - 60)

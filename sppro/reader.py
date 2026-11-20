@@ -19,10 +19,18 @@ class Reader:
         self.__factory = protocol_factory
         self.__protocol = None
         self.__retries = retries
+        # monotonic time after which calls stop retrying and give up, so a single operation (e.g. a whole
+        # configuration read of many blocks over a flaky Select.Live link) can't hold the link lock for minutes.
+        self.deadline = None
+
+    def __expired(self):
+        return self.deadline is not None and time.monotonic() > self.deadline
 
     def __call(self, what: str, fn):
         last = None
         for attempt in range(1, self.__retries + 1):
+            if self.__expired():
+                raise TimeoutError('%s: SP PRO link deadline exceeded' % what)
             try:
                 if self.__protocol is None:
                     self.__protocol = self.__factory()
@@ -31,6 +39,8 @@ class Reader:
                 last = e
                 self.__protocol = None
                 logging.warning('%s failed (attempt %d/%d): %s', what, attempt, self.__retries, e)
+                if self.__expired():
+                    break
                 time.sleep(min(2 * attempt, 5))
         raise last
 

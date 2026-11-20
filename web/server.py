@@ -51,8 +51,10 @@ class Inverter:
         self.busy = None          # what holds the lock (shown in the page)
         self.keep_open = 0        # > 0 while an SP LINK proxy client is connected: keep the link up
 
-    def use(self, what, fn, wait=False, check_versions=True):
-        """wait: False = fail at once if busy, True = wait as long as it takes, a number = wait that many seconds."""
+    def use(self, what, fn, wait=False, check_versions=True, deadline=None):
+        """wait: False = fail at once if busy, True = wait as long as it takes, a number = wait that many seconds.
+        deadline: seconds to bound the whole operation, so a stalled link can't hold the lock (and block the page
+        and HA polls) indefinitely; the reader stops retrying past it and raises."""
         got = self.lock.acquire(blocking=False) if wait is False else \
             self.lock.acquire() if wait is True else self.lock.acquire(timeout=wait)
         if not got:
@@ -61,6 +63,7 @@ class Inverter:
         try:
             if self.reader is None:
                 self.reader = Reader()
+            self.reader.deadline = (time.monotonic() + deadline) if deadline else None
             if self.versions is None and check_versions:
                 self.versions = live.versions(self.reader)
                 self.version_problems = live.version_problems(self.versions)
@@ -73,9 +76,11 @@ class Inverter:
             self.versions = None
             raise
         finally:
-            # free the ESP's single proxy slot for SP LINK between jobs (Select.Live stays connected)
-            if self.reader is not None and os.environ.get('SELPI_CONNECTION_TYPE') == 'TCP' and not self.keep_open:
-                self.reader.close()
+            if self.reader is not None:
+                self.reader.deadline = None
+                # free the ESP's single proxy slot for SP LINK between jobs (Select.Live stays connected)
+                if os.environ.get('SELPI_CONNECTION_TYPE') == 'TCP' and not self.keep_open:
+                    self.reader.close()
             self.busy = None
             self.lock.release()
 
@@ -325,11 +330,11 @@ class Handler(BaseHTTPRequestHandler):
                     'jobs': [{k: v for k, v in j.items() if k != 'file'} for j in JOBS.values()][-5:]})
             if path == '/api/live':
                 screens = [s for s in q.get('screens', 'now,today').split(',') if s in live.SCREENS] or None
-                rows = SPPRO.use('live read', lambda r: live.snapshot(r, screens))
+                rows = SPPRO.use('live read', lambda r: live.snapshot(r, screens), deadline=25)
                 return self._send(200, {'rows': rows, 'version_problems': SPPRO.version_problems,
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/settings':
-                memory = SPPRO.use('settings read', config.read_memory)
+                memory = SPPRO.use('settings read', config.read_memory, deadline=40)
                 return self._send(200, {'settings': config.settings(memory),
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/config/layout':
@@ -337,7 +342,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, settings_ui.layout())
             if path == '/api/config/read':
                 from web import settings_ui
-                return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=60))
+                return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=60, deadline=45))
             if path == '/api/backups':
                 return self._send(200, {'backups': list_backups()})
             m = re.fullmatch(r'/api/backups/([0-9_-]+)/([A-Za-z0-9_.-]+)', path)
@@ -377,7 +382,7 @@ class Handler(BaseHTTPRequestHandler):
             if path == '/api/config/check':
                 from web import settings_ui
                 return self._send(200, SPPRO.use('configuration check', lambda r: settings_ui.check(
-                    r, body.get('read_id'), body.get('changes') or {}), wait=30))
+                    r, body.get('read_id'), body.get('changes') or {}), wait=30, deadline=45))
             if path == '/api/config/write':
                 from web import settings_ui
                 logging.warning('configuration write from the web UI: %s', ', '.join(sorted((body.get('changes') or {}))))
