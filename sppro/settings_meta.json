@@ -10362,6 +10362,42 @@
     "1": "AC Source Power"
    },
    "min_version": 29
+  },
+  {
+   "name": "DefaultExportLimit",
+   "section": "Service",
+   "slot": 40,
+   "control": "nudCsipDefaultExportLimit",
+   "load": null,
+   "save": "fnGetNumericalValueWhichIsStoredInDeciUnits",
+   "kind": "number",
+   "scale": "raw / 10",
+   "min": 0.0,
+   "max": 6553.5,
+   "step": 0.1,
+   "decimals": 1,
+   "range_text": "[0.0 - 6553.5 kW]",
+   "unit": "kW",
+   "label_override": "CSIP Default Export Limit",
+   "installer_only": true
+  },
+  {
+   "name": "DefaultExportLimitRampRate",
+   "section": "Service",
+   "slot": 41,
+   "control": "nudCsipDefaultExportLimitRampRate",
+   "load": null,
+   "save": "fnGetNumericalValueWhichIsStoredInCentiUnits",
+   "kind": "number",
+   "scale": "raw / 100",
+   "min": 0.01,
+   "max": 100.0,
+   "step": 0.01,
+   "decimals": 2,
+   "range_text": "[0.01 - 100.00 kW/s]",
+   "unit": "kW/s",
+   "label_override": "CSIP Default Export Limit Ramp Rate",
+   "installer_only": true
   }
  ]
 }

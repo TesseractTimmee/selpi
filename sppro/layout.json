@@ -772,7 +772,7 @@
  "service": {
   "version": "14",
   "base": "0xc201",
-  "read_words": 40,
+  "read_words": 42,
   "slots": [
    "FanType",
    "InitialSoC",
@@ -814,8 +814,8 @@
    "AcSolarFilterFallingSync",
    "AcSolarFilterRisingStandalone",
    "AcSolarFilterFallingStandalone",
-   "",
-   "",
+   "DefaultExportLimit",
+   "DefaultExportLimitRampRate",
    "",
    "",
    "",

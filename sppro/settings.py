@@ -75,7 +75,10 @@ def address(name):
     if _ADDR is None:
         from sppro import config
         by_slot = {(sec, i): a for sec, i, _, a in config.slots()}
-        _ADDR = {n: by_slot.get((SECTION_TITLES.get(e['section']), e['slot'])) for n, e in META.items()}
+        for i, _nm, a in config.service_slots():
+            by_slot[('Service', i)] = a
+        _ADDR = {n: by_slot.get(('Service', e['slot']) if e['section'] == 'Service'
+                                else (SECTION_TITLES.get(e['section']), e['slot'])) for n, e in META.items()}
     return _ADDR.get(entry(name)['name'])
 
 
