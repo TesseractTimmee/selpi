@@ -4466,7 +4466,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 20
   },
   {
    "name": "AcCoupledInverterControl",
@@ -4723,7 +4724,8 @@
    "step": 0.1,
    "decimals": 2,
    "unit": "kW",
-   "range_text": "[0 - 50 kW]"
+   "range_text": "[0 - 50 kW]",
+   "min_version": 27
   },
   {
    "name": "KacoExportPreTripTime",
@@ -4739,7 +4741,8 @@
    "step": 1.0,
    "decimals": 0,
    "range_text": "[0 - 1000 s]",
-   "unit": "s"
+   "unit": "s",
+   "min_version": 27
   },
   {
    "name": "AcCoupledFrequencyRampLimit",
@@ -4918,7 +4921,8 @@
    "values": {
     "0": "Export",
     "1": "Import"
-   }
+   },
+   "min_version": 27
   },
   {
    "name": "MpptModel",
@@ -7565,7 +7569,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1AcExportCapacity",
@@ -7582,7 +7587,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1InvDcSupportCapacity",
@@ -7599,7 +7605,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1InvDcChargeCapacity",
@@ -7616,7 +7623,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1InvDcChargeCapacityViaSoC",
@@ -7649,7 +7657,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1SoCStartCharging",
@@ -7694,7 +7703,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1ChargerLockout",
@@ -7708,7 +7718,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1ExportOnDemand",
@@ -7725,7 +7736,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1DigitalInput",
@@ -7787,7 +7799,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule1StartDate",
@@ -7910,7 +7923,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2AcExportCapacity",
@@ -7927,7 +7941,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2InvDcSupportCapacity",
@@ -7944,7 +7959,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2InvDcChargeCapacity",
@@ -7961,7 +7977,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2InvDcChargeCapacityViaSoC",
@@ -7994,7 +8011,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2SoCStartCharging",
@@ -8039,7 +8057,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2ChargerLockout",
@@ -8053,7 +8072,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2ExportOnDemand",
@@ -8070,7 +8090,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2DigitalInput",
@@ -8132,7 +8153,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule2StartDate",
@@ -8255,7 +8277,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3AcExportCapacity",
@@ -8272,7 +8295,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3InvDcSupportCapacity",
@@ -8289,7 +8313,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3InvDcChargeCapacity",
@@ -8306,7 +8331,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3InvDcChargeCapacityViaSoC",
@@ -8339,7 +8365,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3SoCStartCharging",
@@ -8384,7 +8411,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3ChargerLockout",
@@ -8398,7 +8426,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3ExportOnDemand",
@@ -8415,7 +8444,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3DigitalInput",
@@ -8477,7 +8507,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule3StartDate",
@@ -8600,7 +8631,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4AcExportCapacity",
@@ -8617,7 +8649,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4InvDcSupportCapacity",
@@ -8634,7 +8667,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4InvDcChargeCapacity",
@@ -8651,7 +8685,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4InvDcChargeCapacityViaSoC",
@@ -8684,7 +8719,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4SoCStartCharging",
@@ -8729,7 +8765,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4ChargerLockout",
@@ -8743,7 +8780,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4ExportOnDemand",
@@ -8760,7 +8798,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4DigitalInput",
@@ -8822,7 +8861,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule4StartDate",
@@ -8945,7 +8985,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5AcExportCapacity",
@@ -8962,7 +9003,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5InvDcSupportCapacity",
@@ -8979,7 +9021,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5InvDcChargeCapacity",
@@ -8996,7 +9039,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5InvDcChargeCapacityViaSoC",
@@ -9029,7 +9073,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5SoCStartCharging",
@@ -9074,7 +9119,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5ChargerLockout",
@@ -9088,7 +9134,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5ExportOnDemand",
@@ -9105,7 +9152,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5DigitalInput",
@@ -9167,7 +9215,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule5StartDate",
@@ -9249,7 +9298,8 @@
     "7": "Sunday",
     "8": "Monday to Friday",
     "9": "Saturday to Sunday"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6StartTime",
@@ -9261,7 +9311,8 @@
    "kind": "time",
    "scale": "minutes since midnight (HH:MM)",
    "range_text": "[00:00 - 23:59]",
-   "unit": null
+   "unit": null,
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6StopTime",
@@ -9273,7 +9324,8 @@
    "kind": "time",
    "scale": "minutes since midnight (HH:MM)",
    "range_text": "[00:00 - 23:59]",
-   "unit": null
+   "unit": null,
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6AcInputCapacity",
@@ -9290,7 +9342,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6AcExportCapacity",
@@ -9307,7 +9360,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6InvDcSupportCapacity",
@@ -9324,7 +9378,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6InvDcChargeCapacity",
@@ -9341,7 +9396,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6InvDcChargeCapacityViaSoC",
@@ -9374,7 +9430,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6SoCStartCharging",
@@ -9419,7 +9476,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6ChargerLockout",
@@ -9433,7 +9491,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6ExportOnDemand",
@@ -9450,7 +9509,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6DigitalInput",
@@ -9512,7 +9572,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6StartDate",
@@ -9524,7 +9585,8 @@
    "kind": "daymonth",
    "scale": "low byte = day, high byte = month",
    "range_text": "[1 Jan - 31 Dec]",
-   "unit": null
+   "unit": null,
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6StopDate",
@@ -9536,7 +9598,8 @@
    "kind": "daymonth",
    "scale": "low byte = day, high byte = month",
    "range_text": "[1 Jan - 31 Dec]",
-   "unit": null
+   "unit": null,
+   "min_version": 22
   },
   {
    "name": "SystemSchedule6ChargerLockoutViaSoC",
@@ -9635,7 +9698,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7AcExportCapacity",
@@ -9652,7 +9716,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7InvDcSupportCapacity",
@@ -9669,7 +9734,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7InvDcChargeCapacity",
@@ -9686,7 +9752,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7InvDcChargeCapacityViaSoC",
@@ -9719,7 +9786,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7SoCStartCharging",
@@ -9764,7 +9832,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7ChargerLockout",
@@ -9778,7 +9847,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7ExportOnDemand",
@@ -9795,7 +9865,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7DigitalInput",
@@ -9857,7 +9928,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule7StartDate",
@@ -9980,7 +10052,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8AcExportCapacity",
@@ -9997,7 +10070,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8InvDcSupportCapacity",
@@ -10014,7 +10088,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8InvDcChargeCapacity",
@@ -10031,7 +10106,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8InvDcChargeCapacityViaSoC",
@@ -10064,7 +10140,8 @@
    "step": 0.1,
    "decimals": 1,
    "range_text": "[1.0 - 100.0 %]",
-   "unit": "%"
+   "unit": "%",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8SoCStartCharging",
@@ -10109,7 +10186,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8ChargerLockout",
@@ -10123,7 +10201,8 @@
     "0": "Charging On",
     "1": "Renewable Only",
     "2": "Charging Off"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8ExportOnDemand",
@@ -10140,7 +10219,8 @@
    "step": 0.1,
    "decimals": 1,
    "unit": "kW",
-   "range_text": "[0.1 - 50.0 kW]"
+   "range_text": "[0.1 - 50.0 kW]",
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8DigitalInput",
@@ -10202,7 +10282,8 @@
    "values": {
     "0": "Disabled",
     "1": "Enabled"
-   }
+   },
+   "min_version": 22
   },
   {
    "name": "SystemSchedule8StartDate",
