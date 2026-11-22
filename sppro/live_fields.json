@@ -4578,6 +4578,67 @@
    "kind": "raw",
    "table": null,
    "converter": "fnConvertDeciUnitsNumberOrFFFFBlankToString"
+  },
+  {
+   "key": "comms_card_serial",
+   "name": "Comms Card Serial",
+   "field": "CommsCardSerialNumber",
+   "label": "Comms Card Serial",
+   "screen": "TechnicalDataSubTab",
+   "words": [
+    "0xa017",
+    "0xa018"
+   ],
+   "formula": "u32({0xa017},{0xa018})",
+   "unit": "",
+   "kind": "raw",
+   "table": null,
+   "converter": "fnConvert32BitSerialNumberValueToString"
+  },
+  {
+   "key": "comms_card_software",
+   "name": "Comms Card Software Version",
+   "field": "CommsCardSoftwareVersion",
+   "label": "Comms Card Software Version",
+   "screen": "TechnicalDataSubTab",
+   "words": [
+    "0xa01b"
+   ],
+   "formula": "{0xa01b}",
+   "unit": "",
+   "kind": "raw",
+   "table": null,
+   "converter": null
+  },
+  {
+   "key": "kaco_mode",
+   "name": "Kaco Mode",
+   "field": "ConfigKacoComPort",
+   "label": "Kaco Mode",
+   "screen": "TechnicalDataSubTab",
+   "words": [
+    "0xa023"
+   ],
+   "formula": "{0xa023}",
+   "unit": "",
+   "kind": "enum",
+   "table": "kaco_mode",
+   "converter": null
+  },
+  {
+   "key": "number_of_kacos",
+   "name": "Number of Kacos",
+   "field": "ConfigNumberOfKacos",
+   "label": "Number of Kacos",
+   "screen": "TechnicalDataSubTab",
+   "words": [
+    "0xa024"
+   ],
+   "formula": "{0xa024}",
+   "unit": "",
+   "kind": "raw",
+   "table": null,
+   "converter": null
   }
  ],
  "blocks": {

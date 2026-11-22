@@ -68,7 +68,7 @@ UNITS = {
 # adds the non-raw ones (e.g. firmware version). Batteryless (0xa021) and the factory export limit (0xa0aa)
 # are now pinned (from the Select.Live capture) and surfaced as raw diagnostics; connected phase / comms-card serial
 # can be added the same way.
-DIAGNOSTIC = {'version_number'}
+DIAGNOSTIC = {'version_number', 'kaco_mode'}
 
 
 def hints(f):

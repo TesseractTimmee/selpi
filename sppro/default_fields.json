@@ -54,5 +54,9 @@
  "pm1_serial_number": "PM1 Serial",
  "pm2_serial_number": "PM2 Serial",
  "factory_batteryless": "Batteryless",
- "factory_export_limit": "Factory Export Limit"
+ "factory_export_limit": "Factory Export Limit",
+ "comms_card_serial": "Comms Card Serial",
+ "comms_card_software": "Comms Card Software Version",
+ "kaco_mode": "Kaco Mode",
+ "number_of_kacos": "Number of Kacos"
 }
