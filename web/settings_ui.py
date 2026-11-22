@@ -65,7 +65,8 @@ def layout():
             if settings.factory_only(n):
                 meta[n]['factory_only'] = True
         _LAYOUT = {'tabs': tabs, 'settings': meta, 'hidden_tabs': ['Factory Mode Settings'],
-                   'hidden_group_categories': ['legacy', 'unreleased', 'advanced']}
+                   'hidden_group_categories': ['legacy', 'unreleased', 'advanced'],
+                   'visibility': settings.RULES.get('visibility', [])}
     return dict(_LAYOUT, writes_allowed=writes_allowed(), writes_available=writes_available())
 
 
@@ -162,6 +163,8 @@ def _evaluate(reader, s_sess, changes):
     for name, text in (changes or {}).items():
         try:
             e = settings.entry(name)
+            if settings.greyed(e['name'], shown):
+                continue   # SP LINK greys this field for the planned config; keep its stored value, don't write the edit
             if e.get('words') == 2:
                 raise settings.SettingError('%s spans two words: not writable here' % name)
             ro = settings.read_only_reason(e['name'])

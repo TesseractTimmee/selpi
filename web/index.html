@@ -204,9 +204,28 @@ let LAYOUT = null, READ = null, EDITS = {}, NOTES = {}, CHECK = null, curTab = n
 async function cfgLayout() { if (!LAYOUT) LAYOUT = await api('api/config/layout'); return LAYOUT; }
 const visTabs = () => LAYOUT.tabs.filter(t => (t.title || t.id) && ($('#cfg-factory').checked || !LAYOUT.hidden_tabs.includes(t.title)));
 function currentText(name) { const v = READ && READ.values[name]; return v ? v.text : ''; }
+// current display value of a setting (pending edit if any), for dependent-visibility conditions
+function curVal(name) { const v = READ && READ.values[name]; return EDITS[name] !== undefined ? EDITS[name] : (v ? v.text : undefined); }
+function matchCond(c) {
+  if (c.all) return c.all.every(matchCond);
+  if (c.any) return c.any.some(matchCond);
+  const v = curVal(c.setting);
+  if ('eq' in c) return v === c.eq;
+  if ('ne' in c) return v !== c.ne;
+  if ('in' in c) return c.in.includes(v);
+  if ('nin' in c) return !c.nin.includes(v);
+  return false;
+}
+// the visibility rule (or null) that greys this setting given current values — SP LINK's dependent show/hide-and-grey
+function greyedBy(name) {
+  for (const r of (LAYOUT.visibility || [])) if ((r.grey || []).includes(name) && matchCond(r.when)) return r;
+  return null;
+}
 function control(name) {
   const m = LAYOUT.settings[name] || {}, v = READ.values[name];
   if (!v) return '<span class="muted">not read</span>';
+  const gr = greyedBy(name);
+  if (gr) return `<span class="muted">${esc(v.text)}</span> <span class="badge" title="${esc(gr.message || 'SP LINK greys this field here.')}">greyed</span>`;
   if (m.installer_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind the installer code (AS4777 grid-protection / power quality). selpi shows it but keeps it read-only.">installer&nbsp;only &middot; read-only</span>`;
   if (m.factory_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind a factory passcode (Selectronic factory calibration). selpi shows it but keeps it read-only.">factory &middot; read-only</span>`;
   if (m.min_version && READ.config_version != null && READ.config_version < m.min_version)
@@ -258,6 +277,9 @@ const catBadge = g => g.visibility ? ` <span class="badge" title="SP LINK hides 
 function drawCfg() {
   if ($('#cfg-rawview').checked) return drawRaw();
   if (!LAYOUT || !READ) return;
+  // a field greyed by a dependency (e.g. its trigger was just changed) keeps its stored value, like SP LINK:
+  // drop any pending edit on it so it is neither shown as changed nor written
+  for (const n of Object.keys(EDITS)) if (greyedBy(n)) delete EDITS[n];
   const f = $('#cfg-filter').value.trim().toLowerCase();
   const tabs = visTabs();
   if (f) {   // search across every tab

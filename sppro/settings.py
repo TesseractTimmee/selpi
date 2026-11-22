@@ -121,6 +121,35 @@ def available(name, config_version):
     return config_version is None or mv is None or config_version >= mv
 
 
+def _match(cond, values):
+    """Evaluate a structured visibility condition (settings_rules.json 'visibility') against display values:
+    {'setting': n, 'eq'/'ne': v} or {'in'/'nin': [..]}, combined with {'all': [..]} / {'any': [..]}."""
+    if 'all' in cond:
+        return all(_match(c, values) for c in cond['all'])
+    if 'any' in cond:
+        return any(_match(c, values) for c in cond['any'])
+    v = values.get(cond['setting'])
+    if 'eq' in cond:
+        return v == cond['eq']
+    if 'ne' in cond:
+        return v != cond['ne']
+    if 'in' in cond:
+        return v in cond['in']
+    if 'nin' in cond:
+        return v not in cond['nin']
+    return False
+
+
+def greyed(name, values):
+    """The visibility rule (or None) that greys this setting given the current display values {name: label/number}.
+    SP LINK's dependent show-hide-and-grey (an Adjust*/EnableOrDisable* handler disables a field from another
+    setting's value); selpi greys the same fields. values are display values (settings.to_display)."""
+    for r in RULES.get('visibility', ()):
+        if name in r.get('grey', ()) and _match(r['when'], values):
+            return r
+    return None
+
+
 def factory_only(name):
     """True for Selectronic factory-calibration settings (SP LINK's password-gated Factory Mode tab)."""
     w = where(name)

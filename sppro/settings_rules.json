@@ -206,6 +206,97 @@
    "source": "fclsMain::CheckConfigurationIsOkBeforeSendingToInverter"
   }
  ],
+ "visibility": [
+  {
+   "id": "soc_control_greys_soc_settings",
+   "when": {
+    "setting": "SoCMonitor",
+    "ne": "Enabled"
+   },
+   "grey": [
+    "LowSoCToStartGen",
+    "LowSoCToStartGenStartSoC",
+    "LowSoCToStartGenStopSoC",
+    "NormalPeriodStartSoC",
+    "NormalPeriodStopSoC",
+    "OveridePartialSoCStop",
+    "PeukertsExponent",
+    "SoCNightAssistPeriod",
+    "SoCNightAssistPeriodStartSoC",
+    "SoCNightAssistPeriodStartTime",
+    "SoCNightAssistPeriodStopSoC",
+    "SoCNightAssistPeriodStopTime",
+    "SoCOutput",
+    "SoCRenewAssistPeriod",
+    "SoCRenewAssistPeriodStartSoC",
+    "SoCRenewAssistPeriodStartTime",
+    "SoCRenewAssistPeriodStopSoC",
+    "SoCRenewAssistPeriodStopTime",
+    "SoCRenewPrefferedPeriod",
+    "SoCRenewPrefferedPeriodStartSoC",
+    "SoCRenewPrefferedPeriodStartTime",
+    "SoCRenewPrefferedPeriodStopSoC",
+    "SoCRenewPrefferedPeriodStopTime",
+    "SocAssertLevel",
+    "SocDeassertLevel",
+    "StatOfChargeShutdownSoC",
+    "StateOfChargeShutdown",
+    "StopSoCOverridePeriodicFloat"
+   ],
+   "message": "SoC Control is disabled, so these State-of-Charge settings do not apply.",
+   "note": "SP LINK AdjustSocSettings greys these when SoC Control (cbSoCMonitor) is not Enabled."
+  },
+  {
+   "id": "power_factor_greyed_when_fixed_vars",
+   "when": {
+    "setting": "PowerFactorCorrectionMode",
+    "eq": "Fixed Vars"
+   },
+   "grey": [
+    "SupportPowerFactor",
+    "ChargePowerFactor"
+   ],
+   "message": "Power Factor Correction is set to Fixed Vars, so the power-factor settings do not apply.",
+   "note": "SP LINK EnableOrDisablePowerFactorSettings: enabled only when the mode is Fixed AC Inverter/Source p.f."
+  },
+  {
+   "id": "constant_var_greyed_unless_fixed_vars",
+   "when": {
+    "setting": "PowerFactorCorrectionMode",
+    "ne": "Fixed Vars"
+   },
+   "grey": [
+    "ConstantVarPercent"
+   ],
+   "message": "Power Factor Correction is not set to Fixed Vars, so the constant-VAr setting does not apply.",
+   "note": "SP LINK EnableOrDisableConstantVarSettings: enabled only when the mode is Fixed Vars."
+  },
+  {
+   "id": "external_ct_ratio_greyed_when_ct_disabled",
+   "when": {
+    "setting": "ExternalContactorCT",
+    "eq": "Disabled"
+   },
+   "grey": [
+    "ExternalCTRatio"
+   ],
+   "message": "External Contactor CT is disabled, so the external CT ratio does not apply.",
+   "note": "SP LINK EnableOrDisableExternalCTRatio."
+  },
+  {
+   "id": "ac_coupled_freq_ramp_greyed_when_coupling_disabled",
+   "when": {
+    "setting": "AcCoupledInverterFrequencyControl",
+    "eq": "Disabled"
+   },
+   "grey": [
+    "AcCoupledFrequencyRampRate",
+    "AcCoupledFrequencyRampLimit"
+   ],
+   "message": "AC-coupled inverter frequency control is disabled, so the AC-coupled frequency ramp settings do not apply.",
+   "note": "SP LINK AdjustSettingsForGenericAcCoupling: enabled when frequency control is Enabled or Microgrid."
+  }
+ ],
  "not_yet": [
   "AS4777.2:2020 not available on some models (model list)",
   "InhibitNewFunctionsIn*Area (settings hidden for older firmware)",
