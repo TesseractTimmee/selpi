@@ -117,17 +117,19 @@ def read(reader):
     memory = config.read_memory(reader)
     model = settings.model(reader)
     cells = settings.cells_for(model)
-    config_version = live.versions(reader).get('config_settings')
+    versions = live.versions(reader)
+    config_version = versions.get('config_settings')
+    batteryless = live.batteryless(reader)
     raw = settings.raw_config(memory)
     rid = uuid.uuid4().hex[:12]
     with _LOCK:
         _forget_old()
         READS[rid] = {'at': time.time(), 'memory': memory, 'model': model, 'cells': cells,
-                      'config_version': config_version}
+                      'config_version': config_version, 'versions': versions, 'batteryless': batteryless}
     problems = [p for p in settings.check(raw, cells, model) if p['severity'] != 'skipped']
     shown = {n: settings.to_display(n, v, cells)[0] for n, v in raw.items()}
     return {'read_id': rid, 'model': model, 'cells': cells, 'config_version': config_version,
-            'unit': settings.unit_context(model),     # constant unit props for dependent-visibility conditions
+            'unit': settings.unit_context(model, versions, batteryless),   # unit props for dependent-visibility
             'values': _values(raw, cells), 'problems': problems,
             'limits': limits(cells, shown.get('BatteryType'), shown),
             'version_problems': live.version_problems(live.versions(reader)),
@@ -162,7 +164,7 @@ def _evaluate(reader, s_sess, changes):
     """Convert {name: text} and work out what the change would cause. Returns (result, raw_changes)."""
     s = s_sess
     cells, model = s['cells'], s['model']
-    unit_ctx = settings.unit_context(model)       # unit props for dependent-visibility (e.g. model_nominal_v)
+    unit_ctx = settings.unit_context(model, s.get('versions'), s.get('batteryless'))   # for dependent-visibility
     raw_now = settings.raw_config(s['memory'])
     out, raw_changes = {}, {}
     # limits follow the Battery Type and other settings as they will be after the change

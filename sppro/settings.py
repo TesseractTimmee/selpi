@@ -151,11 +151,18 @@ def _match(cond, values, unit=None):
     return False
 
 
-def unit_context(model_name):
+def unit_context(model_name, versions=None, batteryless=None):
     """The unit properties a visibility condition may read ({'unit': p}). Constant for a unit, so the web read
-    sends it once. model_nominal_v is the model's nominal battery voltage (SP LINK gates e.g. Econo mode on it)."""
+    sends it once. model_nominal_v is the model's nominal battery voltage; comms_card_software / comms_card_revision /
+    config_version come from the 0xa007 version block; batteryless is the factory batteryless flag (0xa05c word, SP
+    LINK's ActualSP_PROFactoryBatterylessEnabled: 1 = batteryless unit). SP LINK gates fields on all of these."""
     m = MODELS.get(model_name)
-    return {'model_nominal_v': m.nominal_v if m else None}
+    ctx = {'model_nominal_v': m.nominal_v if m else None, 'batteryless': batteryless}
+    if versions:
+        ctx['comms_card_software'] = versions.get('comms_card_software')
+        ctx['comms_card_revision'] = versions.get('comms_card_revision')
+        ctx['config_version'] = versions.get('config_settings')
+    return ctx
 
 
 def greyed(name, values, unit=None):

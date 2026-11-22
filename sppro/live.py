@@ -46,6 +46,18 @@ def versions(reader):
     return {k: w[i] for k, i in VERSIONS.items()}
 
 
+FACTORY_BATTERYLESS = 0xa05c   # ActualSP_PROFactoryBatterylessEnabled: word 0 of the identity block (0xa05d = model,
+                               # 0xa062 = Control PCA serial). Sent at connect, so it comes over Select.Live too.
+
+
+def batteryless(reader):
+    """The factory batteryless flag (1 = batteryless unit; SP LINK then hides the battery settings). None on error."""
+    try:
+        return reader.words(FACTORY_BATTERYLESS, 1)[0]
+    except Exception:
+        return None
+
+
 def version_problems(v):
     """Differences from the verified versions, e.g. ['memory_map 30 (verified 31)']. Empty = matches."""
     return ['%s %d (verified %d)' % (k, v[k], want) for k, want in VERIFIED.items() if v.get(k) != want]
