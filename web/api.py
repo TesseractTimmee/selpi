@@ -103,6 +103,7 @@ class Api:
         else:
             label = conn or 'Unknown'
         return {'id': self.install_id, 'connection': conn, 'connection_label': label,
+                'clock_sync': os.environ.get('SELPI_CLOCK_SYNC', '').lower() == 'true',
                 'scan_interval': 60 if conn == 'SelectLive' else 10,
                 'model': 'SP PRO', 'manufacturer': 'Selectronic', 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
