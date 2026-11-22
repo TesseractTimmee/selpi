@@ -96,7 +96,14 @@ class Api:
                 self.values(['version_number'])
             except Exception as e:
                 logging.debug('firmware read failed: %s', e)
-        return {'id': self.install_id, 'connection': conn, 'scan_interval': 60 if conn == 'SelectLive' else 10,
+        server = os.environ.get('SELPI_CONNECTION_SELECT_LIVE_SERVER', '')
+        if conn == 'SelectLive':
+            label = {'select.live2': 'Select.Live 2',
+                     'select.live2-nonprod': 'Select.Live 2 (test)'}.get(server, 'Select.Live')
+        else:
+            label = conn or 'Unknown'
+        return {'id': self.install_id, 'connection': conn, 'connection_label': label,
+                'scan_interval': 60 if conn == 'SelectLive' else 10,
                 'model': 'SP PRO', 'manufacturer': 'Selectronic', 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
                 'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS)}
