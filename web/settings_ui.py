@@ -22,6 +22,7 @@ from sppro import buttons, config, config_write, controls, live, settings
 
 READ_MAX_AGE = 30 * 60          # s: a write needs a read this recent
 READS = {}                      # read id -> {'at', 'memory', 'model', 'cells'}
+_LATEST = None                  # most recent read id: lets the page be reopened from cache without re-reading the link
 _LOCK = threading.Lock()
 _LAYOUT = None
 
@@ -114,29 +115,54 @@ def _values(raw, cells):
 
 
 def read(reader):
+    """Read the whole configuration from the SP PRO (a heavy, many-block read) and render it. The snapshot is
+    kept (READS[rid]) so a later check/write validates against exactly these bytes, and so the page can be
+    reopened from cache (see cached()) without re-reading the link."""
     memory = config.read_memory(reader)
     model = settings.model(reader)
     cells = settings.cells_for(model)
     versions = live.versions(reader)
-    config_version = versions.get('config_settings')
     batteryless = live.batteryless(reader)
-    raw = settings.raw_config(memory)
     rid = uuid.uuid4().hex[:12]
+    snap = {'at': time.time(), 'memory': memory, 'model': model, 'cells': cells,
+            'config_version': versions.get('config_settings'), 'versions': versions, 'batteryless': batteryless}
+    global _LATEST
     with _LOCK:
         _forget_old()
-        READS[rid] = {'at': time.time(), 'memory': memory, 'model': model, 'cells': cells,
-                      'config_version': config_version, 'versions': versions, 'batteryless': batteryless}
+        READS[rid] = snap
+        _LATEST = rid
+    return _render(rid, snap, False)
+
+
+def _render(rid, snap, from_cache):
+    """Build the Configuration-page payload from a stored snapshot, without touching the link."""
+    memory, model, cells = snap['memory'], snap['model'], snap['cells']
+    versions, batteryless = snap['versions'], snap['batteryless']
+    raw = settings.raw_config(memory)
     problems = [p for p in settings.check(raw, cells, model) if p['severity'] != 'skipped']
     shown = {n: settings.to_display(n, v, cells)[0] for n, v in raw.items()}
-    return {'read_id': rid, 'model': model, 'cells': cells, 'config_version': config_version,
+    return {'read_id': rid, 'model': model, 'cells': cells, 'config_version': snap['config_version'],
             'unit': settings.unit_context(model, versions, batteryless),   # unit props for dependent-visibility
             'values': _values(raw, cells), 'problems': problems,
             'limits': limits(cells, shown.get('BatteryType'), shown),
-            'version_problems': live.version_problems(live.versions(reader)),
-            'map_mismatch': live.versions(reader).get('memory_map') != live.VERIFIED['memory_map'],
+            'version_problems': live.version_problems(versions),
+            'map_mismatch': versions.get('memory_map') != live.VERIFIED['memory_map'],
             'writes_allowed': writes_allowed(),
             'writes_available': writes_available(),
-            'read_max_age': READ_MAX_AGE}
+            'read_max_age': READ_MAX_AGE,
+            'cached': from_cache, 'read_at': snap['at']}
+
+
+def cached():
+    """The most recent configuration read, rendered without touching the link, or None if there is no read
+    within READ_MAX_AGE. The configuration only changes when written (and a write clears this), so serving the
+    last read lets the page reopen instantly instead of re-reading the whole config over a slow Select.Live
+    link. A fresh read (the Refresh button / ?refresh=1) still goes to the unit."""
+    with _LOCK:
+        _forget_old()
+        rid = _LATEST
+        snap = READS.get(rid) if rid else None
+    return _render(rid, snap, True) if snap else None
 
 
 def _session(rid):
@@ -240,8 +266,10 @@ def write(reader, rid, changes, passcode, allow_out_of_range=False, ignore_rules
         raise ValueError('the SP LINK passcode is a number')
     r = config_write.write_settings(reader, raw_changes, passcode, out_dir=out_dir or 'config-writes', force=force,
                                     expected=s['memory'], log=lambda *_: None)
+    global _LATEST
     with _LOCK:
         READS.pop(rid, None)        # the configuration changed: the page must read again
+        _LATEST = None              # drop the cache so the next open re-reads the changed configuration
     cells = s['cells']
     return {'written': r['written'], 'backup': os.path.basename(r['backup']),
             'changes': [{'setting': c['setting'], 'old': settings.to_display(c['setting'], c['old'], cells)[1],

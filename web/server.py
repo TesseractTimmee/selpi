@@ -342,6 +342,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, settings_ui.layout())
             if path == '/api/config/read':
                 from web import settings_ui
+                if not q.get('refresh'):
+                    hit = settings_ui.cached()           # reopen from cache: no link read over a slow Select.Live
+                    if hit is not None:
+                        return self._send(200, hit)
                 return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=60, deadline=45))
             if path == '/api/backups':
                 return self._send(200, {'backups': list_backups()})

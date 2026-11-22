@@ -105,7 +105,8 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
       <label class="muted"><input type="checkbox" id="cfg-factory"> show hidden</label>
       <label class="muted"><input type="checkbox" id="cfg-rawview"> raw list</label>
       <span class="note" id="cfg-at"></span>
-      <button class="act" id="cfg-go">Read from SP PRO</button>
+      <button class="act" id="cfg-go">Read configuration</button>
+      <button class="act" id="cfg-refresh" title="Re-read from the SP PRO, ignoring the cached copy">↻</button>
     </div>
     <div id="cfg-msg"></div>
     <div id="cfg-tabs" class="subnav"></div>
@@ -378,7 +379,7 @@ async function doWrite() {
   } catch (e) { $('#cfg-res').innerHTML = `<p class="err">${esc(e.message)}</p>`; $('#cfg-do').disabled = false; }
 }
 let cfgBusy = false, cfgTimer = null;
-async function cfgRead(note) {
+async function cfgRead(note, fresh) {
   if (cfgBusy) return;          // a read is already in flight: don't start a second (two timers + both fight the link)
   cfgBusy = true;
   $('#cfg-go').disabled = true;
@@ -388,9 +389,9 @@ async function cfgRead(note) {
   tick(); cfgTimer = setInterval(tick, 1000);
   try {
     await cfgLayout();
-    READ = await api('api/config/read');
-    READ.at = new Date();
-    $('#cfg-at').textContent = `${READ.model || '?'} · read ${READ.at.toTimeString().slice(0, 8)}`;
+    READ = await api('api/config/read' + (fresh ? '?refresh=1' : ''));
+    READ.at = READ.read_at ? new Date(READ.read_at * 1000) : new Date();   // the snapshot's read time (drives the write-age check)
+    $('#cfg-at').textContent = `${READ.model || '?'} · ${READ.cached ? 'cached, ' : ''}read ${READ.at.toTimeString().slice(0, 8)}`;
     const ro = !READ.writes_available ? `<div class="msg">Read-only release: selpi shows the configuration as SP LINK does but does not write it yet (configuration writes arrive after on-hardware validation).</div>` : '';
     const vp = READ.version_problems.length ? `<div class="msg">This unit differs from the verified versions (${esc(READ.version_problems.join(', '))}). ${READ.map_mismatch ? 'Its memory map differs, so setting addresses may be wrong and writing is refused.' : 'The addresses still match (same memory map); firmware-specific settings are flagged, and writing works for the settings your firmware has.'}</div>` : '';
     $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + ro + vp + problemsHtml("Already in the unit's configuration (SP LINK would flag these)", READ.problems);
@@ -407,7 +408,8 @@ setInterval(() => {   // a write needs a recent read (the server checks too)
   if (READ && READ.at && (Date.now() - READ.at) / 1000 > READ.read_max_age - 60)
     $('#cfg-at').innerHTML = '<span class="err">read is old: read again before writing</span>';
 }, 30000);
-$('#cfg-go').onclick = cfgRead;
+$('#cfg-go').onclick = () => cfgRead();                 // show the config (cached if we have a recent read)
+$('#cfg-refresh').onclick = () => cfgRead(null, true);  // force a fresh read from the SP PRO
 $('#cfg-filter').oninput = drawCfg; $('#cfg-factory').onchange = drawCfg; $('#cfg-rawview').onchange = drawCfg;
 $('#cfg-tabs').onclick = e => { const b = e.target.closest('button'); if (b) { curTab = b.dataset.t; curSub = null; history.replaceState(null, '', '#settings/' + curTab); drawCfg(); } };
 $('#cfg-subtabs').onclick = e => { const b = e.target.closest('button'); if (b) { curSub = b.dataset.st; drawCfg(); } };
