@@ -535,6 +535,7 @@ async function loadStatus() {
     ['Unit versions', v + (s.version_problems.length ? ` <span class="err">— differs: ${esc(s.version_problems.join(', '))}</span>` : (s.versions ? ' <span class="ok">verified</span>' : ''))],
     ['Last good read', s.last_ok || '—'], ['Last error', s.last_error ? `<span class="err">${esc(s.last_error)}</span>` : '—'],
     ['Busy', s.busy || 'idle'], ['Backups', s.backups],
+    ['Caching', `page cache ${s.cache_ttl ? s.cache_ttl + ' s' : 'off (always fresh)'}, serve last value ${s.stale_grace ? 'up to ' + s.stale_grace + ' s after a dropout' : 'off (go unavailable at once)'}`],
     ['Clock sync', !s.clock_sync ? 'off' : (s.clock.checked ? `checked ${s.clock.checked.slice(11, 19)}: ` + (s.clock.error ? 'error ' + s.clock.error : `drift ${s.clock.drift} s` + (s.clock.set_to != null ? `, set (now ${s.clock.set_to} s)` : '')) : 'on, first check soon')],
   ].map(([k, val]) => `<tr><th>${k}</th><td>${typeof val === 'string' && val.includes('<span') ? val : esc(val)}</td></tr>`).join('') + '</table>';
   $('#state').textContent = s.busy ? s.busy + '…' : (s.last_error ? 'error' : '');

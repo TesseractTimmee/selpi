@@ -166,15 +166,19 @@ def _render(rid, snap, from_cache):
             'cached': from_cache, 'read_at': snap['at']}
 
 
-def cached():
+def cached(max_age=None):
     """The most recent configuration read, rendered without touching the link, or None if there is no read
-    within READ_MAX_AGE. The configuration only changes when written (and a write clears this), so serving the
-    last read lets the page reopen instantly instead of re-reading the whole config over a slow Select.Live
-    link. A fresh read (the Refresh button / ?refresh=1) still goes to the unit."""
+    within READ_MAX_AGE (and, when max_age is given, no older than that). The configuration only changes when
+    written (and a write clears this), so serving the last read lets the page reopen instantly instead of
+    re-reading the whole config over a slow Select.Live link. A fresh read (the Refresh button / ?refresh=1)
+    still goes to the unit; max_age (the cache-first TTL) is how recent the read must be to serve it without
+    reading — the stall fallback calls this with no max_age to serve the last read whatever its age."""
     with _LOCK:
         _forget_old()
         rid = _LATEST
         snap = READS.get(rid) if rid else None
+        if snap and max_age is not None and time.time() - snap['at'] > max_age:
+            return None
     return _render(rid, snap, True) if snap else None
 
 

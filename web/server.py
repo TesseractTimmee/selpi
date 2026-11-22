@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
+import settings
 from sppro import clock, config, config_write, live, logs
 from sppro.reader import Reader
 
@@ -382,6 +383,7 @@ class Handler(BaseHTTPRequestHandler):
                     'backups': len(list_backups()),
                     'backup_time': os.environ.get('SELPI_BACKUP_TIME', ''),
                     'clock_sync': os.environ.get('SELPI_CLOCK_SYNC', '').lower() == 'true', 'clock': CLOCK,
+                    'cache_ttl': settings.cache_ttl(), 'stale_grace': settings.stale_grace(),
                     'jobs': [{k: v for k, v in j.items() if k != 'file'} for j in JOBS.values()][-5:]})
             if path == '/api/live':
                 screens = [s for s in q.get('screens', 'now,today').split(',') if s in live.SCREENS] or None
@@ -390,7 +392,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, {'rows': rows, 'version_problems': SPPRO.version_problems,
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/settings':
-                memory = None if q.get('refresh') else config.cached_memory()   # serve the last read, no link hit
+                ttl = settings.cache_ttl()   # 0 (local link) = always read fresh; >0 (Select.Live) = serve a recent read
+                memory = config.cached_memory(ttl) if (ttl > 0 and not q.get('refresh')) else None
                 cached = memory is not None
                 if memory is None:
                     try:
@@ -408,8 +411,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, settings_ui.layout())
             if path == '/api/config/read':
                 from web import settings_ui
-                if not q.get('refresh'):
-                    hit = settings_ui.cached()           # reopen from cache: no link read over a slow Select.Live
+                if settings.cache_ttl() > 0 and not q.get('refresh'):
+                    hit = settings_ui.cached(settings.cache_ttl())   # reopen from a recent read: no link read over a slow link
                     if hit is not None:
                         return self._send(200, hit)
                 try:

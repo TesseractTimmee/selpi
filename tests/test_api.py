@@ -54,6 +54,16 @@ class TestValues(unittest.TestCase):
     def setUp(self):
         self.inv = FakeInverter()
         self.api = api.Api(self.inv, Busy, lambda reason: None, lambda: [], {}, 'id1')
+        # default these tests to the resilient (Select.Live) grace so a busy/partial poll serves last-good;
+        # the fast-'unknown' (grace 0) path has its own tests below.
+        self._grace0 = os.environ.pop('SELPI_STALE_GRACE', None)
+        os.environ['SELPI_STALE_GRACE'] = '600'
+
+    def tearDown(self):
+        if self._grace0 is None:
+            os.environ.pop('SELPI_STALE_GRACE', None)
+        else:
+            os.environ['SELPI_STALE_GRACE'] = self._grace0
 
     def test_reads_only_needed_screens(self):
         out = self.api.values(['batt_soc_percent', 'nonsense'])
@@ -98,6 +108,32 @@ class TestValues(unittest.TestCase):
         out = self.api.values(['batt_soc_percent'])    # does NOT raise despite the failed block
         self.assertTrue(out['stale'])                  # partial poll is flagged stale
         self.assertIn('batt_soc_percent', out['values'])   # last good value still served, not overwritten
+
+    def test_grace_zero_busy_raises_at_once(self):
+        # grace 0 (a reliable local link): a busy link serves NOTHING, so the integration can go 'unknown' now
+        os.environ['SELPI_STALE_GRACE'] = '0'
+        self.api.values(['batt_soc_percent'])          # populate the cache
+        self.inv.lock.acquire()
+        try:
+            with self.assertRaises(Busy):
+                self.api.values(['batt_soc_percent'])  # busy + grace 0 -> raise, not serve stale
+        finally:
+            self.inv.lock.release()
+
+    def test_grace_zero_partial_drops_stale_block_keeps_fresh(self):
+        # grace 0: a partial poll returns the blocks read this cycle but drops the stale (skipped) one
+        os.environ['SELPI_STALE_GRACE'] = '0'
+        self.api.values(['batt_soc_percent', 'd_ck_wh_in_today'])   # both cached (different blocks)
+        good = self.inv.words
+        def flaky(base, n):
+            if base == 0xa058:                         # the Now screen block (batt_soc_percent) times out
+                raise TimeoutError('The read operation timed out')
+            return good(base, n)
+        self.inv.words = flaky
+        out = self.api.values(['batt_soc_percent', 'd_ck_wh_in_today'])
+        self.assertTrue(out['stale'])
+        self.assertNotIn('batt_soc_percent', out['values'])      # stale skipped block dropped (grace 0)
+        self.assertIn('d_ck_wh_in_today', out['values'])         # block read this cycle still served
 
 
 class TestHttp(unittest.TestCase):

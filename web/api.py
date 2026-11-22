@@ -31,6 +31,7 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
+import settings
 from sppro import field_meta, live
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -41,9 +42,10 @@ SCREEN_NAMES = {
     'ServiceSettings': 'service settings', 'Now_Today_Tech_KacoModelsCapacityAndOEM': 'unit',
 }
 VALUE_WAIT = 20        # seconds a values request waits for the link before answering from cache
-STALE_AFTER = 600      # cache older than this isn't served
 POLL_DEADLINE = 30     # bound the whole read so a slow/flaky link can't hold the lock for minutes; blocks that
                        # don't come back in time are skipped (partial poll) and served from cache instead
+                       # how long a last-good value may still be served after a failed/busy poll is
+                       # settings.stale_grace() (0 = never, for a fast 'unknown' on a reliable link)
 
 
 def _slug(name):
@@ -109,6 +111,8 @@ class Api:
         return {'id': self.install_id, 'connection': conn, 'connection_label': label,
                 'clock_sync': os.environ.get('SELPI_CLOCK_SYNC', '').lower() == 'true',
                 'scan_interval': 60 if conn == 'SelectLive' else 10,
+                'stale_grace': settings.stale_grace(),   # add-on serves last-good this long after a failed poll
+                'cache_ttl': settings.cache_ttl(),        # config/settings page cache-first window
                 'model': 'SP PRO', 'manufacturer': 'Selectronic', 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
                 'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS)}
@@ -117,27 +121,34 @@ class Api:
         asked = {live.KEY_ALIASES.get(k, k): k for k in keys}   # old (renamed) keys still answered
         keys = [k for k in asked if k in self.fields]
         fields = [self.fields[k] for k in keys]
+        grace = settings.stale_grace()   # how long a last-good value may be served after a failed poll (0 = never)
         stale = False
+        fresh_at = None                  # the timestamp written to the cache this cycle (fresh reads keep it exactly)
         try:
             def read(r):
                 mem = live.read(r, fields)
                 return {f['key']: live.evaluate(f, mem) for f in fields}
             got = self.sppro.use('HA poll', read, wait=VALUE_WAIT, deadline=POLL_DEADLINE,
                                   key='poll:' + ','.join(sorted(keys))) if fields else {}
-            now = time.time()
+            fresh_at = time.time()
             for k, (v, text) in got.items():
                 if v is not None:    # a skipped block returns None: keep the last good cache, don't overwrite it
-                    self.cache[k] = (text if self.fields[k]['kind'] == 'enum' else v, now)
+                    self.cache[k] = (text if self.fields[k]['kind'] == 'enum' else v, fresh_at)
             if got.get('version_number', (None,))[0] is not None:
                 self.firmware = got['version_number'][1]
             if any(v is None for v, _ in got.values()):   # a partial poll (some blocks skipped): mark it stale
                 stale = True
         except self.Busy:
+            # link busy/failed: only serve the last good values while within the stale-grace window; with
+            # grace 0 (a reliable local link) serve nothing — let the poll fail so entities go 'unknown' at once.
             stale = True
-            if not any(k in self.cache for k in keys):
+            now = time.time()
+            if not any(k in self.cache and now - self.cache[k][1] <= grace for k in keys):
                 raise
         now = time.time()
-        out = {asked[k]: self.cache[k][0] for k in keys if k in self.cache and now - self.cache[k][1] < STALE_AFTER}
+        # values read this cycle are always returned; anything older only within the stale-grace window
+        out = {asked[k]: self.cache[k][0] for k in keys
+               if k in self.cache and (self.cache[k][1] == fresh_at or now - self.cache[k][1] <= grace)}
         return {'at': datetime.now().isoformat(timespec='seconds'), 'stale': stale, 'values': out,
                 'version_problems': self.sppro.version_problems}
 
