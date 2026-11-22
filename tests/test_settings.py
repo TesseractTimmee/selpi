@@ -165,6 +165,21 @@ class TestRules(unittest.TestCase):
         # Powerchain workers shows stored+1
         self.assertEqual(S.to_display('AdvancedMultiphaseNumberOfWorkers', 1, CELLS)[1], '2')
 
+    def test_dependent_visibility_rules(self):
+        grey = lambda name, vals: bool(S.greyed(name, vals, {}))
+        # Kaco count: shown for a multi-unit AC-solar port, greyed for a non-count port
+        self.assertFalse(grey('NumberOfKacosConnected', {'KacoModeCommPort': 'Fronius Verto'}))
+        self.assertFalse(grey('NumberOfKacosConnected', {'KacoModeCommPort': 'RS485 Port 1 Powador'}))
+        self.assertTrue(grey('NumberOfKacosConnected', {'KacoModeCommPort': 'Disabled'}))
+        self.assertTrue(grey('NumberOfKacosConnected', {'KacoModeCommPort': 'RS232 Port 1 Powador'}))
+        self.assertTrue(grey('NumberOfKacosConnected', {'KacoModeCommPort': 'External Comms'}))
+        # Multiphase workers: greyed when the structure is Disabled (the single-phase case)
+        self.assertTrue(grey('AdvancedMultiphaseNumberOfWorkers', {'AdvancedMultiPhaseStructure': 'Disabled'}))
+        self.assertFalse(grey('AdvancedMultiphaseNumberOfWorkers', {'AdvancedMultiPhaseStructure': 'Three Phase'}))
+        # Three-phase AC source balancing: only for a three-phase structure
+        self.assertTrue(grey('AdvancedMultiPhaseThreePhaseAcSourceBalanced', {'AdvancedMultiPhaseStructure': 'Two Phase (120°)'}))
+        self.assertFalse(grey('AdvancedMultiPhaseThreePhaseAcSourceBalanced', {'AdvancedMultiPhaseStructure': 'Three Phase + Split'}))
+
     def test_models(self):
         self.assertEqual(S.cells_for('SPMC482'), 24)
         self.assertEqual(S.cells_for('SPMC241'), 12)

@@ -410,6 +410,55 @@
    ],
    "message": "This unit is batteryless (factory), so the battery settings do not apply.",
    "note": "SP LINK EnableOrDisableSettingsAndReadingsByBatterylessMode: when ActualSP_PROFactoryBatterylessEnabled==1 these are greyed and Battery Type shows Batteryless. Flag read from 0xa05c."
+  },
+  {
+   "id": "number_of_kacos_greyed_on_non_count_port",
+   "when": {
+    "setting": "KacoModeCommPort",
+    "nin": [
+     "RS485 Port 1 Powador",
+     "Powador",
+     "ABB / FIMER",
+     "Fronius SnapIN Primo",
+     "SelectSun",
+     "Fronius SnapIN Symo",
+     "Fronius GEN24 Primo",
+     "Fronius GEN24 Symo",
+     "Fronius Verto"
+    ]
+   },
+   "grey": [
+    "NumberOfKacosConnected"
+   ],
+   "message": "The number of AC Solar units applies only to the multi-unit AC-coupled solar ports.",
+   "note": "SP LINK TweakKacoPortOptions enables nudNumberOfKacosConnected only for the RS485/Powador/ABB/Fronius/SelectSun AC-solar types; it greys it for Disabled, the RS232 Powador ports and External Comms. Matched on the stored KacoModeCommPort labels (16.11: Tauro -> Verto), not the dynamic combo text ('ABB Solar on Port 1' etc.)."
+  },
+  {
+   "id": "multiphase_workers_greyed_when_structure_disabled",
+   "when": {
+    "setting": "AdvancedMultiPhaseStructure",
+    "eq": "Disabled"
+   },
+   "grey": [
+    "AdvancedMultiphaseNumberOfWorkers"
+   ],
+   "message": "Advanced Multiphase is disabled, so the number of workers does not apply.",
+   "note": "SP LINK AdjustSettingsForAdvancedMultiPhase greys nudAdvancedMultiphaseNumberOfWorkers when AdvancedMultiPhaseStructure is Disabled (SP LINK also requires config v40 and comms-card sw >= 400; those are separate gates). Applies on a single-phase unit, where Structure is Disabled."
+  },
+  {
+   "id": "multiphase_3phase_balance_greyed_unless_three_phase",
+   "when": {
+    "setting": "AdvancedMultiPhaseStructure",
+    "nin": [
+     "Three Phase",
+     "Three Phase + Split"
+    ]
+   },
+   "grey": [
+    "AdvancedMultiPhaseThreePhaseAcSourceBalanced"
+   ],
+   "message": "AC Source balancing applies only to a three-phase structure.",
+   "note": "SP LINK AdjustSettingsForAdvancedMultiPhase enables cbAdvancedMultiPhaseThreePhaseACSourceBalanced only when AdvancedMultiPhaseStructure is Three Phase or Three Phase + Split; greyed for Disabled / Multi Single Phase / Two Phase / Split Phase."
   }
  ],
  "not_yet": [
