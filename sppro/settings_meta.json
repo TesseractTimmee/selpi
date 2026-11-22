@@ -10479,6 +10479,422 @@
    "unit": "kW/s",
    "label_override": "CSIP Default Export Limit Ramp Rate",
    "installer_only": true
+  },
+  {
+   "name": "FanType",
+   "section": "Service",
+   "slot": 0,
+   "installer_only": true,
+   "control": "nudFanType",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "ActivePowerDisconnect",
+   "section": "Service",
+   "slot": 35,
+   "installer_only": true,
+   "control": "nudActivePowerDisconnect",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalGainConnectedToSource",
+   "section": "Service",
+   "slot": 18,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalGainConnectedToSource",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarIntegralGain",
+   "section": "Service",
+   "slot": 19,
+   "installer_only": true,
+   "control": "nudAcSolarIntegralGain",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarDifferentialGain",
+   "section": "Service",
+   "slot": 20,
+   "installer_only": true,
+   "control": "nudAcSolarDifferentialGain",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarFeedForwardGain",
+   "section": "Service",
+   "slot": 21,
+   "installer_only": true,
+   "control": "nudAcSolarFeedForwardGain",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarIntegralGainConnectedToSource",
+   "section": "Service",
+   "slot": 15,
+   "installer_only": true,
+   "control": "nudAcSolarIntegralGainConnectedToSource",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarDifferentialGainConnectedToSource",
+   "section": "Service",
+   "slot": 16,
+   "installer_only": true,
+   "control": "nudAcSolarDifferentialGainConnectedToSource",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarFeedForwardGainConnectedToSource",
+   "section": "Service",
+   "slot": 17,
+   "installer_only": true,
+   "control": "nudAcSolarFeedForwardGainConnectedToSource",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarFilterRisingSync",
+   "section": "Service",
+   "slot": 36,
+   "installer_only": true,
+   "control": "nudAcSolarFilterRisingSync",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarFilterFallingSync",
+   "section": "Service",
+   "slot": 37,
+   "installer_only": true,
+   "control": "nudAcSolarFilterFallingSync",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarFilterRisingStandalone",
+   "section": "Service",
+   "slot": 38,
+   "installer_only": true,
+   "control": "nudAcSolarFilterRisingStandalone",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarFilterFallingStandalone",
+   "section": "Service",
+   "slot": 39,
+   "installer_only": true,
+   "control": "nudAcSolarFilterFallingStandalone",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalVoltage0",
+   "section": "Service",
+   "slot": 22,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalVoltage0",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalVoltage1",
+   "section": "Service",
+   "slot": 24,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalVoltage1",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalVoltage2",
+   "section": "Service",
+   "slot": 26,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalVoltage2",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalVoltage3",
+   "section": "Service",
+   "slot": 28,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalVoltage3",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalVoltage4",
+   "section": "Service",
+   "slot": 30,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalVoltage4",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalGain0",
+   "section": "Service",
+   "slot": 23,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalGain0",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalGain1",
+   "section": "Service",
+   "slot": 25,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalGain1",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalGain2",
+   "section": "Service",
+   "slot": 27,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalGain2",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalGain3",
+   "section": "Service",
+   "slot": 29,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalGain3",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "AcSolarProportionalGain4",
+   "section": "Service",
+   "slot": 31,
+   "installer_only": true,
+   "control": "nudAcSolarProportionalGain4",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0
+  },
+  {
+   "name": "ActiveAntiIslandingSensitivityPercent",
+   "section": "Service",
+   "slot": 11,
+   "installer_only": true,
+   "control": "nudActiveAntiIslandingSensitivityPercent",
+   "load": null,
+   "save": "fnGetNumericalValue",
+   "kind": "number",
+   "scale": "raw",
+   "decimals": 0,
+   "unit": "%"
+  },
+  {
+   "name": "EmulatedInductanceRatio",
+   "section": "Service",
+   "slot": 10,
+   "installer_only": true,
+   "control": "nudEmulatedInductancePercent",
+   "load": null,
+   "save": "fnGetNumericalValueWhichIsStoredInCentiUnits",
+   "kind": "number",
+   "scale": "raw / 100",
+   "decimals": 2,
+   "unit": "%"
+  },
+  {
+   "name": "ACInputDisconnectionMonitor",
+   "section": "Service",
+   "slot": 4,
+   "installer_only": true,
+   "control": "cbACInputDisconnection",
+   "kind": "enum",
+   "values": {
+    "0": "Disabled",
+    "1": "Enabled"
+   }
+  },
+  {
+   "name": "ExpansionCardEnabled",
+   "section": "Service",
+   "slot": 5,
+   "installer_only": true,
+   "control": "cbNewExpansionCardEnabled",
+   "kind": "enum",
+   "values": {
+    "0": "Disabled",
+    "1": "Enabled"
+   }
+  },
+  {
+   "name": "SynchOverloadShutdownCountTrips",
+   "section": "Service",
+   "slot": 9,
+   "installer_only": true,
+   "control": "cbSynchOverloadShutdownCountTrips",
+   "kind": "enum",
+   "values": {
+    "0": "Normal",
+    "1": "Poor"
+   }
+  },
+  {
+   "name": "AllowPowerOverride",
+   "section": "Service",
+   "slot": 13,
+   "installer_only": true,
+   "control": "cbAllowPowerOverride",
+   "kind": "enum",
+   "values": {
+    "0": "Disabled",
+    "1": "Enabled"
+   }
+  },
+  {
+   "name": "IndependentGridDisconnect",
+   "section": "Service",
+   "slot": 14,
+   "installer_only": true,
+   "control": "cbIndependentGridDisconnect",
+   "kind": "enum",
+   "values": {
+    "0": "Disabled",
+    "1": "Enabled"
+   }
+  },
+  {
+   "name": "AemoRideThrough",
+   "section": "Service",
+   "slot": 34,
+   "installer_only": true,
+   "control": "cbAemoRideThrough",
+   "kind": "enum",
+   "values": {
+    "0": "Disabled",
+    "1": "Enabled"
+   }
+  },
+  {
+   "name": "InitialSoC",
+   "section": "Service",
+   "slot": 1,
+   "installer_only": true,
+   "kind": "raw"
+  },
+  {
+   "name": "Shunt1UserZero",
+   "section": "Service",
+   "slot": 2,
+   "installer_only": true,
+   "kind": "raw"
+  },
+  {
+   "name": "Shunt2UserZero",
+   "section": "Service",
+   "slot": 3,
+   "installer_only": true,
+   "kind": "raw"
+  },
+  {
+   "name": "MultiPhaseValuesSplink",
+   "section": "Service",
+   "slot": 12,
+   "installer_only": true,
+   "kind": "raw"
+  },
+  {
+   "name": "ServiceSettingReserved33",
+   "section": "Service",
+   "slot": 32,
+   "installer_only": true,
+   "kind": "raw"
+  },
+  {
+   "name": "ServiceSettingReserved34",
+   "section": "Service",
+   "slot": 33,
+   "installer_only": true,
+   "kind": "raw"
   }
  ]
 }
