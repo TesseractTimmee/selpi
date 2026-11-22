@@ -6,6 +6,7 @@ version 31. Values were checked against the SP PRO's Modbus map on 17 Nov 2026.
 Reads use the same blocks SP LINK reads, so no range is requested that the unit doesn't serve.
 """
 import json
+import logging
 import math
 import os
 import re
@@ -142,14 +143,23 @@ def fields_for(screens=None):
 
 
 def read(reader, fields):
-    """Read every block the fields need, plus the scale factors. Returns {address: word}."""
+    """Read every block the fields need, plus the scale factors. Returns {address: word}. A block that fails
+    (a flaky/slow Select.Live link, or the operation's deadline running out) is skipped rather than failing the
+    whole poll, so a slow poll returns partial data — the fields on the blocks that did come back — instead of
+    nothing. The reader reconnects per block, so a skipped block doesn't disturb the next one."""
     mem = {}
-    for i, w in enumerate(reader.words(SCALE_BASE, len(SCALES))):
-        mem[SCALE_BASE + i] = w
-    for screen in sorted({f['screen'] for f in fields}):
-        for base, n in BLOCKS.get(screen, []):
+
+    def block(base, n):
+        try:
             for i, w in enumerate(reader.words(base, n)):
                 mem[base + i] = w
+        except Exception as e:                      # link loss / short read / deadline: skip this block
+            logging.debug('live read 0x%x+%d skipped: %s', base, n, e)
+
+    block(SCALE_BASE, len(SCALES))
+    for screen in sorted({f['screen'] for f in fields}):
+        for base, n in BLOCKS.get(screen, []):
+            block(base, n)
     return mem
 
 
@@ -157,10 +167,10 @@ def evaluate(field, mem):
     """(value, text) for one field; value is a number, an enum code, or None if not available."""
     if any(int(a, 16) not in mem for a in field['words']):
         return None, ''
-    scales = {name: mem[SCALE_BASE + i] for i, name in enumerate(SCALES)}
+    scales = {name: mem.get(SCALE_BASE + i) for i, name in enumerate(SCALES)}   # None if the scale block was skipped
     try:
         v = eval(_code(field['formula']), dict(_ENV, M=mem, S=scales))
-    except (ArithmeticError, ValueError):
+    except (ArithmeticError, ValueError, KeyError, TypeError):   # TypeError/KeyError: a scale/word is missing
         return None, ''
     if field['kind'] == 'enum':
         label = tables().get(field['table'], {}).get(str(v))

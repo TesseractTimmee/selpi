@@ -18,7 +18,7 @@ class FakeInverter:
         self.lock = threading.Lock()
         self.reads = []
 
-    def use(self, what, fn, wait=False, check_versions=True):
+    def use(self, what, fn, wait=False, check_versions=True, deadline=None):
         if not self.lock.acquire(blocking=False):
             raise Busy('busy: backup')
         try:
@@ -84,6 +84,21 @@ class TestValues(unittest.TestCase):
         out = self.api.values(['digital_in_status1'])
         self.assertEqual(out['values']['digital_in_status1'], 'Inactive')
 
+    def test_partial_poll_keeps_last_value_and_marks_stale(self):
+        # a flaky Select.Live link where one block (the Now screen, 0xa058) times out must not fail the whole
+        # poll: the field on it keeps its last good value (served stale) instead of being wiped to None.
+        self.api.values(['batt_soc_percent'])          # first poll populates the cache
+        self.assertIn('batt_soc_percent', self.api.cache)
+        good = self.inv.words
+        def flaky(base, n):
+            if base == 0xa058:
+                raise TimeoutError('The read operation timed out')
+            return good(base, n)
+        self.inv.words = flaky
+        out = self.api.values(['batt_soc_percent'])    # does NOT raise despite the failed block
+        self.assertTrue(out['stale'])                  # partial poll is flagged stale
+        self.assertIn('batt_soc_percent', out['values'])   # last good value still served, not overwritten
+
 
 class TestHttp(unittest.TestCase):
     def test_token_required(self):
@@ -116,7 +131,7 @@ class SimInverter:
         self.sim = sim_sppro.SimProtocol({0xa000: struct.pack('<H', 0x0101)})
         self.reader = Reader(lambda: self.sim)
 
-    def use(self, what, fn, wait=False, check_versions=True):
+    def use(self, what, fn, wait=False, check_versions=True, deadline=None):
         return fn(self.reader)
 
 

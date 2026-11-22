@@ -42,6 +42,8 @@ SCREEN_NAMES = {
 }
 VALUE_WAIT = 20        # seconds a values request waits for the link before answering from cache
 STALE_AFTER = 600      # cache older than this isn't served
+POLL_DEADLINE = 30     # bound the whole read so a slow/flaky link can't hold the lock for minutes; blocks that
+                       # don't come back in time are skipped (partial poll) and served from cache instead
 
 
 def _slug(name):
@@ -120,12 +122,15 @@ class Api:
             def read(r):
                 mem = live.read(r, fields)
                 return {f['key']: live.evaluate(f, mem) for f in fields}
-            got = self.sppro.use('HA poll', read, wait=VALUE_WAIT) if fields else {}
+            got = self.sppro.use('HA poll', read, wait=VALUE_WAIT, deadline=POLL_DEADLINE) if fields else {}
             now = time.time()
             for k, (v, text) in got.items():
-                self.cache[k] = (text if self.fields[k]['kind'] == 'enum' and v is not None else v, now)
-            if 'version_number' in got and got['version_number'][0] is not None:
+                if v is not None:    # a skipped block returns None: keep the last good cache, don't overwrite it
+                    self.cache[k] = (text if self.fields[k]['kind'] == 'enum' else v, now)
+            if got.get('version_number', (None,))[0] is not None:
                 self.firmware = got['version_number'][1]
+            if any(v is None for v, _ in got.values()):   # a partial poll (some blocks skipped): mark it stale
+                stale = True
         except self.Busy:
             stale = True
             if not any(k in self.cache for k in keys):
