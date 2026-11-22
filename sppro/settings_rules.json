@@ -333,6 +333,24 @@
    ],
    "message": "Econo mode applies only to a standalone system (no AC coupling, multiphase or batteryless) and not on 120 V models.",
    "note": "SP LINK EnableOrDisableEconoMode: enabled only when KacoModeCommPort/AcCoupledInverterFrequencyControl/MultiplePhase/EnableUserBatterylessMode/AdvancedMultiPhaseStructure are all Disabled AND the model nominal battery voltage != 120 V. (SP LINK also allows configVersion<39 OR connected, always true for a live selpi read, so omitted.)"
+  },
+  {
+   "id": "nominal_frequency_greyed_on_kaco_powador",
+   "when": {
+    "setting": "KacoModeCommPort",
+    "in": [
+     "RS232 Port 1 Powador",
+     "RS232 Port 2 Powador",
+     "RS485 Port 1 Powador",
+     "Powador",
+     "External Comms"
+    ]
+   },
+   "grey": [
+    "NominalFrequency"
+   ],
+   "message": "The AC-coupled inverter type fixes the frequency, so Nominal Frequency does not apply (SP LINK greys it at 50 Hz).",
+   "note": "SP LINK EnableOrDisableFrequencyMode: NominalFrequency editable only for Disabled or a grid-interactive type (ABB/FIMER, Fronius, SelectSun), greyed for the Powador/External types. SP LINK also has a configVersion 40-42 + not-connected precondition that never applies to a live selpi read, so omitted."
   }
  ],
  "not_yet": [
