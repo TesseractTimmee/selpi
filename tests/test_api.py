@@ -18,7 +18,7 @@ class FakeInverter:
         self.lock = threading.Lock()
         self.reads = []
 
-    def use(self, what, fn, wait=False, check_versions=True, deadline=None):
+    def use(self, what, fn, wait=False, check_versions=True, deadline=None, key=None):
         if not self.lock.acquire(blocking=False):
             raise Busy('busy: backup')
         try:
@@ -131,7 +131,7 @@ class SimInverter:
         self.sim = sim_sppro.SimProtocol({0xa000: struct.pack('<H', 0x0101)})
         self.reader = Reader(lambda: self.sim)
 
-    def use(self, what, fn, wait=False, check_versions=True, deadline=None):
+    def use(self, what, fn, wait=False, check_versions=True, deadline=None, key=None):
         return fn(self.reader)
 
 

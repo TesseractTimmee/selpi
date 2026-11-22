@@ -122,7 +122,8 @@ class Api:
             def read(r):
                 mem = live.read(r, fields)
                 return {f['key']: live.evaluate(f, mem) for f in fields}
-            got = self.sppro.use('HA poll', read, wait=VALUE_WAIT, deadline=POLL_DEADLINE) if fields else {}
+            got = self.sppro.use('HA poll', read, wait=VALUE_WAIT, deadline=POLL_DEADLINE,
+                                  key='poll:' + ','.join(sorted(keys))) if fields else {}
             now = time.time()
             for k, (v, text) in got.items():
                 if v is not None:    # a skipped block returns None: keep the last good cache, don't overwrite it
@@ -168,7 +169,7 @@ class Api:
         from sppro import buttons
         logging.warning('front panel button press via the API: %s%s', name, ' (long)' if long else '')
         out = self.sppro.use('button %s' % name, lambda r: buttons.press(r, name, long=long), wait=30,
-                             check_versions=False)
+                             deadline=30, check_versions=False)
         return {'pressed': name, 'register': '0x%x' % out['register'], 'read_back': out['read_back']}
 
     def control(self, name, state='', confirm=''):
@@ -204,7 +205,7 @@ class Api:
                                 % ', '.join(self.sppro.version_problems))
         logging.warning('control via the API: %s %s', name, state)
         try:
-            out = self.sppro.use('control %s' % name, act, wait=60, check_versions=False)
+            out = self.sppro.use('control %s' % name, act, wait=60, deadline=45, check_versions=False)
         except controls.ControlError as e:
             raise ConflictError(str(e))
         result = {'control': name, 'state': state, 'pressed': out.get('pressed', True)}

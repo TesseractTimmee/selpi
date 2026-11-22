@@ -33,13 +33,37 @@ LOG_FILES = {'events': 'EventData', 'detailed': 'DetailedData', 'daily': 'DailyS
 # HA ingress connects from the Supervisor; anything else is refused unless SELPI_WEB_ALLOW_ANY=1
 INGRESS_PEERS = {'172.30.32.2', '127.0.0.1', '::1'}
 
+# One policy for the shared SP PRO link: every operation is time-bounded (so nothing — not even the automatic
+# clock sync or backup — can hold the lock indefinitely and wedge polls/pages), and reads wait a bounded time
+# for the lock instead of failing the instant it is in use.
+READ_WAIT = 30            # s a read waits for the link before giving up (then Busy)
+CLOCK_DEADLINE = 25       # the automatic ops must stay short so they can't block everything
+BACKUP_DEADLINE = 90
+LOG_DEADLINE = 120
+LIVE_DEADLINE = 25
+SETTINGS_DEADLINE = 40
+CONFIG_DEADLINE = 45
+WRITE_DEADLINE = 60
+
 
 class Busy(Exception):
     pass
 
 
+class _Flight:
+    """Shared outcome for single-flight coalescing: identical concurrent reads wait on one and reuse its result."""
+    __slots__ = ('event', 'result', 'error')
+
+    def __init__(self):
+        self.event = threading.Event()
+        self.result = None
+        self.error = None
+
+
 class Inverter:
-    """One shared SP PRO link; every use holds the lock, so requests never interleave."""
+    """One shared SP PRO link; every use holds the lock, so requests never interleave. Identical concurrent reads
+    are coalesced (pass key=): a second caller with the same key waits for the first and reuses its result instead
+    of running a duplicate over the (slow) link."""
 
     def __init__(self):
         self.lock = threading.Lock()
@@ -50,11 +74,42 @@ class Inverter:
         self.last_error = None
         self.busy = None          # what holds the lock (shown in the page)
         self.keep_open = 0        # > 0 while an SP LINK proxy client is connected: keep the link up
+        self._inflight = {}       # key -> _Flight: coalesces duplicate in-flight reads
+        self._inflight_lock = threading.Lock()
 
-    def use(self, what, fn, wait=False, check_versions=True, deadline=None):
-        """wait: False = fail at once if busy, True = wait as long as it takes, a number = wait that many seconds.
-        deadline: seconds to bound the whole operation, so a stalled link can't hold the lock (and block the page
-        and HA polls) indefinitely; the reader stops retrying past it and raises."""
+    def use(self, what, fn, wait=False, check_versions=True, deadline=None, key=None):
+        """Run fn(reader) holding the link lock. wait: False = fail at once if busy, True = wait as long as it
+        takes, a number = wait that many seconds for the lock. deadline: bound the whole operation so a stalled
+        link can't hold the lock (and block polls/pages) indefinitely; the reader stops retrying past it and
+        raises. key: coalesce identical in-flight reads — a second caller with the same key waits for the first
+        and reuses its result (or re-raises its error) rather than running a duplicate. Use key only for
+        idempotent reads, never writes."""
+        if key is None:
+            return self._run(what, fn, wait, check_versions, deadline)
+        with self._inflight_lock:
+            flight = self._inflight.get(key)
+            lead = flight is None
+            if lead:
+                flight = self._inflight[key] = _Flight()
+        if not lead:                                      # a duplicate: wait for the in-flight one, reuse its outcome
+            budget = (wait if type(wait) in (int, float) else 60) + (deadline or 0) + 5
+            if not flight.event.wait(timeout=budget):
+                raise Busy('busy: %s' % self.busy)
+            if flight.error is not None:
+                raise flight.error
+            return flight.result
+        try:
+            flight.result = self._run(what, fn, wait, check_versions, deadline)
+            return flight.result
+        except Exception as e:
+            flight.error = e
+            raise
+        finally:
+            with self._inflight_lock:
+                self._inflight.pop(key, None)
+            flight.event.set()
+
+    def _run(self, what, fn, wait, check_versions, deadline):
         got = self.lock.acquire(blocking=False) if wait is False else \
             self.lock.acquire() if wait is True else self.lock.acquire(timeout=wait)
         if not got:
@@ -72,8 +127,8 @@ class Inverter:
             return out
         except Exception as e:
             self.last_error = '%s: %s' % (what, e)
-            self.reader = None
-            self.versions = None
+            self.reader = None          # the connection is already dropped on failure; reconnect next time
+            # keep self.versions cached: the firmware version block is constant, so don't re-read it after a failure
             raise
         finally:
             if self.reader is not None:
@@ -109,7 +164,7 @@ def clock_syncer(max_drift):
     time.sleep(30)
     while True:
         try:
-            before, after = SPPRO.use('clock check', lambda r: clock.sync(r, max_drift, lead), wait=True)
+            before, after = SPPRO.use('clock check', lambda r: clock.sync(r, max_drift, lead), wait=READ_WAIT, deadline=CLOCK_DEADLINE)
             CLOCK.update(checked=datetime.now(), drift=before, set_to=after, error=None)
             logging.info('clock check: drift %+d s%s', before, '' if after is None else ', set (now %+d s)' % after)
         except Exception as e:
@@ -131,7 +186,7 @@ JOBS = {}
 # ------------------------------------------------------------------------------------------- backups
 
 def backup_now(reason='manual'):
-    memory = SPPRO.use('config backup', config.read_memory, wait=True)
+    memory = SPPRO.use('config backup', config.read_memory, wait=READ_WAIT, deadline=BACKUP_DEADLINE)
     stamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     folder = os.path.join(BACKUPS, stamp)
     os.makedirs(folder, exist_ok=True)
@@ -246,7 +301,7 @@ def logs_job(since, until, keys):
                                   '%s (%d of %d): %d of %d records' % (title, index + 1, len(keys), done, total))
             return scales, logs.download(reader, keys, since, until, progress)
         job['message'] = 'waiting for the SP PRO link' + (' (busy: %s)' % SPPRO.busy if SPPRO.busy else '')
-        scales, records = SPPRO.use('log download', work, wait=True)
+        scales, records = SPPRO.use('log download', work, wait=READ_WAIT, deadline=LOG_DEADLINE)
         job['message'] = 'building the CSV files'
         job['progress'] = dict(job.get('progress') or {}, percent=100)
         merged = {}
@@ -330,11 +385,12 @@ class Handler(BaseHTTPRequestHandler):
                     'jobs': [{k: v for k, v in j.items() if k != 'file'} for j in JOBS.values()][-5:]})
             if path == '/api/live':
                 screens = [s for s in q.get('screens', 'now,today').split(',') if s in live.SCREENS] or None
-                rows = SPPRO.use('live read', lambda r: live.snapshot(r, screens), deadline=25)
+                rows = SPPRO.use('live read', lambda r: live.snapshot(r, screens), wait=READ_WAIT, deadline=LIVE_DEADLINE,
+                                 key='live:' + ','.join(screens or []))
                 return self._send(200, {'rows': rows, 'version_problems': SPPRO.version_problems,
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/settings':
-                memory = SPPRO.use('settings read', config.read_memory, deadline=40)
+                memory = SPPRO.use('settings read', config.read_memory, wait=READ_WAIT, deadline=SETTINGS_DEADLINE, key='settings')
                 return self._send(200, {'settings': config.settings(memory),
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/config/layout':
@@ -346,7 +402,7 @@ class Handler(BaseHTTPRequestHandler):
                     hit = settings_ui.cached()           # reopen from cache: no link read over a slow Select.Live
                     if hit is not None:
                         return self._send(200, hit)
-                return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=60, deadline=45))
+                return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=READ_WAIT, deadline=CONFIG_DEADLINE, key='config'))
             if path == '/api/backups':
                 return self._send(200, {'backups': list_backups()})
             m = re.fullmatch(r'/api/backups/([0-9_-]+)/([A-Za-z0-9_.-]+)', path)
@@ -386,7 +442,7 @@ class Handler(BaseHTTPRequestHandler):
             if path == '/api/config/check':
                 from web import settings_ui
                 return self._send(200, SPPRO.use('configuration check', lambda r: settings_ui.check(
-                    r, body.get('read_id'), body.get('changes') or {}), wait=30, deadline=45))
+                    r, body.get('read_id'), body.get('changes') or {}), wait=READ_WAIT, deadline=CONFIG_DEADLINE))
             if path == '/api/config/write':
                 from web import settings_ui
                 logging.warning('configuration write from the web UI: %s', ', '.join(sorted((body.get('changes') or {}))))
@@ -395,7 +451,7 @@ class Handler(BaseHTTPRequestHandler):
                         r, body.get('read_id'), body.get('changes') or {}, body.get('passcode', ''),
                         allow_out_of_range=bool(body.get('allow_out_of_range')),
                         ignore_rules=body.get('ignore_rules') or [],
-                        out_dir=os.path.join(DATA, 'config-writes')), wait=60)
+                        out_dir=os.path.join(DATA, 'config-writes')), wait=READ_WAIT, deadline=WRITE_DEADLINE)
                 except PermissionError as e:
                     return self._send(403, {'error': str(e)})
                 except config_write.WriteError as e:
