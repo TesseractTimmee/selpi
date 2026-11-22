@@ -414,7 +414,7 @@ def _dc_problems(values, cells):
 
 def send_check(raw_new, raw_old, unit, link, cells=None, model_name=None):
     """SP LINK's send-time checks. unit: output_mode, hardware_revision, comms_card_revision,
-    comms_card_attached, region, factory_export_limit; link: port."""
+    comms_card_attached, comms_card_software, region, factory_export_limit; link: port."""
     values = _values(raw_new, cells)
     changed = {n for n in raw_new if raw_old.get(n) != raw_new.get(n)}
     extra = {'unit': SimpleNamespace(**unit), 'link': SimpleNamespace(**link),

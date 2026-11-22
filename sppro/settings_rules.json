@@ -5,7 +5,7 @@
   "{N} in a rule expands to the eight Solar Hybrid priorities (SystemSchedule1..8).",
   "'active(N)' = SystemScheduleNEnable is Enabled or SystemScheduleNDigitalInput is not None (SP LINK's test for a priority in use).",
   "severity: error = SP LINK refuses to save; warning = SP LINK warns. confidence: high = read directly; check = constant or operand to confirm.",
-  "send_checks use the unit's live state as well as the configuration: unit.output_mode (Output Mode, 0xa07d), unit.hardware_revision, unit.comms_card_revision, unit.region (as configured now), unit.factory_export_limit, link.port (the SP PRO port selpi is talking through: low byte of 0xa000). 'changed(X)' = the write changes setting X.",
+  "send_checks use the unit's live state as well as the configuration: unit.output_mode (Output Mode, 0xa07d), unit.hardware_revision, unit.comms_card_revision, unit.comms_card_software (Comms Card software version from the 0xa007 block, SP LINK's InverterCommsCardSoftwareVersion), unit.region (as configured now), unit.factory_export_limit, link.port (the SP PRO port selpi is talking through: low byte of 0xa000). 'changed(X)' = the write changes setting X.",
   "models: per SP PRO model (SP LINK's list): battery cells (DC voltages are stored per cell), nominal V, and the minimum battery size for AC-coupled systems. 'model' = the unit's model (selpi reads it from the unit)."
  ],
  "rules": [
@@ -253,6 +253,33 @@
    "message": "The inverter needs the Comms Card 2017 for this battery type.",
    "severity": "error",
    "confidence": "high"
+  },
+  {
+   "id": "battery_type_needs_comms_sw_400",
+   "when": "BatteryType in ('BMS - Murata', 'BMS - Cegasa/SelectCell 144V', 'BMS - Cegasa 48V', 'BMS - AERL', 'BMS - XESS')",
+   "require": "unit.comms_card_software >= 400",
+   "message": "This battery type needs Comms Card software version 400 or later.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "SP LINK AdjustBatteryTypeItemListForBatterylessMode removes these from the Battery Type list when InverterCommsCardSoftwareVersion < 400."
+  },
+  {
+   "id": "battery_type_needs_comms_sw_511",
+   "when": "BatteryType in ('BMS - ZYC', 'BMS - Dyness', 'BMS - Discover')",
+   "require": "unit.comms_card_software >= 511",
+   "message": "This battery type needs Comms Card software version 511 or later.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "SP LINK removes these from the Battery Type list when InverterCommsCardSoftwareVersion < 511."
+  },
+  {
+   "id": "battery_type_needs_comms_sw_523",
+   "when": "BatteryType == 'BMS - SelectCell River Gum'",
+   "require": "unit.comms_card_software >= 523",
+   "message": "This battery type needs Comms Card software version 523 or later.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "SP LINK removes SelectCell River Gum from the Battery Type list when InverterCommsCardSoftwareVersion < 523."
   },
   {
    "id": "export_pretrip_above_factory_limit",

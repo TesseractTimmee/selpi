@@ -140,6 +140,7 @@ def _unit_state(reader, raw_now, cells):
     app = settings.to_display('ApplicationType', raw_now['ApplicationType'], cells)[0] if 'ApplicationType' in raw_now else None
     unit = {'output_mode': controls.output_state(reader)['mode'], 'hardware_revision': reader.words(0xa060, 1)[0],
             'comms_card_revision': v.get('comms_card_revision'), 'comms_card_attached': bool(v.get('comms_card_attached')),
+            'comms_card_software': v.get('comms_card_software'),
             'region': region if app == 'Solar Hybrid (AS4777.2:2020)' else 'None', 'factory_export_limit': None}
     return unit, {'port': buttons.port(reader)}
 
