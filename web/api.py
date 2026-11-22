@@ -100,6 +100,8 @@ class Api:
         if conn == 'SelectLive':
             label = {'select.live2': 'Select.Live 2',
                      'select.live2-nonprod': 'Select.Live 2 (test)'}.get(server, 'Select.Live')
+        elif conn == 'TCP':
+            label = 'ESP (proxy)'        # the add-on's TCP link is the ESPHome sppro proxy
         else:
             label = conn or 'Unknown'
         return {'id': self.install_id, 'connection': conn, 'connection_label': label,
