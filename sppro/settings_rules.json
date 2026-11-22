@@ -295,6 +295,44 @@
    ],
    "message": "AC-coupled inverter frequency control is disabled, so the AC-coupled frequency ramp settings do not apply.",
    "note": "SP LINK AdjustSettingsForGenericAcCoupling: enabled when frequency control is Enabled or Microgrid."
+  },
+  {
+   "id": "econo_mode_greyed_unless_plain_standalone",
+   "when": {
+    "any": [
+     {
+      "setting": "KacoModeCommPort",
+      "ne": "Disabled"
+     },
+     {
+      "setting": "AcCoupledInverterFrequencyControl",
+      "ne": "Disabled"
+     },
+     {
+      "setting": "MultiplePhase",
+      "ne": "Disabled"
+     },
+     {
+      "setting": "EnableUserBatterylessMode",
+      "ne": "Disabled"
+     },
+     {
+      "setting": "AdvancedMultiPhaseStructure",
+      "ne": "Disabled"
+     },
+     {
+      "unit": "model_nominal_v",
+      "eq": 120
+     }
+    ]
+   },
+   "grey": [
+    "Econo",
+    "EconoPulseRate",
+    "EconoThreshold"
+   ],
+   "message": "Econo mode applies only to a standalone system (no AC coupling, multiphase or batteryless) and not on 120 V models.",
+   "note": "SP LINK EnableOrDisableEconoMode: enabled only when KacoModeCommPort/AcCoupledInverterFrequencyControl/MultiplePhase/EnableUserBatterylessMode/AdvancedMultiPhaseStructure are all Disabled AND the model nominal battery voltage != 120 V. (SP LINK also allows configVersion<39 OR connected, always true for a live selpi read, so omitted.)"
   }
  ],
  "not_yet": [

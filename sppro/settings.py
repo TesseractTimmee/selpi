@@ -121,14 +121,15 @@ def available(name, config_version):
     return config_version is None or mv is None or config_version >= mv
 
 
-def _match(cond, values):
-    """Evaluate a structured visibility condition (settings_rules.json 'visibility') against display values:
-    {'setting': n, 'eq'/'ne': v} or {'in'/'nin': [..]}, combined with {'all': [..]} / {'any': [..]}."""
+def _match(cond, values, unit=None):
+    """Evaluate a structured visibility condition (settings_rules.json 'visibility'). A leaf reads either a setting's
+    display value ({'setting': n, ...}) or a unit property ({'unit': p, ...}, from unit = {model_nominal_v, ...});
+    operators eq / ne / in / nin and the numeric ge / le / gt / lt; combine with {'all': [..]} / {'any': [..]}."""
     if 'all' in cond:
-        return all(_match(c, values) for c in cond['all'])
+        return all(_match(c, values, unit) for c in cond['all'])
     if 'any' in cond:
-        return any(_match(c, values) for c in cond['any'])
-    v = values.get(cond['setting'])
+        return any(_match(c, values, unit) for c in cond['any'])
+    v = (unit or {}).get(cond['unit']) if 'unit' in cond else values.get(cond['setting'])
     if 'eq' in cond:
         return v == cond['eq']
     if 'ne' in cond:
@@ -137,15 +138,32 @@ def _match(cond, values):
         return v in cond['in']
     if 'nin' in cond:
         return v not in cond['nin']
+    if v is None:
+        return False                           # numeric comparisons are None-safe (e.g. a unit property not read)
+    if 'ge' in cond:
+        return v >= cond['ge']
+    if 'le' in cond:
+        return v <= cond['le']
+    if 'gt' in cond:
+        return v > cond['gt']
+    if 'lt' in cond:
+        return v < cond['lt']
     return False
 
 
-def greyed(name, values):
-    """The visibility rule (or None) that greys this setting given the current display values {name: label/number}.
-    SP LINK's dependent show-hide-and-grey (an Adjust*/EnableOrDisable* handler disables a field from another
-    setting's value); selpi greys the same fields. values are display values (settings.to_display)."""
+def unit_context(model_name):
+    """The unit properties a visibility condition may read ({'unit': p}). Constant for a unit, so the web read
+    sends it once. model_nominal_v is the model's nominal battery voltage (SP LINK gates e.g. Econo mode on it)."""
+    m = MODELS.get(model_name)
+    return {'model_nominal_v': m.nominal_v if m else None}
+
+
+def greyed(name, values, unit=None):
+    """The visibility rule (or None) that greys this setting given the current display values {name: label/number}
+    and unit properties (unit_context). SP LINK's dependent show-hide-and-grey (an Adjust*/EnableOrDisable* handler
+    disables a field from another setting's value, sometimes the unit model); selpi greys the same fields."""
     for r in RULES.get('visibility', ()):
-        if name in r.get('grey', ()) and _match(r['when'], values):
+        if name in r.get('grey', ()) and _match(r['when'], values, unit):
             return r
     return None
 

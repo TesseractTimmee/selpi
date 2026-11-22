@@ -209,11 +209,16 @@ function curVal(name) { const v = READ && READ.values[name]; return EDITS[name] 
 function matchCond(c) {
   if (c.all) return c.all.every(matchCond);
   if (c.any) return c.any.some(matchCond);
-  const v = curVal(c.setting);
+  const v = ('unit' in c) ? ((READ && READ.unit || {})[c.unit]) : curVal(c.setting);
   if ('eq' in c) return v === c.eq;
   if ('ne' in c) return v !== c.ne;
   if ('in' in c) return c.in.includes(v);
   if ('nin' in c) return !c.nin.includes(v);
+  if (v == null) return false;
+  if ('ge' in c) return v >= c.ge;
+  if ('le' in c) return v <= c.le;
+  if ('gt' in c) return v > c.gt;
+  if ('lt' in c) return v < c.lt;
   return false;
 }
 // the visibility rule (or null) that greys this setting given current values — SP LINK's dependent show/hide-and-grey
