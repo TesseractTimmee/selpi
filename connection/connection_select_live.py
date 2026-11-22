@@ -5,6 +5,15 @@ from . import Connection
 from .ssl import create_ssl_connection
 import re
 
+# Named Select.Live servers (all port 7528, from SP LINK). CONNECTION_SELECT_LIVE_SERVER picks one; anything else
+# (or unset) falls back to the manual CONNECTION_SELECT_LIVE_HOST / _PORT (default select.live).
+SERVERS = {
+    b'select.live': (b'select.live', 7528),
+    b'select.live2': (b'splink-api.selectlive.selectronic.com.au', 7528),
+    b'select.live2-nonprod': (b'splink-api.nonprod.selectlive.selectronic.com.au', 7528),
+}
+
+
 class ConnectionSelectLive(Connection):
     def __init__(
             self,
@@ -18,8 +27,14 @@ class ConnectionSelectLive(Connection):
         self.__write_failures = 0
 
     def _connect(self):
-        hostname = b'select.live'
-        port = 7528
+        # Server: a named preset (Select.Live / Select.Live 2 / nonprod) or a manual host/port. Same protocol.
+        server = self.__settings_module.getb(b'CONNECTION_SELECT_LIVE_SERVER')
+        if server in SERVERS:
+            hostname, port = SERVERS[server]
+        else:
+            hostname = self.__settings_module.getb(b'CONNECTION_SELECT_LIVE_HOST') or b'select.live'
+            port_b = self.__settings_module.getb(b'CONNECTION_SELECT_LIVE_PORT')
+            port = int(port_b) if port_b else 7528
         self.__socket = self.__create_ssl_connection(hostname, port)
 
         response = self._read(1024)
