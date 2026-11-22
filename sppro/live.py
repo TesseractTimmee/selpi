@@ -46,14 +46,26 @@ def versions(reader):
     return {k: w[i] for k, i in VERSIONS.items()}
 
 
-FACTORY_BATTERYLESS = 0xa05c   # ActualSP_PROFactoryBatterylessEnabled: word 0 of the identity block (0xa05d = model,
-                               # 0xa062 = Control PCA serial). Sent at connect, so it comes over Select.Live too.
+FACTORY_BATTERYLESS = 0xa021    # AddFactoryLockedBatterylessMode (1 = batteryless unit). Pinned from the Select.Live
+                                # capture: reads 0 on this (battery) unit; its shadow is 0xa390.
+FACTORY_EXPORT_LIMIT = 0xa0aa   # AddBatteryPlusKacoSupportLimitShadow = SP LINK's ActualSP_PROFactoryExportLimitValue
+                                # (deci kW, 0xFFFF = blank / no factory cap). The stored copy is 0xca0e.
 
 
 def batteryless(reader):
     """The factory batteryless flag (1 = batteryless unit; SP LINK then hides the battery settings). None on error."""
     try:
         return reader.words(FACTORY_BATTERYLESS, 1)[0]
+    except Exception:
+        return None
+
+
+def factory_export_limit(reader):
+    """The factory export limit in kW (SP LINK reads it at connect), or None when blank / no cap (0xFFFF). Comes over
+    Select.Live too (it is in the connect handshake)."""
+    try:
+        w = reader.words(FACTORY_EXPORT_LIMIT, 1)[0]
+        return None if w == 0xffff else w / 10
     except Exception:
         return None
 
