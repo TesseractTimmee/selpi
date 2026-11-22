@@ -105,8 +105,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
       <label class="muted"><input type="checkbox" id="cfg-factory"> show hidden</label>
       <label class="muted"><input type="checkbox" id="cfg-rawview"> raw list</label>
       <span class="note" id="cfg-at"></span>
-      <button class="act" id="cfg-go">Read configuration</button>
-      <button class="act" id="cfg-refresh" title="Re-read from the SP PRO, ignoring the cached copy">↻</button>
+      <button class="act" id="cfg-go">Read from SP PRO</button>
     </div>
     <div id="cfg-msg"></div>
     <div id="cfg-tabs" class="subnav"></div>
@@ -408,8 +407,7 @@ setInterval(() => {   // a write needs a recent read (the server checks too)
   if (READ && READ.at && (Date.now() - READ.at) / 1000 > READ.read_max_age - 60)
     $('#cfg-at').innerHTML = '<span class="err">read is old: read again before writing</span>';
 }, 30000);
-$('#cfg-go').onclick = () => cfgRead();                 // show the config (cached if we have a recent read)
-$('#cfg-refresh').onclick = () => cfgRead(null, true);  // force a fresh read from the SP PRO
+$('#cfg-go').onclick = () => cfgRead(null, true);       // the button always re-reads from the SP PRO; the tab auto-loads the cached copy on open
 $('#cfg-filter').oninput = drawCfg; $('#cfg-factory').onchange = drawCfg; $('#cfg-rawview').onchange = drawCfg;
 $('#cfg-tabs').onclick = e => { const b = e.target.closest('button'); if (b) { curTab = b.dataset.t; curSub = null; history.replaceState(null, '', '#settings/' + curTab); drawCfg(); } };
 $('#cfg-subtabs').onclick = e => { const b = e.target.closest('button'); if (b) { curSub = b.dataset.st; drawCfg(); } };
