@@ -64,6 +64,17 @@ def layout():
         for n in meta:
             if settings.factory_only(n):
                 meta[n]['factory_only'] = True
+        # Service-settings block (SP LINK's installer-only Service tab): not in settings_layout.json (built from the
+        # config tabs), so give the decoded service settings their own read-only tab from settings_meta.
+        svc = [n for n, e in settings.META.items() if e.get('section') == 'Service']
+        if svc:
+            tabs.append({'id': 'tabServiceSettings', 'title': 'Service Settings', 'subtabs': [
+                {'id': None, 'title': None, 'groups': [
+                    {'id': 'gbServiceSettings', 'title': 'Service Settings (installer only, read-only)',
+                     'pos': None, 'outer': None, 'rows': [
+                        {'setting': n, 'control': settings.META[n].get('control'),
+                         'label': settings.META[n].get('label_override') or n,
+                         'range': settings.META[n].get('range_text'), 'pos': None, 'hidden': False} for n in svc]}]}]})
         _LAYOUT = {'tabs': tabs, 'settings': meta, 'hidden_tabs': ['Factory Mode Settings'],
                    'hidden_group_categories': ['legacy', 'unreleased', 'advanced'],
                    'visibility': settings.RULES.get('visibility', [])}
