@@ -351,6 +351,18 @@
    ],
    "message": "The AC-coupled inverter type fixes the frequency, so Nominal Frequency does not apply (SP LINK greys it at 50 Hz).",
    "note": "SP LINK EnableOrDisableFrequencyMode: NominalFrequency editable only for Disabled or a grid-interactive type (ABB/FIMER, Fronius, SelectSun), greyed for the Powador/External types. SP LINK also has a configVersion 40-42 + not-connected precondition that never applies to a live selpi read, so omitted."
+  },
+  {
+   "id": "shunt1_max_current_greyed_on_direct_soc",
+   "when": {
+    "setting": "Shunt1Name",
+    "eq": "Direct SoC Input"
+   },
+   "grey": [
+    "ScalingShunt1MaxCurrent"
+   ],
+   "message": "With Shunt 1 set to Direct SoC Input the shunt max current does not apply (SoC is read directly).",
+   "note": "SP LINK subAdjustSettingsForShunt1 disables ScalingShunt1MaxCurrent when Shunt1Name is Direct SoC Input (and relabels the max-voltage field to Voltage for 100% SoC)."
   }
  ],
  "not_yet": [
