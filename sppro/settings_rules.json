@@ -363,6 +363,53 @@
    ],
    "message": "With Shunt 1 set to Direct SoC Input the shunt max current does not apply (SoC is read directly).",
    "note": "SP LINK subAdjustSettingsForShunt1 disables ScalingShunt1MaxCurrent when Shunt1Name is Direct SoC Input (and relabels the max-voltage field to Voltage for 100% SoC)."
+  },
+  {
+   "id": "modbus_rtu_greyed",
+   "when": {
+    "any": [
+     {
+      "unit": "comms_card_software",
+      "lt": 425
+     },
+     {
+      "unit": "comms_card_revision",
+      "lt": 8
+     },
+     {
+      "unit": "config_version",
+      "lt": 43
+     },
+     {
+      "setting": "BatteryType",
+      "eq": "BMS - Murata"
+     }
+    ]
+   },
+   "grey": [
+    "ModbusRtuPort",
+    "ModbusRtuAddress"
+   ],
+   "message": "Modbus RTU is not available here (needs Comms Card software 425+/revision 8+, config version 43+, and is used by the Murata BMS).",
+   "note": "SP LINK EnableOrDisableModbus: disabled when configVersion<43 OR commsSw<425 OR commsRev<8 OR BatteryType is BMS - Murata."
+  },
+  {
+   "id": "batteryless_greys_battery_settings",
+   "when": {
+    "unit": "batteryless",
+    "eq": 1
+   },
+   "grey": [
+    "BatterySize",
+    "BatteryType",
+    "SoCMonitor",
+    "PrimaryMaxPower",
+    "EnableUserBatterylessMode",
+    "ApplicationType",
+    "GridFailBeeper"
+   ],
+   "message": "This unit is batteryless (factory), so the battery settings do not apply.",
+   "note": "SP LINK EnableOrDisableSettingsAndReadingsByBatterylessMode: when ActualSP_PROFactoryBatterylessEnabled==1 these are greyed and Battery Type shows Batteryless. Flag read from 0xa05c."
   }
  ],
  "not_yet": [
@@ -464,6 +511,33 @@
    "severity": "warning",
    "confidence": "high",
    "note": "SP LINK: KacoModeCommPort 1 / 3 use SP PRO port 1, 2 uses port 2, 4+ use port 2 without a comms card; the comms card accessory port (0xc087) reassigns port 1 on log out"
+  },
+  {
+   "id": "kaco_port_needs_comms_sw_500",
+   "when": "KacoModeCommPort in ('Fronius SnapIN Symo', 'Fronius GEN24 Primo')",
+   "require": "unit.comms_card_software >= 500",
+   "message": "This Kaco/AC-coupled inverter type needs Comms Card software version 500 or later.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "SP LINK subAdjustKacoModeComboBox removes it below 500."
+  },
+  {
+   "id": "kaco_port_needs_comms_sw_510",
+   "when": "KacoModeCommPort == 'Fronius GEN24 Symo'",
+   "require": "unit.comms_card_software >= 510",
+   "message": "This Kaco/AC-coupled inverter type needs Comms Card software version 510 or later.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "SP LINK subAdjustKacoModeComboBox removes it below 510."
+  },
+  {
+   "id": "kaco_port_needs_comms_sw_526",
+   "when": "KacoModeCommPort == 'Fronius Verto'",
+   "require": "unit.comms_card_software >= 526",
+   "message": "This Kaco/AC-coupled inverter type needs Comms Card software version 526 or later.",
+   "severity": "error",
+   "confidence": "high",
+   "note": "SP LINK subAdjustKacoModeComboBox removes it below 526."
   }
  ],
  "models": {
