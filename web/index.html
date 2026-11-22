@@ -65,6 +65,11 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
 .problems li { margin-left: 16px; }
 #cfg-write { position: sticky; bottom: 0; }
 #cfg-write .inner { padding: 12px; }
+/* loading indicator: a small spinner shown in a status line, and a dim over content being refreshed */
+.spin { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -2px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading { opacity: .45; transition: opacity .15s; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 2s; } }
 </style>
 </head>
 <body>
@@ -184,6 +189,10 @@ const SCREEN = {NowSubTab:'Now', TodaySubTab:'Today', TechnicalDataSubTab:'Techn
 let liveBusy = false;
 async function loadLive() {
   if (liveBusy) return; liveBusy = true;
+  const out = $('#live-out');
+  out.classList.add('loading');                                   // dim the stale table while the new one loads
+  if (!out.innerHTML.trim()) out.innerHTML = '<p class="note"><span class="spin"></span>reading…</p>';
+  $('#live-at').innerHTML = '<span class="spin"></span>reading…';
   try {
     const d = await api('api/live?screens=' + $('#screens').value);
     $('#banner').innerHTML = d.version_problems.length ? `<div class="msg">This unit differs from the verified memory map (${esc(d.version_problems.join(', '))}); values may be wrong.</div>` : '';
@@ -194,6 +203,7 @@ async function loadLive() {
         `<tr><td>${esc(r.label)}</td><td class="num">${esc(r.text)} <span class="muted">${esc(r.unit)}</span></td></tr>`).join('')}</table></div>`).join('') + '</div>';
     $('#live-at').textContent = 'read ' + d.at.slice(11);
   } catch (e) { $('#live-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  out.classList.remove('loading');
   liveBusy = false;
 }
 $('#live-go').onclick = loadLive; $('#screens').onchange = loadLive;
@@ -383,7 +393,7 @@ async function cfgRead(note, fresh) {
   cfgBusy = true;
   $('#cfg-go').disabled = true;
   const t0 = Date.now(), tick = () => { const s = Math.round((Date.now() - t0) / 1000);
-    $('#cfg-at').textContent = `reading the configuration… ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+    $('#cfg-at').innerHTML = `<span class="spin"></span>reading the configuration… ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
   clearInterval(cfgTimer);      // never leave a previous timer running
   tick(); cfgTimer = setInterval(tick, 1000);
   try {
@@ -473,6 +483,7 @@ async function waitJob(job, out, done) {
 
 // ---- backups
 async function loadBackups() {
+  if (!$('#bk-out').innerHTML.trim()) $('#bk-out').innerHTML = '<p class="note" style="padding:0 12px"><span class="spin"></span>loading…</p>';
   const [d, st] = await Promise.all([api('api/backups'), api('api/status')]);
   $('#bk-sched').textContent = st.backup_time ? `Daily backup at ${st.backup_time}.` : 'No daily backup scheduled.';
   const opts = d.backups.map(b => `<option value="${esc(b.name)}">${esc(b.name.replace('_', ' '))} (${esc(b.reason)})</option>`).join('');
@@ -516,6 +527,7 @@ $('#lg-go').onclick = async () => {
 
 // ---- status
 async function loadStatus() {
+  if (!$('#st-out').innerHTML.trim()) $('#st-out').innerHTML = '<p class="note" style="padding:12px"><span class="spin"></span>reading…</p>';
   const s = await api('api/status');
   const v = s.versions ? `settings ${s.versions.config_settings}/${s.versions.service_settings}, map ${s.versions.memory_map}, logs ${s.versions.event_log_format}/${s.versions.detailed_log_format}/${s.versions.daily_log_format}, comms card ${s.versions.comms_card_software}` : 'not read yet';
   $('#st-out').innerHTML = '<table>' + [
