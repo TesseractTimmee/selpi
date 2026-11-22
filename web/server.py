@@ -41,8 +41,8 @@ CLOCK_DEADLINE = 25       # the automatic ops must stay short so they can't bloc
 BACKUP_DEADLINE = 90
 LOG_DEADLINE = 120
 LIVE_DEADLINE = 25
-SETTINGS_DEADLINE = 40
-CONFIG_DEADLINE = 45
+SETTINGS_DEADLINE = 20
+CONFIG_DEADLINE = 20
 WRITE_DEADLINE = 60
 
 
@@ -390,8 +390,18 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(200, {'rows': rows, 'version_problems': SPPRO.version_problems,
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/settings':
-                memory = SPPRO.use('settings read', config.read_memory, wait=READ_WAIT, deadline=SETTINGS_DEADLINE, key='settings')
-                return self._send(200, {'settings': config.settings(memory),
+                memory = None if q.get('refresh') else config.cached_memory()   # serve the last read, no link hit
+                cached = memory is not None
+                if memory is None:
+                    try:
+                        memory = SPPRO.use('settings read', config.read_memory, wait=READ_WAIT,
+                                           deadline=SETTINGS_DEADLINE, key='settings')
+                    except Exception:
+                        memory = config.cached_memory()      # link stalled/busy: fall back to the last good read
+                        cached = True
+                        if memory is None:
+                            raise
+                return self._send(200, {'settings': config.settings(memory), 'cached': cached,
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/config/layout':
                 from web import settings_ui
@@ -402,7 +412,14 @@ class Handler(BaseHTTPRequestHandler):
                     hit = settings_ui.cached()           # reopen from cache: no link read over a slow Select.Live
                     if hit is not None:
                         return self._send(200, hit)
-                return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=READ_WAIT, deadline=CONFIG_DEADLINE, key='config'))
+                try:
+                    return self._send(200, SPPRO.use('configuration read', settings_ui.read, wait=READ_WAIT,
+                                                     deadline=CONFIG_DEADLINE, key='config'))
+                except Exception:
+                    hit = settings_ui.cached()           # link stalled/busy: fall back to the last good config read
+                    if hit is not None:
+                        return self._send(200, hit)
+                    raise
             if path == '/api/backups':
                 return self._send(200, {'backups': list_backups()})
             m = re.fullmatch(r'/api/backups/([0-9_-]+)/([A-Za-z0-9_.-]+)', path)

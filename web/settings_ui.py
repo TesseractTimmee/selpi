@@ -13,6 +13,7 @@ Writes need SELPI_ALLOW_CONFIG_WRITES=true (the app option allow_config_writes),
 (never stored), verified unit versions, and a read from this session no older than READ_MAX_AGE.
 """
 import json
+import logging
 import os
 import threading
 import time
@@ -23,6 +24,8 @@ from sppro import buttons, config, config_write, controls, live, settings
 READ_MAX_AGE = 30 * 60          # s: a write needs a read this recent
 READS = {}                      # read id -> {'at', 'memory', 'model', 'cells'}
 _LATEST = None                  # most recent read id: lets the page be reopened from cache without re-reading the link
+_LAST_MODEL = None              # model + versions are constant per unit; keep the last known so a read during a
+_LAST_VERSIONS = None           # flaky Select.Live spell can still render instead of failing on these small reads
 _LOCK = threading.Lock()
 _LAYOUT = None
 
@@ -118,15 +121,25 @@ def read(reader):
     """Read the whole configuration from the SP PRO (a heavy, many-block read) and render it. The snapshot is
     kept (READS[rid]) so a later check/write validates against exactly these bytes, and so the page can be
     reopened from cache (see cached()) without re-reading the link."""
-    memory = config.read_memory(reader)
-    model = settings.model(reader)
+    global _LATEST, _LAST_MODEL, _LAST_VERSIONS
+    memory = config.read_memory(reader)   # partial-tolerant; raises only on a cold stall with no earlier read
+    try:
+        _LAST_MODEL = settings.model(reader)
+    except Exception as e:
+        if _LAST_MODEL is None:           # never read the model and can't now: nothing to render
+            raise
+        logging.debug('config read: model unavailable, using last known (%s)', e)
+    model = _LAST_MODEL
     cells = settings.cells_for(model)
-    versions = live.versions(reader)
-    batteryless = live.batteryless(reader)
+    try:
+        _LAST_VERSIONS = live.versions(reader)
+    except Exception as e:
+        logging.debug('config read: versions unavailable, using last known (%s)', e)
+    versions = _LAST_VERSIONS or {}
+    batteryless = live.batteryless(reader)   # already returns None on failure
     rid = uuid.uuid4().hex[:12]
     snap = {'at': time.time(), 'memory': memory, 'model': model, 'cells': cells,
             'config_version': versions.get('config_settings'), 'versions': versions, 'batteryless': batteryless}
-    global _LATEST
     with _LOCK:
         _forget_old()
         READS[rid] = snap
@@ -145,8 +158,8 @@ def _render(rid, snap, from_cache):
             'unit': settings.unit_context(model, versions, batteryless),   # unit props for dependent-visibility
             'values': _values(raw, cells), 'problems': problems,
             'limits': limits(cells, shown.get('BatteryType'), shown),
-            'version_problems': live.version_problems(versions),
-            'map_mismatch': versions.get('memory_map') != live.VERIFIED['memory_map'],
+            'version_problems': live.version_problems(versions) if versions else [],
+            'map_mismatch': bool(versions) and versions.get('memory_map') != live.VERIFIED['memory_map'],
             'writes_allowed': writes_allowed(),
             'writes_available': writes_available(),
             'read_max_age': READ_MAX_AGE,

@@ -6,7 +6,8 @@ from ssl import SSLSocket
 # Select.Live answers in well under a second (login about 2.5 s). Without a timeout a lost reply blocks until
 # Select.Live drops the connection about a minute later; with one the request fails fast and sppro.reader.Reader
 # retries it on a fresh connection.
-DEFAULT_TIMEOUT = 15.0
+DEFAULT_TIMEOUT = 7.0   # Select.Live answers reads in <1 s and logs in ~2.5 s; 7 s covers that but fails a stalled
+                        # read fast (it used to block 15 s/attempt x 3 retries = a ~54 s hang on a config read)
 
 
 def create_ssl_connection(hostname, port: int, timeout: float = None) -> SSLSocket:

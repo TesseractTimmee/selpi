@@ -6,7 +6,9 @@ The layout (section bases and slot names, from SP LINK 15.40 / firmware 15.47) i
 Read-only: nothing is written to the SP PRO.
 """
 import json
+import logging
 import os
+import time
 
 from .reader import Reader
 
@@ -14,6 +16,8 @@ LAYOUT = json.load(open(os.path.join(os.path.dirname(__file__), 'layout.json')))
 
 # Blocks SP LINK reads and writes, in its order.
 BLOCKS = [(0xc000, 197), (0xc0e5, 18), (0xc100, 125), (0xc180, 60), (0xc800, 193)]
+
+_MEM_CACHE = None   # (timestamp, memory): the last good full read, served when a fresh read stalls
 
 
 def slots():
@@ -37,12 +41,33 @@ def service_slots():
 
 def read_memory(reader: Reader) -> dict:
     """Read all configuration and service blocks; returns {address: uint16}."""
-    memory = {}
+    global _MEM_CACHE
+    # Start from the last good read so a block we can't read this time keeps its previous value (over a flaky
+    # Select.Live link a single block can time out); a block that does come back overwrites it. A block that
+    # fails is skipped rather than aborting the whole read, so a partial stall still returns (mostly) fresh data.
+    memory = dict(_MEM_CACHE[1]) if _MEM_CACHE else {}
     blocks = BLOCKS + [(int(LAYOUT['service']['base'], 16), LAYOUT['service']['read_words'])]
+    fresh = 0
     for address, words in blocks:
-        for i, value in enumerate(reader.words(address, words)):
-            memory[address + i] = value
+        try:
+            for i, value in enumerate(reader.words(address, words)):
+                memory[address + i] = value
+            fresh += 1
+        except Exception as e:
+            logging.debug('config read 0x%x+%d skipped: %s', address, words, e)
+    if fresh == 0 and not _MEM_CACHE:
+        raise TimeoutError('the SP PRO link is busy or stalled and there is no earlier read to show')
+    if fresh:
+        _MEM_CACHE = (time.time(), memory)
     return memory
+
+
+def cached_memory(max_age: int = 1800):
+    """The last good read_memory result if within max_age seconds, else None. Lets the settings/config pages be
+    served from the last read instead of re-reading all the config blocks over a slow/stalled Select.Live link."""
+    if _MEM_CACHE and time.time() - _MEM_CACHE[0] < max_age:
+        return _MEM_CACHE[1]
+    return None
 
 
 def settings(memory: dict) -> list:
