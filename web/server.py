@@ -38,6 +38,8 @@ INGRESS_PEERS = {'172.30.32.2', '127.0.0.1', '::1'}
 # clock sync or backup — can hold the lock indefinitely and wedge polls/pages), and reads wait a bounded time
 # for the lock instead of failing the instant it is in use.
 READ_WAIT = 30            # s a read waits for the link before giving up (then Busy)
+BREAKER_FAILS = 3         # consecutive link failures before the circuit breaker trips (fail fast)
+BREAKER_COOLDOWN = 20     # s to serve Busy instantly between recovery probes while the breaker is tripped
 CLOCK_DEADLINE = 25       # the automatic ops must stay short so they can't block everything
 BACKUP_DEADLINE = 90
 LOG_DEADLINE = 120
@@ -77,6 +79,12 @@ class Inverter:
         self.keep_open = 0        # > 0 while an SP LINK proxy client is connected: keep the link up
         self._inflight = {}       # key -> _Flight: coalesces duplicate in-flight reads
         self._inflight_lock = threading.Lock()
+        # circuit breaker: once the link has failed repeatedly (e.g. Select.Live won't reconnect — the device
+        # session is still held server-side), serve Busy instantly instead of letting every caller burn the full
+        # ~25 s retry stack. One probe is let through per cooldown to test recovery; a success clears it.
+        self._fails = 0           # consecutive failures
+        self._backoff_until = 0.0 # monotonic; > now = breaker tripped
+        self._breaker_lock = threading.Lock()
 
     def use(self, what, fn, wait=False, check_versions=True, deadline=None, key=None):
         """Run fn(reader) holding the link lock. wait: False = fail at once if busy, True = wait as long as it
@@ -110,7 +118,41 @@ class Inverter:
                 self._inflight.pop(key, None)
             flight.event.set()
 
+    def _breaker_ok(self):
+        """False while the link is in a failure backoff (fail fast). When the cooldown has elapsed, let exactly
+        one caller through as a recovery probe and re-arm the backoff so the others keep failing fast until it
+        succeeds."""
+        with self._breaker_lock:
+            now = time.monotonic()
+            if self._backoff_until and now < self._backoff_until:
+                return False
+            if self._backoff_until:                        # cooldown elapsed: this caller probes; re-arm for others
+                self._backoff_until = now + BREAKER_COOLDOWN
+            return True
+
+    def _breaker_record(self, ok):
+        with self._breaker_lock:
+            if ok:
+                if self._fails >= BREAKER_FAILS:
+                    logging.info('SP PRO link recovered after %d failures', self._fails)
+                self._fails = 0
+                self._backoff_until = 0.0
+            else:
+                self._fails += 1
+                if self._fails == BREAKER_FAILS:           # just tripped: log it once
+                    logging.warning('SP PRO link down after %d failures (%s); backing off, probing every %ds',
+                                    self._fails, self.last_error, BREAKER_COOLDOWN)
+                if self._fails >= BREAKER_FAILS:
+                    self._backoff_until = time.monotonic() + BREAKER_COOLDOWN
+
+    @property
+    def link_down(self):
+        """True while the circuit breaker is tripped (repeated link/reconnect failures)."""
+        return self._fails >= BREAKER_FAILS
+
     def _run(self, what, fn, wait, check_versions, deadline):
+        if not self._breaker_ok():          # link is in a known-bad backoff: fail fast, don't burn the retry stack
+            raise Busy('busy: %s' % (self.last_error or 'link down, reconnecting'))
         got = self.lock.acquire(blocking=False) if wait is False else \
             self.lock.acquire() if wait is True else self.lock.acquire(timeout=wait)
         if not got:
@@ -125,11 +167,15 @@ class Inverter:
                 self.version_problems = live.version_problems(self.versions)
             out = fn(self.reader)
             self.last_ok, self.last_error = datetime.now(), None
+            self._breaker_record(True)
             return out
         except Exception as e:
             self.last_error = '%s: %s' % (what, e)
-            self.reader = None          # the connection is already dropped on failure; reconnect next time
+            if self.reader is not None:
+                self.reader.close()     # tear the dead link down cleanly (prompt FIN) so Select.Live frees the
+                self.reader = None      # device session fast, rather than leaving the socket to GC; reconnect next time
             # keep self.versions cached: the firmware version block is constant, so don't re-read it after a failure
+            self._breaker_record(False)
             raise
         finally:
             if self.reader is not None:

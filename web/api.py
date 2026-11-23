@@ -169,6 +169,7 @@ class Api:
                 pass
         last_ok = self.sppro.last_ok
         return {'last_ok': last_ok and last_ok.astimezone().isoformat(timespec='seconds'), 'last_error': self.sppro.last_error, 'busy': self.sppro.busy,
+                'link_down': getattr(self.sppro, 'link_down', False),   # circuit breaker tripped: repeated reconnect failures
                 'clock': self.clock, 'backup_running': self.backup_running,
                 'last_backup': last and {'name': last['name'], 'reason': last.get('reason'), 'at': at},
                 'proxy': self.proxy and dict(self.proxy.status, port=self.proxy.port)}
