@@ -2,8 +2,8 @@
 Variables: named SP PRO memory values.
 
 Two sources:
-- MAP below: the original hand-written variables (names, units W / Wh, conversions in memory/converter.py),
-  used by `selpi stat` / `http` and kept unchanged so their output stays the same.
+- MAP below: the original hand-written variables (names, units W / Wh, conversions in memory/converter.py);
+  kept as a reference mapping (live_names() / live_field()) and exercised by the tests.
 - SP LINK's own field table (sppro/live_fields.json, 276 fields, matching SP LINK 15.40):
   any name not in MAP is looked up there, by SP LINK field name (e.g. 'BattOutKWHTotalAcc') or selpi key
   (e.g. 'batt_out_kwh_total_acc'), and evaluated with SP LINK's formula (units as SP LINK shows them, e.g. kW,

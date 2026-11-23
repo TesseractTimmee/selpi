@@ -31,8 +31,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.environ.get('SELPI_DATA_DIR', os.path.join(HERE, '..', 'data'))
 BACKUPS = os.path.join(DATA, 'backups')
 LOG_FILES = {'events': 'EventData', 'detailed': 'DetailedData', 'daily': 'DailySummaryData'}
-# HA ingress connects from the Supervisor; anything else is refused unless SELPI_WEB_ALLOW_ANY=1
+# HA ingress connects from the Supervisor; anything else is refused unless SELPI_WEB_ALLOW_ANY=1,
+# and then only for the read-only endpoints in ANON_READ_PATHS (never writes/controls/config reads).
 INGRESS_PEERS = {'172.30.32.2', '127.0.0.1', '::1'}
+ANON_READ_PATHS = {'/api/live', '/api/status'}   # safe to expose to a non-ingress collector (e.g. Grafana)
 
 # One policy for the shared SP PRO link: every operation is time-bounded (so nothing — not even the automatic
 # clock sync or backup — can hold the lock indefinitely and wedge polls/pages), and reads wait a bounded time
@@ -410,8 +412,18 @@ class Handler(BaseHTTPRequestHandler):
         peer = self.client_address[0]
         if peer.startswith('::ffff:'):   # IPv4 peer on the dual-stack socket
             peer = peer[7:]
-        if os.environ.get('SELPI_WEB_ALLOW_ANY') == '1' or peer in INGRESS_PEERS:
+        if peer in INGRESS_PEERS:         # HA Supervisor / loopback: full access
             return True
+        if os.environ.get('SELPI_WEB_ALLOW_ANY') == '1':
+            # escape hatch for a non-ingress collector: read-only, and only the safe endpoints.
+            path = urlparse(self.path).path.rstrip('/') or '/'
+            if self.command == 'GET' and path in ANON_READ_PATHS:
+                return True
+            logging.warning('refused %s %s from %s (SELPI_WEB_ALLOW_ANY is read-only: GET %s)',
+                            self.command, path, peer, ', '.join(sorted(ANON_READ_PATHS)))
+            self._send(403, {'error': 'read-only: only GET %s are available to non-ingress clients'
+                             % ' / '.join(sorted(ANON_READ_PATHS))})
+            return False
         logging.warning('refused request from %s (not HA ingress)', peer)
         self._send(403, {'error': 'only via Home Assistant ingress'})
         return False
