@@ -224,6 +224,18 @@ def load_backup(name):
         return json.load(fh)
 
 
+def delete_backup(name):
+    if not re.fullmatch(r'[0-9_-]+', name or ''):
+        raise ValueError('bad backup name')
+    folder = os.path.join(BACKUPS, name)
+    if not os.path.isdir(folder):
+        raise ValueError('no such backup')
+    for f in os.listdir(folder):
+        os.remove(os.path.join(folder, f))
+    os.rmdir(folder)
+    logging.info('deleted backup %s', name)
+
+
 def diff(a, b):
     sa = {s['address']: s for s in load_backup(a)['settings']}
     sb = {s['address']: s for s in load_backup(b)['settings']}
@@ -485,6 +497,19 @@ class Handler(BaseHTTPRequestHandler):
                 keys = [k for k in body.get('logs', []) if k in logs.LOGS] or ['events', 'alerts']
                 job = logs_job(since, until, keys)
                 return self._send(200, {k: v for k, v in job.items() if k != 'file'})
+            return self._send(404, {'error': 'not found'})
+        except Exception as e:
+            return self._send(400, {'error': str(e)})
+
+    def do_DELETE(self):
+        if not self._allowed():
+            return
+        path = urlparse(self.path).path.rstrip('/')
+        try:
+            m = re.fullmatch(r'/api/backups/([0-9_-]+)', path)
+            if m:
+                delete_backup(m.group(1))
+                return self._send(200, {'deleted': m.group(1)})
             return self._send(404, {'error': 'not found'})
         except Exception as e:
             return self._send(400, {'error': str(e)})

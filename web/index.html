@@ -31,6 +31,8 @@ section { display: none; } section.on { display: block; }
 .bar .grow { flex: 1; }
 button.act { background: var(--accent); color: var(--accent-text); border: 0; border-radius: 6px; padding: 6px 14px; font: inherit; cursor: pointer; }
 button.act:disabled { opacity: .5; cursor: default; }
+button.link-btn { border: 0; background: transparent; color: var(--bad); padding: 0; font: inherit; font-size: 12px; cursor: pointer; }
+button.link-btn:hover { text-decoration: underline; }
 input, select { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0; margin-bottom: 16px; overflow: hidden; }
 .card h2 { font-size: 13px; margin: 0; padding: 10px 12px; border-bottom: 1px solid var(--line); color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
@@ -491,8 +493,15 @@ async function loadBackups() {
   if (d.backups.length > 1) $('#bk-a').selectedIndex = 1;
   $('#bk-out').innerHTML = d.backups.length ? '<table>' + d.backups.map(b =>
     `<tr><td>${esc(b.name.replace('_', ' '))}</td><td class="muted">${esc(b.reason)}</td><td>${b.files.map(f =>
-      `<a href="api/backups/${esc(b.name)}/${esc(f)}">${esc(f.split('_')[0])}</a>`).join(' · ')}</td></tr>`).join('') + '</table>'
+      `<a href="api/backups/${esc(b.name)}/${esc(f)}">${esc(f.split('_')[0])}</a>`).join(' · ')}</td>` +
+      `<td><button class="link-btn" title="Delete this backup" onclick="deleteBackup('${esc(b.name)}')">delete</button></td></tr>`).join('') + '</table>'
     : '<p class="note" style="padding:0 12px">No backups yet.</p>';
+}
+
+async function deleteBackup(name) {
+  if (!confirm(`Delete backup ${name.replace('_', ' ')}?\n\nThis permanently removes the stored backup files. It cannot be undone.`)) return;
+  try { await api('api/backups/' + encodeURIComponent(name), {method: 'DELETE'}); loadBackups(); }
+  catch (e) { alert('Could not delete the backup: ' + e.message); }
 }
 $('#bk-go').onclick = async () => {
   $('#bk-go').disabled = true;
