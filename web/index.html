@@ -115,7 +115,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
     <div id="cfg-msg"></div>
     <div id="cfg-tabs" class="subnav"></div>
     <div id="cfg-subtabs" class="subnav small"></div>
-    <div id="cfg-out"><p class="note">Read the configuration to see it as SP LINK shows it.</p></div>
+    <div id="cfg-out"><p class="note">Read the configuration to see it.</p></div>
     <div class="card" id="cfg-write" style="display:none"><div class="inner" id="cfg-write-in"></div></div>
   </section>
 
@@ -148,7 +148,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
         <span class="grow"></span>
         <button class="act" id="lg-go">Download</button>
       </div>
-      <p class="note">SP LINK-format CSVs in a zip. The SP PRO serves one download at a time; this waits if SP LINK or the installer is downloading.</p>
+      <p class="note">Selectronic-format CSVs in a zip. The SP PRO serves one download at a time; this waits if another download is in progress.</p>
       <div id="lg-out"></div>
     </div>
   </section>
@@ -240,11 +240,11 @@ function control(name) {
   const m = LAYOUT.settings[name] || {}, v = READ.values[name];
   if (!v) return '<span class="muted">not read</span>';
   const gr = greyedBy(name);
-  if (gr) return `<span class="muted">${esc(v.text)}</span> <span class="badge" title="${esc(gr.message || 'SP LINK greys this field here.')}">greyed</span>`;
-  if (m.installer_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind the installer code (AS4777 grid-protection / power quality). selpi shows it but keeps it read-only.">installer&nbsp;only &middot; read-only</span>`;
-  if (m.factory_only) return `<span>${esc(v.text)}</span> <span class="badge" title="SP LINK keeps this behind a factory passcode (Selectronic factory calibration). selpi shows it but keeps it read-only.">factory &middot; read-only</span>`;
+  if (gr) return `<span class="muted">${esc(v.text)}</span> <span class="badge" title="${esc(gr.message || 'Not applicable with the current settings.')}">not&nbsp;applicable</span>`;
+  if (m.installer_only) return `<span>${esc(v.text)}</span> <span class="badge" title="Requires the installer code (AS4777 grid-protection / power quality). Shown here but read-only.">requires&nbsp;installer&nbsp;code</span>`;
+  if (m.factory_only) return `<span>${esc(v.text)}</span> <span class="badge" title="Requires a factory passcode (Selectronic factory calibration). Shown here but read-only.">requires&nbsp;factory&nbsp;code</span>`;
   if (m.min_version && READ.config_version != null && READ.config_version < m.min_version)
-    return `<span class="muted">${esc(v.text)}</span> <span class="badge" title="This setting needs SP PRO config-settings version ${m.min_version}; this unit is ${READ.config_version}. SP LINK greys it out on older firmware.">needs&nbsp;firmware&nbsp;v${m.min_version}</span>`;
+    return `<span class="muted">${esc(v.text)}</span> <span class="badge" title="This setting needs SP PRO config-settings version ${m.min_version}; this unit is ${READ.config_version}. Read-only on older firmware.">needs&nbsp;firmware&nbsp;v${m.min_version}</span>`;
   if (!READ.writes_available) return `<span>${esc(v.text)}</span>`;   // read-only release: viewer only
   const ed = EDITS[name], dis = m.words === 2 ? ' disabled title="spans two words"' : '';
   if (m.kind === 'enum') {
@@ -288,7 +288,7 @@ function rowHtml(r, where) {
 }
 const CAT_LABEL = {legacy: 'legacy', unreleased: 'experimental', advanced: 'advanced'};
 const groupShown = g => !g.visibility || $('#cfg-factory').checked;
-const catBadge = g => g.visibility ? ` <span class="badge" title="SP LINK hides this group (${esc(g.visibility === 'legacy' ? 'legacy settings, off by default' : g.visibility === 'unreleased' ? 'unreleased / experimental feature' : 'advanced view')}).">${esc(CAT_LABEL[g.visibility] || g.visibility)}</span>` : '';
+const catBadge = g => g.visibility ? ` <span class="badge" title="Hidden group (${esc(g.visibility === 'legacy' ? 'legacy settings, off by default' : g.visibility === 'unreleased' ? 'unreleased / experimental feature' : 'advanced view')}).">${esc(CAT_LABEL[g.visibility] || g.visibility)}</span>` : '';
 function drawCfg() {
   if ($('#cfg-rawview').checked) return drawRaw();
   if (!LAYOUT || !READ) return;
@@ -342,11 +342,11 @@ function drawWrite() {
   const off = !READ.writes_allowed;
   $('#cfg-write-in').innerHTML = `<b>${names.length} change${names.length > 1 ? 's' : ''}</b><table class="cfg">${names.map(n =>
     `<tr><td>${esc(n)}</td><td>${esc(currentText(n))} → <b>${esc(CHECK && CHECK.changes[n] && CHECK.changes[n].text || EDITS[n])}</b></td></tr>`).join('')}</table>` +
-    (CHECK ? problemsHtml("SP LINK's checks on these changes", probs) || '<p class="ok">SP LINK\'s checks: no problems.</p>' : '<p class="note">checking…</p>') +
+    (CHECK ? problemsHtml("Checks on these changes", probs) || '<p class="ok">No problems.</p>' : '<p class="note">checking…</p>') +
     (off ? '<p class="note">Writing is off: turn on the app option <b>allow_config_writes</b> to write from here.</p>' : `
     <div class="bar">
-      ${errors.length ? '<label class="err"><input type="checkbox" id="cfg-ign"> write although SP LINK would refuse</label>' : ''}
-      <input type="password" id="cfg-pass" placeholder="SP LINK passcode" autocomplete="off" size="14">
+      ${errors.length ? '<label class="err"><input type="checkbox" id="cfg-ign"> write although this would normally be refused</label>' : ''}
+      <input type="password" id="cfg-pass" placeholder="passcode" autocomplete="off" size="14">
       <button class="act" id="cfg-do"${bad || !CHECK ? ' disabled' : ''}>Write to SP PRO</button>
       <button id="cfg-undo">Discard changes</button>
     </div><div id="cfg-res"></div>`) + (off ? '<button id="cfg-undo">Discard changes</button>' : '');
@@ -370,7 +370,7 @@ async function runCheck() {
 }
 async function doWrite() {
   const pass = $('#cfg-pass').value;
-  if (!pass) { $('#cfg-res').innerHTML = '<p class="err">Enter the SP LINK passcode.</p>'; return; }
+  if (!pass) { $('#cfg-res').innerHTML = '<p class="err">Enter the passcode.</p>'; return; }
   const list = Object.keys(EDITS).map(n => `${n}: ${currentText(n)} → ${CHECK.changes[n].text}`).join('\n');
   if (!confirm(`Write ${Object.keys(EDITS).length} setting(s) to the SP PRO?\n\n${list}\n\nA full backup is saved first; the configuration is read back afterwards.`)) return;
   const errors = [...CHECK.problems, ...CHECK.send_problems].filter(p => p.severity === 'error');
@@ -401,9 +401,9 @@ async function cfgRead(note, fresh) {
     READ = await api('api/config/read' + (fresh ? '?refresh=1' : ''));
     READ.at = READ.read_at ? new Date(READ.read_at * 1000) : new Date();   // the snapshot's read time (drives the write-age check)
     $('#cfg-at').textContent = `${READ.model || '?'} · ${READ.cached ? 'cached, ' : ''}read ${READ.at.toTimeString().slice(0, 8)}`;
-    const ro = !READ.writes_available ? `<div class="msg">Read-only release: selpi shows the configuration as SP LINK does but does not write it yet (configuration writes arrive after on-hardware validation).</div>` : '';
+    const ro = !READ.writes_available ? `<div class="msg">Configuration is read-only.</div>` : '';
     const vp = READ.version_problems.length ? `<div class="msg">This unit differs from the verified versions (${esc(READ.version_problems.join(', '))}). ${READ.map_mismatch ? 'Its memory map differs, so setting addresses may be wrong and writing is refused.' : 'The addresses still match (same memory map); firmware-specific settings are flagged, and writing works for the settings your firmware has.'}</div>` : '';
-    $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + ro + vp + problemsHtml("Already in the unit's configuration (SP LINK would flag these)", READ.problems);
+    $('#cfg-msg').innerHTML = (typeof note === 'string' ? note : '') + ro + vp + problemsHtml("Already in the unit's configuration (these would normally be flagged)", READ.problems);
     EDITS = {}; NOTES = {}; CHECK = null;
     drawCfg();
   } catch (e) { $('#cfg-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
@@ -447,10 +447,10 @@ function held(name, text) {
   let v = parseFloat(text);
   if (!isFinite(v)) { NOTES[name] = 'not a number: kept the current value'; return String(parseFloat(READ.values[name].value)); }
   let note = '';
-  if (mn != null && v < mn) { v = mn; note = `held to SP LINK's minimum ${mn}`; }
-  if (mx != null && v > mx) { v = mx; note = `held to SP LINK's maximum ${mx}`; }
+  if (mn != null && v < mn) { v = mn; note = `held to minimum ${mn}`; }
+  if (mx != null && v > mx) { v = mx; note = `held to maximum ${mx}`; }
   const r = Number(v.toFixed(dec));
-  if (!note && r !== v) note = `rounded to ${dec} decimal${dec === 1 ? '' : 's'}, as SP LINK does`;
+  if (!note && r !== v) note = `rounded to ${dec} decimal${dec === 1 ? '' : 's'}`;
   if (note) NOTES[name] = note;
   return String(r);
 }

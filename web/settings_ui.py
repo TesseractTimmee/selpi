@@ -228,7 +228,7 @@ def _evaluate(reader, s_sess, changes):
                 raise settings.SettingError('%s spans two words: not writable here' % name)
             ro = settings.read_only_reason(e['name'])
             if ro:
-                raise settings.SettingError('%s is %s; selpi keeps it read-only (change it in SP LINK)' % (e['name'], ro))
+                raise settings.SettingError('%s is %s; selpi keeps it read-only' % (e['name'], ro))
             if not settings.available(e['name'], s_sess['config_version']):
                 raise settings.SettingError('%s needs SP PRO config version %d; this unit is %s'
                                             % (e['name'], e['min_version'], s_sess['config_version']))
@@ -260,8 +260,7 @@ def check(reader, rid, changes):
 
 def write(reader, rid, changes, passcode, allow_out_of_range=False, ignore_rules=(), force=False, out_dir=None):
     if not config_write.writes_available():
-        raise PermissionError('configuration writes are not enabled in this release (not yet validated on a real '
-                              'SP PRO); this build is read-only')
+        raise PermissionError('configuration is read-only in this build')
     if not writes_allowed():
         raise PermissionError('configuration writes are off (app option allow_config_writes)')
     s = _session(rid)
@@ -272,15 +271,15 @@ def write(reader, rid, changes, passcode, allow_out_of_range=False, ignore_rules
     if not raw_changes:
         raise ValueError('nothing to write: every value is already set')
     if not allow_out_of_range and any(c.get('warnings') for c in result['changes'].values()):
-        raise ValueError("a value is outside SP LINK's range (confirm out-of-range values to write anyway)")
+        raise ValueError("a value is outside the allowed range (confirm out-of-range values to write anyway)")
     blocking = [p for p in result['problems'] + result['send_problems']
                 if p['severity'] == 'error' and p['id'] not in set(ignore_rules or ())]
     if blocking:
-        raise ValueError('SP LINK would refuse this: %s' % '; '.join(p['message'] for p in blocking))
+        raise ValueError('this write would normally be refused: %s' % '; '.join(p['message'] for p in blocking))
     try:
         passcode = int(str(passcode).strip())
     except ValueError:
-        raise ValueError('the SP LINK passcode is a number')
+        raise ValueError('the passcode is a number')
     r = config_write.write_settings(reader, raw_changes, passcode, out_dir=out_dir or 'config-writes', force=force,
                                     expected=s['memory'], log=lambda *_: None)
     global _LATEST
