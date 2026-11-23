@@ -239,6 +239,12 @@ class TestControls(unittest.TestCase):
     def test_info_lists_controls(self):
         self.assertEqual(self.api.info()['controls'], ['equalise', 'generator', 'output'])
 
+    def test_info_exposes_identity_for_the_device(self):
+        info = self.api.info()
+        self.assertIn('serial', info)            # unit serial for the HA device record
+        self.assertTrue(info['model'])           # real model number, or the 'SP PRO' fallback
+        self.assertEqual(info['manufacturer'], 'Selectronic')
+
     def test_generator_on_once(self):
         code, body = self.post('name=generator&state=on')
         self.assertEqual((code, body['pressed'], body['status']), (200, True, 'Not Running'))

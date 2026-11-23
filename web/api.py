@@ -89,17 +89,22 @@ class Api:
         self.fields = {f['key']: f for f in live.FIELDS}
         self.cache = {}           # key -> (value, read at)
         self.firmware = None
+        self.identity = {}        # static unit identity for the HA device (serial, model number), read once
         self.backup_running = False
         self.proxy = None         # web.proxy.Proxy when the SP LINK proxy is on
         self.last_control = {}    # control -> (time pressed, state code before the press)
 
     def info(self):
         conn = os.environ.get('SELPI_CONNECTION_TYPE', '')
-        if self.firmware is None:
+        if self.firmware is None or not self.identity:
+            # firmware + serial + model number for the HA device record; static, read once, in one round trip
+            # (each read is a cloud round trip on Select.Live). values() sets self.firmware from version_number.
             try:
-                self.values(['version_number'])
+                vals = self.values(['version_number', 'unit_serial_number', 'unit_model_number']).get('values', {})
+                self.identity = {'serial': vals.get('unit_serial_number'),
+                                 'model_number': vals.get('unit_model_number')}
             except Exception as e:
-                logging.debug('firmware read failed: %s', e)
+                logging.debug('identity read failed: %s', e)
         server = os.environ.get('SELPI_CONNECTION_SELECT_LIVE_SERVER', '')
         if conn == 'SelectLive':
             label = {'select.live2': 'Select.Live 2',
@@ -113,7 +118,8 @@ class Api:
                 'scan_interval': 60 if conn == 'SelectLive' else 10,
                 'stale_grace': settings.stale_grace(),   # add-on serves last-good this long after a failed poll
                 'cache_ttl': settings.cache_ttl(),        # config/settings page cache-first window
-                'model': 'SP PRO', 'manufacturer': 'Selectronic', 'firmware': self.firmware,
+                'model': self.identity.get('model_number') or 'SP PRO', 'manufacturer': 'Selectronic',
+                'serial': self.identity.get('serial'), 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
                 'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS)}
 
