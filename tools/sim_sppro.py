@@ -59,10 +59,34 @@ def capture_memory(path):
 BUTTON_REGS = {0xa232: 'generator', 0xa233: 'on', 0xa234: 'silence',
                0xa235: 'generator', 0xa236: 'on', 0xa237: 'silence'}   # port 1 / port 2 (see sppro/buttons.py)
 
+# --- Multiphase (Powerchain) emulation -------------------------------------------------------------------------
+# Decoded from the 16.11 SP LINK IL (SP_LINK.mMultiPhase, details/selpi.md "Multi-inverter ... STEP 1/2"). The gateway
+# control registers and the discovery sequence are known; the two byte-layouts marked GUESS are what driving SP LINK
+# against this sim is meant to confirm/correct - every read of them is logged so a stall tells us what was expected.
+MP_REG_STRUCTURE = 0xc0ed      # read (enFrom 0x1d): ActualSP_PROMultiPhaseStructure; gated on commsSW>=200 & memmap>=20
+MP_REG_SERIALLIST = 0xdf50     # read (enFrom 0x1c): the list of unit serials
+MP_REG_BUILDLIST = 0xdfdf      # write (enFrom 0x1b): "rebuild the serial list"; echo clears SP LINK's wait flag
+MP_REG_GATEWAY = 0xdfde        # write (enFrom 0x1f): re-point the link at a unit by index; echo => GatewayAnswered
+MP_ID_BROADCAST = 0x2ff        # "spray and pray": address all units
+MP_REG_SERIAL = 0xa05e         # unit serial number (uint32, 2 words) - read per unit after re-addressing
+MP_REG_COMMISSIONED = 0xca08   # per-unit commissioned-state code; SP LINK needs ==1 to accept + read the phase
+MP_REG_PHASEROLE = 0xc0ee      # per-unit phase + role (manager/worker); ==1 => "System Manager" (only the primary)
+MP_STRUCTURE_VALUE = 3         # 0xc0ed structure enum: 3 showed L1/L2/L3/Split (Three Phase + Split)
+MP_SERIAL_BASE = 10000001      # distinct FAKE serials (unit uid -> MP_SERIAL_BASE+uid); keeps the real one out
+# 0xdf50 layout (decoded from DataReceivedRoutine): 64 uint32 slots back-to-back, NO count word; serial[i] is the
+# uint32 at 0xdf50+2i; a zero uint32 = empty slot (SP LINK keeps the non-zero ones). SP LINK reads 128 words here.
+MP_SERIALLIST_SLOTS = 64
+MP_SERIALLIST_WORDS = MP_SERIALLIST_SLOTS * 2
+
 
 class SimProtocol:
-    def __init__(self, mem):
+    def __init__(self, mem, multiphase=0, capture_log=None):
         self.mem = dict(mem)
+        self.capture_log = capture_log        # file handle: every framed Q/W + reply is logged here (JSONL)
+        self.units = None                     # multiphase: {id: per-unit memory dict}; None = single unit
+        self.target = 0                       # the unit the link currently points at (set by a 0xdfde write)
+        if multiphase:
+            self._mp_setup(multiphase)
         self.writes = []
         self.presses = []           # (button, value) for each accepted front panel button press
         self._pressed = {}          # button register -> (value, time pressed)
@@ -75,6 +99,66 @@ class SimProtocol:
         self.mem.setdefault(0xca14, struct.pack('<H', 0xffff))
         self.mem.setdefault(0xa002, struct.pack('<H', 0))
         self._lock_open = False     # 0xca14 was written 0 (waiting for the passcode)
+
+    def _mp_setup(self, n):
+        """Fake an n-unit Powerchain: one memory per unit + the discovery registers SP LINK reads on connect."""
+        base = self.mem
+        self.serials = [MP_SERIAL_BASE + uid for uid in range(n)]   # distinct FAKE serials (real one stays out)
+        self.units = {}
+        for uid in range(n):
+            m = dict(base)
+            self._seed_u32(m, MP_REG_SERIAL, self.serials[uid])        # this unit's own serial at 0xa05e/0xa05f
+            # a fully-commissioned, assigned site: unit uid -> phase/role code uid+1 (1 L1 mgr, 2 L2 mgr, 3 L3 mgr,
+            # 4 Split mgr, 5 L1 worker, ...). This is the fixture for testing the ESP/integration per-unit reads;
+            # the earlier "factory-default secondaries" seeding (for the SP LINK drag-drop capture) is no longer
+            # needed now that step 2 is done.
+            m[MP_REG_COMMISSIONED] = struct.pack('<H', 1)
+            m[MP_REG_PHASEROLE] = struct.pack('<H', uid + 1)
+            m[0xa081] = struct.pack('<H', (50 + uid * 10) * 256)       # Battery SoC (0xa081, %/256) differs per unit
+            # discovery registers answered on every unit so they work before/after any re-address
+            m[MP_REG_STRUCTURE] = struct.pack('<H', MP_STRUCTURE_VALUE)
+            self._seed_serial_list(m, self.serials)
+            self.units[uid] = m
+        self.mem = self.units[0]
+        print('sim: multiphase mode, %d units, serials %s (structure 0x%x=%d)' %
+              (n, self.serials, MP_REG_STRUCTURE, MP_STRUCTURE_VALUE), flush=True)
+
+    @staticmethod
+    def _seed_u32(mem, addr, value):
+        b = struct.pack('<I', value)
+        mem[addr], mem[addr + 1] = b[:2], b[2:]
+
+    @staticmethod
+    def _seed_serial_list(mem, serials):
+        """0xdf50: 64 uint32 slots back-to-back (no count word); non-zero = a unit, zero = empty. Wipe then fill."""
+        for w in range(MP_SERIALLIST_WORDS):
+            mem[MP_REG_SERIALLIST + w] = b'\0\0'
+        for i, s in enumerate(serials):
+            SimProtocol._seed_u32(mem, MP_REG_SERIALLIST + i * 2, s)
+
+    def _set_target(self, value):
+        """A 0xdfde write re-points the link; route later reads to that unit's memory (broadcast keeps unit 0)."""
+        self.target = value
+        if self.units is not None:
+            self.mem = self.units.get(0 if value == MP_ID_BROADCAST else value, self.units[0])
+            print('sim: re-addressed to unit %s%s' %
+                  (value, ' (broadcast)' if value == MP_ID_BROADCAST else ''), flush=True)
+
+    def log_frame(self, direction, address, words, data=None, raw=None):
+        if not self.capture_log:
+            return
+        import time
+        rec = {'t': round(time.time(), 3), 'dir': direction, 'addr': '0x%x' % address, 'words': words,
+               'target': self.target}
+        if data is not None:
+            rec['data'] = data.hex()
+        if raw is not None:
+            rec['raw'] = raw.hex()
+        if self.units is not None and address in (MP_REG_STRUCTURE, MP_REG_SERIALLIST, MP_REG_BUILDLIST, MP_REG_GATEWAY):
+            rec['mp'] = {MP_REG_STRUCTURE: 'structure', MP_REG_SERIALLIST: 'seriallist',
+                         MP_REG_BUILDLIST: 'buildlist', MP_REG_GATEWAY: 'gateway'}[address]
+        self.capture_log.write(json.dumps(rec) + '\n')
+        self.capture_log.flush()
 
     GEN_REG, OUT_REG = 0xa096, 0xa07d   # Generator Status, Output Mode (see sppro/controls.py)
     TRANSITION = 2.0                     # simulated seconds for Starting -> Running, Stopping -> Not Running
@@ -143,6 +227,14 @@ class SimProtocol:
 
     def write(self, address, data):
         self.writes.append((address, data))
+        if address == MP_REG_GATEWAY and len(data) >= 2:     # re-point the link at a unit (echo => GatewayAnswered)
+            self._set_target(struct.unpack('<H', data[:2])[0])
+            self.mem[address] = data[:2]
+            return
+        if address == MP_REG_BUILDLIST:                      # "rebuild serial list"; echo clears SP LINK's wait flag
+            print('sim: serial-list rebuild requested', flush=True)
+            self.mem[address] = data[:2] if len(data) >= 2 else b'\0\0'
+            return
         if address in BUTTON_REGS and len(data) >= 2:
             import time
             self._buttons()
@@ -163,7 +255,12 @@ class SimProtocol:
                 if v == 0xffff:
                     self.mem[0xa002] = struct.pack('<H', 0)
             elif address == 0xa001 and v != 0:
-                self.mem[0xa002] = struct.pack('<H', 1 if self._lock_open and v == self.passcode else 0)
+                # Unlock on the passcode. The config page opens 0xca14=0 first (_lock_open); SP LINK's multiphase
+                # Save writes the passcode straight to 0xa001 with no 0xca14 step, so also unlock when it matches.
+                ok = v == self.passcode or (self._lock_open and v == self.passcode)
+                self.mem[0xa002] = struct.pack('<H', 1 if ok else 0)
+                if ok:
+                    print('sim: config unlocked (passcode 0x%04x)' % v, flush=True)
             elif address == 0xa002:
                 self.mem[0xa002] = struct.pack('<H', v)
             self.mem[address] = data[:2]
@@ -250,13 +347,16 @@ def serve(sim, port, password=None):
                 if len(buf) < need:
                     break
                 req, buf = buf[:need], buf[need:]
-                # drift: SoC (0xa081, %/256) and battery power (0xa02f, int32) change over time
+                # drift: SoC (0xa081, %/256) and battery power (0xa02f, int32) change over time; in multiphase each
+                # unit gets a per-target offset so the phases read differently (so system sum/avg are meaningful)
                 k = int(time.time() - t0)
-                sim.mem[0xa081] = struct.pack('<H', (60 * 256 + (k * 16) % (30 * 256)) & 0xffff)
-                p = struct.pack('<i', -2000 + (k * 37) % 4000)
+                off = sim.target if sim.units is not None and sim.target != MP_ID_BROADCAST else 0
+                sim.mem[0xa081] = struct.pack('<H', (60 * 256 + (k * 16) % (30 * 256) + off * 5 * 256) & 0xffff)
+                p = struct.pack('<i', -2000 + (k * 37) % 4000 + off * 1000)
                 sim.mem[0xa02f], sim.mem[0xa030] = p[:2], p[2:]
                 if t == 'W':
                     data = req[8:8 + 2 * n]
+                    sim.log_frame('c2s', a, n, data=data)
                     if a == 0x1f0000 and password is not None:
                         md5 = hashlib.md5(challenge + password.encode().ljust(32)).digest()
                         want = b''.join(md5[i + 1:i + 2] + md5[i:i + 1] for i in range(0, 16, 2))
@@ -267,11 +367,15 @@ def serve(sim, port, password=None):
                         sim.write(a, data)
                     n_w += 1
                     conn.sendall(req)
+                    sim.log_frame('s2c', a, n, raw=req)
                 else:
+                    sim.log_frame('c2s', a, n)
                     if not logged_in and a not in range(0x1f0000, 0x1f0011):
                         continue                    # silent, like the real unit before login
                     body = req[:8] + sim.query(type('R', (), {'address': a, 'words': n})())
-                    conn.sendall(body + crc16(body))
+                    reply = body + crc16(body)
+                    conn.sendall(reply)
+                    sim.log_frame('s2c', a, n, raw=reply)
                     n_q += 1
         conn.close()
         print('sim: client gone (%d queries, %d writes)' % (n_q, n_w), flush=True)
@@ -285,8 +389,12 @@ def main():
     ap.add_argument('capture')
     ap.add_argument('what', choices=['config', 'logs', 'serve'])
     ap.add_argument('rest', nargs='*')
+    ap.add_argument('--multiphase', type=int, default=0, metavar='N',
+                    help='serve: fake an N-unit Powerchain (discovery registers + per-unit memories)')
+    ap.add_argument('--capture-log', metavar='FILE', help='serve: log every framed Q/W + reply to FILE (JSONL)')
     a = ap.parse_args()
-    sim = SimProtocol(capture_memory(a.capture))
+    log = open(a.capture_log, 'a') if a.capture_log else None
+    sim = SimProtocol(capture_memory(a.capture), multiphase=a.multiphase, capture_log=log)
     if a.what == 'serve':
         serve(sim, int(a.rest[0]), a.rest[1] if len(a.rest) > 1 else None)
         return

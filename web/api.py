@@ -32,7 +32,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 import settings
-from sppro import field_meta, live
+from sppro import field_meta, live, multiphase
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULTS = json.load(open(os.path.join(HERE, '..', 'sppro', 'default_fields.json'), encoding='utf-8'))
@@ -73,7 +73,8 @@ def catalog():
             name = '%s (%s)' % (name, k)
         names.add(_slug(name))
         entry = {'key': k, 'name': name, 'unit': f['unit'], 'kind': f['kind'], 'screen': f['screen'],
-                 'default': k in DEFAULTS, 'note': f.get('note', '')}
+                 'default': k in DEFAULTS, 'note': f.get('note', ''),
+                 'aggregatable': multiphase.aggregation(f['unit'], f['key']) is not None}   # rolls up to the System device
         entry.update(field_meta.hints(f))
         if f['kind'] == 'enum':
             entry['options'] = sorted(set(tables.get(f['table'], {}).values()))
@@ -90,6 +91,8 @@ class Api:
         self.cache = {}           # key -> (value, read at)
         self.firmware = None
         self.identity = {}        # static unit identity for the HA device (serial, model number), read once
+        self.mp_units = []        # cached Powerchain unit descriptors (from sppro.unit_list); [] = single/unknown
+        self.multi = False        # more than one unit on the bus
         self.backup_running = False
         self.proxy = None         # web.proxy.Proxy when the SP LINK proxy is on
         self.last_control = {}    # control -> (time pressed, state code before the press)
@@ -113,6 +116,7 @@ class Api:
             label = 'ESP (proxy)'        # the add-on's TCP link is the ESPHome sppro proxy
         else:
             label = conn or 'Unknown'
+        units = self.units()             # discover + cache the Powerchain units (sets self.multi)
         return {'id': self.install_id, 'connection': conn, 'connection_label': label,
                 'clock_sync': os.environ.get('SELPI_CLOCK_SYNC', '').lower() == 'true',
                 'scan_interval': 60 if conn == 'SelectLive' else 10,
@@ -121,26 +125,77 @@ class Api:
                 'model': self.identity.get('model_number') or 'SP PRO', 'manufacturer': 'Selectronic',
                 'serial': self.identity.get('serial'), 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
+                'units': units, 'multi': self.multi,          # units first: discovery sets self.multi
                 'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS)}
 
-    def values(self, keys):
+    def units(self):
+        """The Powerchain units for the integration to build (sub-)devices from; a single inverter yields one unit.
+        Discovery is cached on the shared link (sppro.unit_list); a slow link keeps the last-known list. Updates
+        self.mp_units / self.multi, which the per-unit reads use (so the Api owns its own multiphase view)."""
+        try:
+            self.mp_units = self.sppro.unit_list(wait=VALUE_WAIT, deadline=POLL_DEADLINE)
+            self.multi = len(self.mp_units) > 1
+        except Exception as e:
+            logging.debug('unit discovery failed: %s', e)
+        out = [{'index': u['index'], 'serial': u['serial'], 'phase': u['phase'], 'role': u['role'],
+                'label': u['label'], 'model': u['model']} for u in self.mp_units]
+        if self.multi:                 # a synthetic 'system' unit: the add-on computes the whole-system totals
+            out.append({'index': 'system', 'serial': None, 'phase': None, 'role': 'system',
+                        'label': 'System', 'model': None})
+        return out
+
+    def _unit(self, index):
+        """Resolve a unit index to its descriptor (None = the primary / single / the 'system' pseudo-unit)."""
+        if index in (None, '', 'system'):
+            return None
+        try:
+            index = int(index)
+        except (TypeError, ValueError):
+            return None
+        for u in self.mp_units:
+            if u['index'] == index:
+                return u
+        return None
+
+    def values(self, keys, unit=None):
+        """Current values. `unit` (a Powerchain unit index) re-addresses the link to that inverter first and caches
+        its values separately; None = the primary / single inverter (unchanged behaviour)."""
         asked = {live.KEY_ALIASES.get(k, k): k for k in keys}   # old (renamed) keys still answered
         keys = [k for k in asked if k in self.fields]
         fields = [self.fields[k] for k in keys]
+        if not self.mp_units:     # discovery hasn't run in this process yet (e.g. after an add-on restart): populate
+            self.units()          # mp_units/multi lazily, so per-unit and 'system' reads work without a /units call
+        u = self._unit(unit)
+        if u is None and self.multi:         # multi: 'no unit' = the primary (L1 manager); always address a known unit
+            u = (self.mp_units or [None])[0]
+        ck = lambda k: (unit, k)         # cache is namespaced per unit (unit=None for the primary / single)
         grace = settings.stale_grace()   # how long a last-good value may be served after a failed poll (0 = never)
         stale = False
         fresh_at = None                  # the timestamp written to the cache this cycle (fresh reads keep it exactly)
         try:
             def read(r):
+                if unit == 'system':
+                    # whole-system totals: read every unit (coherent snapshot under the one lock) and combine
+                    # per field (sum power/energy/current, avg voltage/SoC/freq/temp); see sppro.multiphase.
+                    cols = {f['key']: [] for f in fields}
+                    for mu in self.mp_units:
+                        multiphase.change_destination(r, mu['index'], mu['serial'])
+                        mem = live.read(r, fields)
+                        for f in fields:
+                            cols[f['key']].append(live.evaluate(f, mem)[0])
+                    return {f['key']: (multiphase.aggregate(f['unit'], cols[f['key']], f['key']), None) for f in fields}
+                if u is not None and self.multi:
+                    multiphase.change_destination(r, u['index'], u['serial'])   # verify serial, then read this unit
                 mem = live.read(r, fields)
                 return {f['key']: live.evaluate(f, mem) for f in fields}
-            got = self.sppro.use('HA poll', read, wait=VALUE_WAIT, deadline=POLL_DEADLINE,
-                                  key='poll:' + ','.join(sorted(keys))) if fields else {}
+            got = self.sppro.use('HA poll%s' % ('' if unit is None else ' u%s' % unit), read,
+                                  wait=VALUE_WAIT, deadline=POLL_DEADLINE,
+                                  key='poll:%s:' % unit + ','.join(sorted(keys))) if fields else {}
             fresh_at = time.time()
             for k, (v, text) in got.items():
                 if v is not None:    # a skipped block returns None: keep the last good cache, don't overwrite it
-                    self.cache[k] = (text if self.fields[k]['kind'] == 'enum' else v, fresh_at)
-            if got.get('version_number', (None,))[0] is not None:
+                    self.cache[ck(k)] = (text if self.fields[k]['kind'] == 'enum' else v, fresh_at)
+            if unit is None and got.get('version_number', (None,))[0] is not None:
                 self.firmware = got['version_number'][1]
             if any(v is None for v, _ in got.values()):   # a partial poll (some blocks skipped): mark it stale
                 stale = True
@@ -149,12 +204,12 @@ class Api:
             # grace 0 (a reliable local link) serve nothing — let the poll fail so entities go 'unknown' at once.
             stale = True
             now = time.time()
-            if not any(k in self.cache and now - self.cache[k][1] <= grace for k in keys):
+            if not any(ck(k) in self.cache and now - self.cache[ck(k)][1] <= grace for k in keys):
                 raise
         now = time.time()
         # values read this cycle are always returned; anything older only within the stale-grace window
-        out = {asked[k]: self.cache[k][0] for k in keys
-               if k in self.cache and (self.cache[k][1] == fresh_at or now - self.cache[k][1] <= grace)}
+        out = {asked[k]: self.cache[ck(k)][0] for k in keys
+               if ck(k) in self.cache and (self.cache[ck(k)][1] == fresh_at or now - self.cache[ck(k)][1] <= grace)}
         return {'at': datetime.now().isoformat(timespec='seconds'), 'stale': stale, 'values': out,
                 'version_problems': self.sppro.version_problems}
 
@@ -291,9 +346,11 @@ def serve(api, port, token, host='::'):
                     return self._send(200, api.info())
                 if method == 'GET' and path == '/api/v1/fields':
                     return self._send(200, {'fields': api.catalog})
+                if method == 'GET' and path == '/api/v1/units':
+                    return self._send(200, {'units': api.units(), 'multi': api.multi})
                 if method == 'GET' and path == '/api/v1/values':
                     keys = [k for k in q.get('keys', '').split(',') if k]
-                    return self._send(200, api.values(keys))
+                    return self._send(200, api.values(keys, q.get('unit')))
                 if method == 'GET' and path == '/api/v1/diagnostics':
                     return self._send(200, api.diagnostics())
                 if method == 'POST' and path == '/api/v1/backup':

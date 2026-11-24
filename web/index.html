@@ -91,6 +91,7 @@ td.addr, .muted { color: var(--muted); font-size: 12px; }
 
   <section id="live" class="on">
     <div class="bar">
+      <select id="unit" style="display:none"></select>
       <select id="screens">
         <option value="now,today">Now + Today</option>
         <option value="tech">Technical</option>
@@ -196,7 +197,8 @@ async function loadLive() {
   if (!out.innerHTML.trim()) out.innerHTML = '<p class="note"><span class="spin"></span>reading…</p>';
   $('#live-at').innerHTML = '<span class="spin"></span>reading…';
   try {
-    const d = await api('api/live?screens=' + $('#screens').value);
+    const u = $('#unit').value;
+    const d = await api('api/live?screens=' + $('#screens').value + (u ? '&unit=' + encodeURIComponent(u) : ''));
     $('#banner').innerHTML = d.version_problems.length ? `<div class="msg">This unit differs from the verified memory map (${esc(d.version_problems.join(', '))}); values may be wrong.</div>` : '';
     const groups = {};
     d.rows.forEach(r => (groups[r.screen] = groups[r.screen] || []).push(r));
@@ -208,6 +210,19 @@ async function loadLive() {
   out.classList.remove('loading');
   liveBusy = false;
 }
+async function loadUnits() {
+  // a Powerchain shows a unit picker (L1 Manager, L1 Worker, …); a single inverter hides it
+  try {
+    const d = await api('api/units');
+    const real = (d.units || []).filter(u => u.index !== 'system');
+    if (!d.multi || real.length < 2) return;
+    // System (the whole-site roll-up) first as the overview, then each inverter
+    const opts = (d.units || []).filter(u => u.index === 'system').concat(real);
+    $('#unit').innerHTML = opts.map(u => `<option value="${u.index}">${esc(u.label || ('Unit ' + u.index))}</option>`).join('');
+    $('#unit').style.display = '';
+  } catch (e) { /* single inverter or older add-on: leave the picker hidden */ }
+}
+$('#unit').onchange = loadLive;
 $('#live-go').onclick = loadLive; $('#screens').onchange = loadLive;
 setInterval(() => { if ($('#auto').checked && $('#live').classList.contains('on') && !document.hidden) loadLive(); }, 15000);
 
@@ -550,6 +565,7 @@ async function loadStatus() {
   $('#state').textContent = s.busy ? s.busy + '…' : (s.last_error ? 'error' : '');
 }
 { const [t, sub] = location.hash.slice(1).split('/'); if (sub) curTab = sub; if (t && t !== 'live' && document.getElementById(t)) show(t); }
+loadUnits();
 loadLive();
 </script>
 </body>

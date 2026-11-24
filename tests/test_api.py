@@ -98,7 +98,7 @@ class TestValues(unittest.TestCase):
         # a flaky Select.Live link where one block (the Now screen, 0xa058) times out must not fail the whole
         # poll: the field on it keeps its last good value (served stale) instead of being wiped to None.
         self.api.values(['batt_soc_percent'])          # first poll populates the cache
-        self.assertIn('batt_soc_percent', self.api.cache)
+        self.assertIn((None, 'batt_soc_percent'), self.api.cache)   # cache is keyed (unit, field); None = primary
         good = self.inv.words
         def flaky(base, n):
             if base == 0xa058:

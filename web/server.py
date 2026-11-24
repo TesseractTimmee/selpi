@@ -24,7 +24,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 import settings
-from sppro import clock, config, config_write, live, logs
+from sppro import clock, config, config_write, live, logs, multiphase
 from sppro.reader import Reader
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -87,6 +87,8 @@ class Inverter:
         self._fails = 0           # consecutive failures
         self._backoff_until = 0.0 # monotonic; > now = breaker tripped
         self._breaker_lock = threading.Lock()
+        self.units = None         # cached multiphase unit list (sppro.multiphase.detect); None until discovered
+        self.multi = False        # more than one unit on the bus
 
     def use(self, what, fn, wait=False, check_versions=True, deadline=None, key=None):
         """Run fn(reader) holding the link lock. wait: False = fail at once if busy, True = wait as long as it
@@ -151,6 +153,20 @@ class Inverter:
     def link_down(self):
         """True while the circuit breaker is tripped (repeated link/reconnect failures)."""
         return self._fails >= BREAKER_FAILS
+
+    def unit_list(self, refresh=False, wait=False, deadline=None):
+        """Discover and cache the units on the bus (>= 1; single inverter = one). Re-reads on refresh.
+        Sets self.multi. detect() re-addresses over the link, so it runs under the lock like any read."""
+        if self.units is not None and not refresh:
+            return self.units
+        us = self.use('discover units', multiphase.detect, wait=wait, deadline=deadline, key='units')
+        self.units = us
+        self.multi = len(us) > 1
+        return us
+
+    def read_unit(self, unit, fn, **kw):
+        """Run read fn(reader) against a specific unit (re-addressing first when multi). kw -> use()."""
+        return self.use(kw.pop('what', 'unit read'), multiphase.for_unit(unit, self.multi, fn), **kw)
 
     def _run(self, what, fn, wait, check_versions, deadline):
         if not self._breaker_ok():          # link is in a known-bad backoff: fail fast, don't burn the retry stack
@@ -455,11 +471,51 @@ class Handler(BaseHTTPRequestHandler):
                     'clock_sync': os.environ.get('SELPI_CLOCK_SYNC', '').lower() == 'true', 'clock': CLOCK,
                     'cache_ttl': settings.cache_ttl(), 'stale_grace': settings.stale_grace(),
                     'jobs': [{k: v for k, v in j.items() if k != 'file'} for j in JOBS.values()][-5:]})
+            if path == '/api/units':
+                units = list(SPPRO.unit_list(wait=READ_WAIT, deadline=LIVE_DEADLINE))
+                if SPPRO.multi:   # a synthetic whole-site unit; its values are the roll-up the add-on computes
+                    units = units + [{'index': 'system', 'label': 'System', 'serial': None,
+                                      'phase': None, 'role': 'system'}]
+                return self._send(200, {'multi': SPPRO.multi, 'units': units})
             if path == '/api/live':
                 screens = [s for s in q.get('screens', 'now,today').split(',') if s in live.SCREENS] or None
-                rows = SPPRO.use('live read', lambda r: live.snapshot(r, screens), wait=READ_WAIT, deadline=LIVE_DEADLINE,
-                                 key='live:' + ','.join(screens or []))
-                return self._send(200, {'rows': rows, 'version_problems': SPPRO.version_problems,
+                unit = q.get('unit')
+                if unit == 'system' and SPPRO.multi:
+                    # whole-site totals: read every unit under the one lock (coherent snapshot), then combine each
+                    # field (sum power/energy/current, avg voltage/SoC/freq); non-aggregatable fields are dropped.
+                    def read_system(r):
+                        cols, template = {}, None
+                        for mu in SPPRO.unit_list():
+                            multiphase.change_destination(r, mu['index'], mu['serial'])
+                            rows = live.snapshot(r, screens)
+                            if template is None:
+                                template = rows
+                            for row in rows:
+                                cols.setdefault(row['key'], []).append(row['value'])
+                        out = []
+                        for row in (template or []):
+                            agg = multiphase.aggregate(row['unit'], cols.get(row['key'], []), row['key'])
+                            if agg is None:
+                                continue
+                            text = ('%.3f' % agg).rstrip('0').rstrip('.') if isinstance(agg, float) else str(agg)
+                            out.append({**row, 'value': agg, 'text': text})
+                        return out
+                    rows = SPPRO.use('live read system', read_system, wait=READ_WAIT, deadline=LIVE_DEADLINE,
+                                     key='live:system:' + ','.join(screens or []))
+                    return self._send(200, {'rows': rows, 'unit': 'system',
+                                            'version_problems': SPPRO.version_problems,
+                                            'at': datetime.now().isoformat(timespec='seconds')})
+                u = None
+                if unit not in (None, '', 'system'):
+                    try:
+                        ui = int(unit)
+                    except ValueError:
+                        ui = None
+                    u = next((x for x in (SPPRO.units or []) if x['index'] == ui), None)
+                read = multiphase.for_unit(u, SPPRO.multi, lambda r: live.snapshot(r, screens))
+                rows = SPPRO.use('live read', read, wait=READ_WAIT, deadline=LIVE_DEADLINE,
+                                 key='live:%s:' % unit + ','.join(screens or []))
+                return self._send(200, {'rows': rows, 'unit': unit, 'version_problems': SPPRO.version_problems,
                                         'at': datetime.now().isoformat(timespec='seconds')})
             if path == '/api/settings':
                 ttl = settings.cache_ttl()   # 0 (local link) = always read fresh; >0 (Select.Live) = serve a recent read
