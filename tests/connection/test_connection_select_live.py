@@ -12,6 +12,7 @@ class CreateTest(TestCase):
         settings_module = create_autospec(settings)
         settings_module.getb.side_effect = (lambda key:
             {
+                b'CONNECTION_SELECT_LIVE_SERVER': b'select.live',
                 b'CONNECTION_SELECT_LIVE_USERNAME': b'foo',
                 b'CONNECTION_SELECT_LIVE_PASSWORD': b'bar',
                 b'CONNECTION_SELECT_LIVE_DEVICE': b'1234567',
@@ -47,6 +48,7 @@ class CreateTest(TestCase):
         settings_module = create_autospec(settings)
         settings_module.getb.side_effect = (lambda key:
             {
+                b'CONNECTION_SELECT_LIVE_SERVER': b'select.live',
                 b'CONNECTION_SELECT_LIVE_USERNAME': b'foo',
                 b'CONNECTION_SELECT_LIVE_PASSWORD': b'bar',
                 b'CONNECTION_SELECT_LIVE_DEVICE': b'987654',
@@ -90,6 +92,7 @@ class CreateTest(TestCase):
         settings_module = create_autospec(settings)
         settings_module.getb.side_effect = (lambda key:
             {
+                b'CONNECTION_SELECT_LIVE_SERVER': b'select.live',
                 b'CONNECTION_SELECT_LIVE_USERNAME': b'foo',
                 b'CONNECTION_SELECT_LIVE_PASSWORD': b'bar',
             }[key]
@@ -122,6 +125,7 @@ class CreateTest(TestCase):
         settings_module = create_autospec(settings)
         settings_module.getb.side_effect = (lambda key:
             {
+                b'CONNECTION_SELECT_LIVE_SERVER': b'select.live',
                 b'CONNECTION_SELECT_LIVE_USERNAME': b'foo',
                 b'CONNECTION_SELECT_LIVE_PASSWORD': b'bar',
             }[key]
@@ -159,6 +163,7 @@ class CreateTest(TestCase):
         settings_module = create_autospec(settings)
         settings_module.getb.side_effect = (lambda key:
             {
+                b'CONNECTION_SELECT_LIVE_SERVER': b'select.live',
                 b'CONNECTION_SELECT_LIVE_USERNAME': b'foo',
                 b'CONNECTION_SELECT_LIVE_PASSWORD': b'bar',
                 b'CONNECTION_SELECT_LIVE_DEVICE': b'1234567',
