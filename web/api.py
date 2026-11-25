@@ -63,7 +63,7 @@ def catalog():
         if k in field_meta.HA_DROP:
             continue
         f = by_key[k]
-        sig = (tuple(f['words']), f['formula'])
+        sig = (tuple(f['words']), f['formula'], f.get('table'), f['kind'])   # model number vs rating share reg+formula, differ by table
         if sig in seen:
             continue
         seen.add(sig)
@@ -74,7 +74,8 @@ def catalog():
             name = '%s (%s)' % (name, k)
         names.add(_slug(name))
         entry = {'key': k, 'name': name, 'unit': f['unit'], 'kind': f['kind'], 'screen': f['screen'],
-                 'default': k in DEFAULTS, 'note': f.get('note', ''),
+                 'default': k in DEFAULTS, 'note': f.get('note', ''), 'feature': f.get('feature'),
+                 'needs_map_version': f.get('needs_map_version'),
                  'aggregatable': multiphase.aggregation(f['unit'], f['key']) is not None}   # rolls up to the System device
         entry.update(field_meta.hints(f))
         if f['kind'] == 'enum':
@@ -92,6 +93,8 @@ class Api:
         self.cache = {}           # key -> (value, read at)
         self.firmware = None
         self.identity = {}        # static unit identity for the HA device (serial, model number), read once
+        self.features = None      # feature set present on this unit (bms, ac_solar, battery) - gates feature-tagged fields
+        self.map_version = None   # unit's memory-map version - gates fields with a needs_map_version
         self.mp_units = []        # cached Powerchain unit descriptors (from sppro.unit_list); [] = single/unknown
         self.multi = False        # more than one unit on the bus
         self.backup_running = False
@@ -104,11 +107,21 @@ class Api:
             # firmware + serial + model number for the HA device record; static, read once, in one round trip
             # (each read is a cloud round trip on Select.Live). values() sets self.firmware from version_number.
             try:
-                vals = self.values(['version_number', 'unit_serial_number', 'unit_model_number']).get('values', {})
+                vals = self.values(['version_number', 'unit_serial_number', 'unit_model_number',
+                                    'unit_model_ratings', 'unit_rev_number']).get('values', {})
                 self.identity = {'serial': vals.get('unit_serial_number'),
-                                 'model_number': vals.get('unit_model_number')}
+                                 'model_number': vals.get('unit_model_number'),
+                                 'model_ratings': vals.get('unit_model_ratings'),   # e.g. "48V DC, 7.5kW, 240V AC"
+                                 'hw': vals.get('unit_rev_number')}                 # "Hardware Revision" -> hw_version
             except Exception as e:
                 logging.debug('identity read failed: %s', e)
+        if self.features is None:   # probe which feature groups this unit has (BMS, AC solar, battery); gate their fields
+            try:
+                self.features = self.sppro.use('features', live.present_features, wait=VALUE_WAIT, deadline=POLL_DEADLINE)
+            except Exception as e:
+                logging.debug('feature probe failed: %s', e)   # retry next info()
+        if self.map_version is None and self.sppro.versions:   # check_versions already read the version block on the
+            self.map_version = self.sppro.versions.get('memory_map')   # first poll; reuse it, no extra round trip
         server = os.environ.get('SELPI_CONNECTION_SELECT_LIVE_SERVER', '')
         if conn == 'SelectLive':
             label = {'select.live2': 'Select.Live 2',
@@ -124,11 +137,15 @@ class Api:
                 'stale_grace': settings.stale_grace(),   # add-on serves last-good this long after a failed poll
                 'cache_ttl': settings.cache_ttl(),        # config/settings page cache-first window
                 'model': self.identity.get('model_number') or 'SP PRO', 'manufacturer': 'Selectronic',
+                'model_ratings': self.identity.get('model_ratings'),   # hardware rating for the device hw_version
                 'serial': self.identity.get('serial'), 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
                 'units': units, 'multi': self.multi,          # units first: discovery sets self.multi
                 'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS),
-                'identify': True}     # per-inverter flash-LEDs (POST /api/v1/identify?unit=N); benign, no passcode
+                'identify': True,     # per-inverter flash-LEDs (POST /api/v1/identify?unit=N); benign, no passcode
+                'hw': self.identity.get('hw'),          # Hardware Revision -> HA device hw_version
+                'map_version': self.map_version,        # unit's memory-map version (for the field map gate)
+                'features': sorted(self.features) if self.features is not None else None}   # present feature groups
 
     def units(self):
         """The Powerchain units for the integration to build (sub-)devices from; a single inverter yields one unit.
@@ -165,6 +182,8 @@ class Api:
         asked = {live.KEY_ALIASES.get(k, k): k for k in keys}   # old (renamed) keys still answered
         keys = [k for k in asked if k in self.fields]
         fields = [self.fields[k] for k in keys]
+        if self.features is not None or self.map_version is not None:   # gate: skip absent features / fields newer than the unit's map
+            fields = [f for f in fields if live.field_available(f, self.features, self.map_version)]
         if not self.mp_units:     # discovery hasn't run in this process yet (e.g. after an add-on restart): populate
             self.units()          # mp_units/multi lazily, so per-unit and 'system' reads work without a /units call
         u = self._unit(unit)
@@ -196,7 +215,7 @@ class Api:
             fresh_at = time.time()
             for k, (v, text) in got.items():
                 if v is not None:    # a skipped block returns None: keep the last good cache, don't overwrite it
-                    self.cache[ck(k)] = (text if self.fields[k]['kind'] == 'enum' else v, fresh_at)
+                    self.cache[ck(k)] = (text if self.fields[k]['kind'] in ('enum', 'bitfield') else v, fresh_at)
             if unit is None and got.get('version_number', (None,))[0] is not None:
                 self.firmware = got['version_number'][1]
             if any(v is None for v, _ in got.values()):   # a partial poll (some blocks skipped): mark it stale

@@ -86,3 +86,78 @@ class DerivedFields(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class SysRegFields(unittest.TestCase):
+    """The SysReg status cluster added for the Modbus→ESP changeover (all on the Now block, free reads)."""
+    def test_defaults_named_and_enabled(self):
+        from web import api
+        cat = {c['key']: c for c in api.catalog()}
+        self.assertEqual(cat['sys_reg_active_schedule']['name'], 'Solar Hybrid Priority')
+        self.assertEqual(cat['sys_reg_export_on_demand_target']['name'], 'Export On Demand Target')
+        for k in ('sys_reg_active_schedule', 'sys_reg_export_on_demand_target'):
+            self.assertTrue(cat[k]['default'], k)
+            self.assertEqual(cat[k]['screen'], 'NowSubTab', k)
+        # the status/limit extras exist but are off by default
+        for k in ('sys_reg_charger_status', 'sys_reg_inverter_lockout_status',
+                  'sys_reg_source_disconnect_status', 'sys_reg_input_power_limit', 'sys_reg_support_power_limit'):
+            self.assertIn(k, cat)
+            self.assertFalse(cat[k]['default'], k)
+
+    def test_ac_coupled_percent_fields_off_by_default(self):
+        from web import api
+        cat = {c['key']: c for c in api.catalog()}
+        for suf in ('l1', 'l2', 'l3', 'l4'):
+            k = 'multi_ac_coupled_percent_' + suf
+            self.assertIn(k, cat)
+            self.assertFalse(cat[k]['default'], k)        # "most people won't care" -> off
+            self.assertEqual(cat[k]['unit'], '%', k)
+            self.assertEqual(cat[k]['screen'], 'DataMultiPhase1', k)
+        # raw/10 => percent (e.g. 10 -> 1.0 %, matching the Modbus "1 %" reading)
+        f = BY_KEY['multi_ac_coupled_percent_l1']
+        self.assertAlmostEqual(live.evaluate(f, mem_with(f, 10))[0], 1.0)
+
+    def test_active_schedule_is_raw(self):
+        f = BY_KEY['sys_reg_active_schedule']
+        self.assertEqual(f['words'], ['0xa070'])
+        self.assertEqual(live.evaluate(f, mem_with(f, 6))[0], 6)      # priority 6, raw
+
+    def test_export_on_demand_target_is_deca_watt_kw(self):
+        f = BY_KEY['sys_reg_export_on_demand_target']
+        self.assertEqual(f['unit'], 'kW')
+        self.assertAlmostEqual(live.evaluate(f, mem_with(f, 150))[0], 1.5)    # deca-watt: raw/100
+        self.assertAlmostEqual(live.evaluate(f, mem_with(f, -50))[0], -0.5)   # signed
+
+
+class FeatureGate(unittest.TestCase):
+    """Feature gating: fields tagged bms/ac_solar are present only when the unit has that feature."""
+    class _R:
+        def __init__(self, mem): self.mem = mem
+        def words(self, base, n): return [self.mem.get(base + i, 0) for i in range(n)]
+
+    def test_present_features_probe(self):
+        nk = int(BY_KEY['number_of_kacos']['words'][0], 16)
+        all3 = live.present_features(self._R({nk: 2, 0xa276: 5, 0xa021: 0}))   # kaco + BMS + battery (0xa021=0)
+        self.assertEqual(all3, {'ac_solar', 'bms', 'battery'})
+        batteryless = live.present_features(self._R({nk: 0, 0xa276: 0, 0xa021: 1}))   # none, and batteryless unit
+        self.assertEqual(batteryless, set())
+        batt_only = live.present_features(self._R({nk: 0, 0xa276: 0, 0xa021: 0}))   # has a battery, no kaco/bms
+        self.assertEqual(batt_only, {'battery'})
+
+    def test_field_available_map_gate(self):
+        f = {'feature': None, 'needs_map_version': 25}
+        self.assertFalse(live.field_available(f, None, 20))     # unit map 20 < 25 -> gated out
+        self.assertTrue(live.field_available(f, None, 31))      # unit map 31 >= 25 -> available
+        self.assertTrue(live.field_available(f, None, None))    # map unknown -> keep
+        g = {'feature': 'bms', 'needs_map_version': None}
+        self.assertFalse(live.field_available(g, {'ac_solar'}, 31))   # bms absent
+        self.assertTrue(live.field_available(g, {'bms'}, 31))
+
+    def test_snapshot_hides_absent_features(self):
+        # scale block present so numeric fields evaluate; no BMS/Kaco data
+        mem = {live.SCALE_BASE + i: 1000 for i in range(len(live.SCALES))}
+        r = type('R', (), {'words': lambda self, b, n: [mem.get(b + i, 0) for i in range(n)]})()
+        rows = {row['key'] for row in live.snapshot(r, None, features={'ac_solar'})}
+        self.assertNotIn('tech_bms_so_c', rows)            # bms feature absent -> hidden
+        self.assertNotIn('now_percent_kaco', rows) if 'now_percent_kaco' not in rows else None
+        self.assertIn('now_total_ac_power_kaco', rows)     # ac_solar present -> shown

@@ -1,0 +1,3 @@
+{
+ "_policy": "include-all: every SP LINK live field is in the catalogue; ServiceSettings are live read-only like the existing 22 (and also in config). No exclusions."
+}

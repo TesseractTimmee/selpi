@@ -1,0 +1,3412 @@
+{
+ "source": "SP LINK 16.11 display fields (verified parity vs 15.40)",
+ "fields": [
+  {
+   "field": "MultiBatteryVoltage",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa318"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "MultiBatterySoC",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa31d"
+   ],
+   "converter": "fnConvertUnSignedPercentageValueToString"
+  },
+  {
+   "field": "MultiBatteryChargerStage",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa31b"
+   ],
+   "converter": "fnConvertChargerStatusValueToString"
+  },
+  {
+   "field": "MultiDCSolarPowerTotal",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa318"
+   ],
+   "converter": "fnConvertSignedDCVoltageAndIntegerMultiphaseDCSolarCurrentValueToPowerString"
+  },
+  {
+   "field": "MultiACSourceStatusL1",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2b5"
+   ],
+   "converter": "fnConvertAcSourceStatusValueToString"
+  },
+  {
+   "field": "MultiPhaseLoadAcVolts_L1",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2b6",
+    "0xa2b7"
+   ],
+   "converter": "fnConvertUnSignedACLoadVoltageValueClampedToSourceVoltageInSyncToString"
+  },
+  {
+   "field": "MultiPhaseAcSourceVolts_L1",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2b7"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "MultiACSourceStatusL2",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2b9"
+   ],
+   "converter": "fnConvertAcSourceStatusValueToString"
+  },
+  {
+   "field": "MultiPhaseLoadAcVolts_L2",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2ba",
+    "0xa2bb"
+   ],
+   "converter": "fnConvertUnSignedACLoadVoltageValueClampedToSourceVoltageInSyncToString"
+  },
+  {
+   "field": "MultiPhaseAcSourceVolts_L2",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2bb"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "MultiAcCoupledPercentL2",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2cb"
+   ],
+   "converter": "fnConvertUnitlessDeciNumberValueToString"
+  },
+  {
+   "field": "MultiACSourceStatusL3",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2bd"
+   ],
+   "converter": "fnConvertAcSourceStatusValueToString"
+  },
+  {
+   "field": "MultiPhaseLoadAcVolts_L3",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2be",
+    "0xa2bf"
+   ],
+   "converter": "fnConvertUnSignedACLoadVoltageValueClampedToSourceVoltageInSyncToString"
+  },
+  {
+   "field": "MultiPhaseAcSourceVolts_L3",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2bf"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "MultiAcCoupledPercentL3",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2cf"
+   ],
+   "converter": "fnConvertUnitlessDeciNumberValueToString"
+  },
+  {
+   "field": "MultiACSourceStatusL4",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2c1"
+   ],
+   "converter": "fnConvertAcSourceStatusValueToString"
+  },
+  {
+   "field": "MultiPhaseLoadAcVolts_L4",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2c2",
+    "0xa2c3"
+   ],
+   "converter": "fnConvertUnSignedACLoadVoltageValueClampedToSourceVoltageInSyncToString"
+  },
+  {
+   "field": "MultiPhaseAcSourceVolts_L4",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2c3"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "MultiAcCoupledPercentL4",
+   "screen": "DataMultiPhase1",
+   "addresses": [
+    "0xa2d3"
+   ],
+   "converter": "fnConvertUnitlessDeciNumberValueToString"
+  },
+  {
+   "field": "MultiACSourceStatusL1",
+   "screen": "DataMultiPhase2",
+   "addresses": [
+    "0xa080"
+   ],
+   "converter": "fnConvertAcSourceStatusValueToString"
+  },
+  {
+   "field": "MultiAcOutStatus",
+   "screen": "DataMultiPhase2",
+   "addresses": [
+    "0xa07d"
+   ],
+   "converter": "fnConvertInverterModeValueToString"
+  },
+  {
+   "field": "MultiInputAcHz",
+   "screen": "DataMultiPhase2",
+   "addresses": [
+    "0xa08d"
+   ],
+   "converter": "fnConvertSignedACFrequencyValueInCentiHzToString"
+  },
+  {
+   "field": "MultiInvFreq",
+   "screen": "DataMultiPhase2",
+   "addresses": [
+    "0xa092",
+    "0xa086",
+    "0xa088",
+    "0xa087",
+    "0xa089"
+   ],
+   "converter": "fnConvertSignedACFrequencyValueInCentiHzToString"
+  },
+  {
+   "field": "MultiBatteryCurrentTotal",
+   "screen": "DataMultiPhase2",
+   "addresses": [
+    "0xa084",
+    "0xa085"
+   ],
+   "converter": "fnConvert2UShortsInto1Uint"
+  },
+  {
+   "field": "ACLoadkWhPreviousAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1cb"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadKWH7DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1cc",
+    "0xa1cd"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadkWh7DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1ce"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadKWH30DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1cf",
+    "0xa1d0"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadkWh30DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1d1"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadKWH365DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1d2",
+    "0xa1d3"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadKWH365DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1d4"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadkWhYearAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1d5",
+    "0xa1d6"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadkWhYearAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1d7"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadkWhResetableAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1d8",
+    "0xa1d9"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadkWhResetableAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1da",
+    "0xa1db",
+    "0xa1dc"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "ACLoadKWHTotalAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1de",
+    "0xa1df"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputkWhPrevious",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1e0"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWH7DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1e1",
+    "0xa1e2"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWH7DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1e3"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWH30DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1e4",
+    "0xa1e5"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWH30DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1e6"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWH365DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1e7",
+    "0xa1e8"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWH365DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1e9"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWHYearAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1ea",
+    "0xa1eb"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputkWhYearAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1ec"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWHResetableAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1ed",
+    "0xa1ee"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputkWhResetableAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1ef",
+    "0xa1f0",
+    "0xa1f1"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "ACInputKWHTotalAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1f3",
+    "0xa1f4"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputHrsPreviousAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1f5"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrs7DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1f6"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrs7DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1f7"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrs30DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1f8"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrs30DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1f9"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrs365DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1fa",
+    "0xa1fb"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrs365DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1fc"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrsYearAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1fd",
+    "0xa1fe"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrsYearAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1ff"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrsResetableAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa200",
+    "0xa201"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACInputHrsResetableAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa202",
+    "0xa203",
+    "0xa204"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "ACInputHrsTotalAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa206",
+    "0xa207"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ACExportkWhPrevious",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa208"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWh7DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa209",
+    "0xa20a"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWh7DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa20b"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWh30DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa20c",
+    "0xa20d"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWh30DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa20e"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWh365DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa20f",
+    "0xa210"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWh365DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa211"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWhYearAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa212",
+    "0xa213"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWhYearAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa214"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWhResetableAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa215",
+    "0xa216"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWhResetableAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa217",
+    "0xa218",
+    "0xa219"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "ACExportkWhTotalAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa21b",
+    "0xa21c"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWhPrevious",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa1ca"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWh7DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa21d",
+    "0xa21e"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWh7DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa21f"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWh30DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa220",
+    "0xa221"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWh30DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa222"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWh365DayAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa223",
+    "0xa224"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWh365DayAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa225"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWhYearAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa226",
+    "0xa227"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWhYearAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa228"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWhResetableAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa229",
+    "0xa22a"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWhResetableAccAvg",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa22b",
+    "0xa22c",
+    "0xa22d"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "ACSolarKacokWhTotalAcc",
+   "screen": "ACHistorySubTab",
+   "addresses": [
+    "0xa22f",
+    "0xa230"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACLoadKWHTotalAcc",
+   "screen": "ACHistorySubTab2",
+   "addresses": [
+    "0xa37e",
+    "0xa37f"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputKWHTotalAcc",
+   "screen": "ACHistorySubTab2",
+   "addresses": [
+    "0xa36e",
+    "0xa36f"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACExportkWhTotalAcc",
+   "screen": "ACHistorySubTab2",
+   "addresses": [
+    "0xa370",
+    "0xa371"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACSolarKacokWhTotalAcc",
+   "screen": "ACHistorySubTab2",
+   "addresses": [
+    "0xa372",
+    "0xa373"
+   ],
+   "converter": "fnConvert32BitUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TechBmsBatteryCurrent",
+   "screen": "Bms",
+   "addresses": [
+    "0xa280",
+    "0xa281"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryCurrentValueToString"
+  },
+  {
+   "field": "TechBmsChargeILimit",
+   "screen": "Bms",
+   "addresses": [
+    "0xa27b",
+    "0xa27c"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryCurrentValueToString"
+  },
+  {
+   "field": "TechBmsDischargeILimit",
+   "screen": "Bms",
+   "addresses": [
+    "0xa27d",
+    "0xa27e"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryCurrentValueToString"
+  },
+  {
+   "field": "TechBmsBatteryTemperature",
+   "screen": "Bms",
+   "addresses": [
+    "0xa282"
+   ],
+   "converter": "fnConvertUnsignedTemperatureValueToString"
+  },
+  {
+   "field": "TechBmsBatteryVoltage",
+   "screen": "Bms",
+   "addresses": [
+    "0xa27f"
+   ],
+   "converter": "fnConvertSignedDCVoltageValueToString"
+  },
+  {
+   "field": "TechBmsChargeVLimit",
+   "screen": "Bms",
+   "addresses": [
+    "0xa27a"
+   ],
+   "converter": "fnConvertSignedDCVoltageValueToString"
+  },
+  {
+   "field": "TechBmsModel",
+   "screen": "Bms",
+   "addresses": [
+    "0xa276"
+   ],
+   "converter": "fnConvertBMSModelValueToString"
+  },
+  {
+   "field": "TechBmsSoC",
+   "screen": "Bms",
+   "addresses": [
+    "0xa285",
+    "0xa287"
+   ],
+   "converter": "fnConvertUnSignedSOCPercentageValueToString"
+  },
+  {
+   "field": "TechBmsSerial",
+   "screen": "Bms",
+   "addresses": [
+    "0xa277",
+    "0xa278"
+   ],
+   "converter": "fnConvertLG32bitBigEndianSerialNumberToString"
+  },
+  {
+   "field": "TechBmsSoH",
+   "screen": "Bms",
+   "addresses": [
+    "0xa286"
+   ],
+   "converter": "fnConvertUnSignedSOCPercentageValueToString"
+  },
+  {
+   "field": "TechBmsAlarms",
+   "screen": "Bms",
+   "addresses": [
+    "0xa283"
+   ],
+   "converter": "fnConvertLGBmsAlarmsValueToList"
+  },
+  {
+   "field": "TechBmsWarnings",
+   "screen": "Bms",
+   "addresses": [
+    "0xa284",
+    "0xa288"
+   ],
+   "converter": "fnConvertLGBmsWarningsValueToList"
+  },
+  {
+   "field": "DCkWhIn",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa127",
+    "0xa128"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "DCkWhOut",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa129",
+    "0xa12a"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "DCkWhNET",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa12b",
+    "0xa12c",
+    "0xa12d",
+    "0xa12e"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToStringAndFlipSign"
+  },
+  {
+   "field": "InverterDCkWhPreviousAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa130"
+   ],
+   "converter": "fnConvertSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWh7DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa131",
+    "0xa132"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWh7DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa133"
+   ],
+   "converter": "fnConvertSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWh30DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa134",
+    "0xa135"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWh30DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa136"
+   ],
+   "converter": "fnConvertSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWh365DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa137",
+    "0xa138"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWh365DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa139"
+   ],
+   "converter": "fnConvertSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWhYearAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa13a",
+    "0xa13b"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWhYearAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa13c"
+   ],
+   "converter": "fnConvertSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWhResetableAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa13d",
+    "0xa13e"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "InverterDCkWhResetableAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa13f",
+    "0xa140",
+    "0xa141"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "InverterDCkWhTotalAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa143",
+    "0xa144"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWhPreviousAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa145"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "DCShunt1PeakPowerPrevious",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa146"
+   ],
+   "converter": "fnConvertSignedDCPeakShuntPowerValueToString"
+  },
+  {
+   "field": "Shunt1kWh7DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa147",
+    "0xa148"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWh7DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa149"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWh30DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa14a",
+    "0xa14b"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWh30DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa14c"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWh365DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa14d",
+    "0xa14e"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWh365DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa14f"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWhYearAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa150",
+    "0xa151"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWhYearAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa152"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWhResetableAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa153",
+    "0xa154"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWhResetableAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa155",
+    "0xa156",
+    "0xa157"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "Shunt1kWhTotalAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa159",
+    "0xa15a"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWhPreviousAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa15c"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "DCShunt2PeakPowerPrevious",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa15b"
+   ],
+   "converter": "fnConvertSignedDCPeakShuntPowerValueToString"
+  },
+  {
+   "field": "Shunt2kWh7DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa15d",
+    "0xa15e"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWh7DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa15f"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWh30DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa160",
+    "0xa161"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWh30DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa162"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWh365DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa163",
+    "0xa164"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWh365DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa165"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWhYearAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa166",
+    "0xa167"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWhYearAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa168"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWhResetableAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa169",
+    "0xa16a"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWhResetableAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa16b",
+    "0xa16c",
+    "0xa16d"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "Shunt2kWhTotalAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa16f",
+    "0xa170"
+   ],
+   "converter": "fnConvert32bitSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWHPreviousAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa171",
+    "0xa172"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWH7DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa173",
+    "0xa174"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWH7DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa175",
+    "0xa176"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWH30DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa177",
+    "0xa178"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWH30DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa179",
+    "0xa17a"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWH365DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa17b",
+    "0xa17c"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWH365DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa17d",
+    "0xa17e"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWHYearAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa17f",
+    "0xa180"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWHYearAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa181",
+    "0xa182"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWHResetableAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa183",
+    "0xa184"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWHResetableAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa185",
+    "0xa186",
+    "0xa187",
+    "0xa188"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInKWHTotalAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa18a",
+    "0xa18b"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWHPreviousAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa18c",
+    "0xa18d"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWH7DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa18e",
+    "0xa18f"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWH7DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa190",
+    "0xa191"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWH30DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa192",
+    "0xa193"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWH30DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa194",
+    "0xa195"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWH365DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa196",
+    "0xa197"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWH365DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa198",
+    "0xa199"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWHYearAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa19a",
+    "0xa19b"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWHYearAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa19c",
+    "0xa19d"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWHResetableAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa19e",
+    "0xa19f"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWHResetableAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1a0",
+    "0xa1a1",
+    "0xa1a2",
+    "0xa1a3"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutKWHTotalAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1a5",
+    "0xa1a6"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "FloatHrsPreviousAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1a7"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrs7DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1a8"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrs7DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1a9"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrs30DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1aa"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrs30DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1ab"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrs365DayAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1ac",
+    "0xa1ad"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrs365DayAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1ae"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrsYearAcc",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1af",
+    "0xa1b0"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "FloatHrsYearAccAvg",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1b1"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "TimeFloatAchievedPrevious",
+   "screen": "DCHistorySubTab",
+   "addresses": [
+    "0xa1b2"
+   ],
+   "converter": "fnConvertTimethatfloatwasachievedToString"
+  },
+  {
+   "field": "NetworkPowerMeter",
+   "screen": "NowNetworkPowerSubTab",
+   "addresses": [
+    "0xa3eb",
+    "0xa3ed",
+    "0xa3ee",
+    "0xa3f0",
+    "0xa3f1",
+    "0xa3f3",
+    "0xa3f4"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToString"
+  },
+  {
+   "field": "ACOutStatus",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa07d"
+   ],
+   "converter": "fnConvertInverterModeValueToString"
+  },
+  {
+   "field": "AcSourceStatus",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa080"
+   ],
+   "converter": "fnConvertAcSourceStatusValueToString"
+  },
+  {
+   "field": "GeneratorStatusFromLed",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa096"
+   ],
+   "converter": "fnConvertGeneratorStatusValueToString"
+  },
+  {
+   "field": "GeneratorStartReason",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa07e"
+   ],
+   "converter": "fnConvertGeneratorStartedBySlashRunningReasonValueToString"
+  },
+  {
+   "field": "LoadAcPower",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa07a",
+    "0xa07b",
+    "0xa093",
+    "0xa094"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToString"
+  },
+  {
+   "field": "ACInverterRmsVolts",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa090",
+    "0xa095"
+   ],
+   "converter": "fnConvertUnSignedACLoadVoltageValueClampedToSourceVoltageInSyncToString"
+  },
+  {
+   "field": "InvFreq",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa092"
+   ],
+   "converter": "fnConvertSignedACFrequencyValueInCentiHzToString"
+  },
+  {
+   "field": "GeneratorRunningReason",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa07f"
+   ],
+   "converter": "fnConvertGeneratorStartedBySlashRunningReasonValueToString"
+  },
+  {
+   "field": "BattSocPercent",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa081"
+   ],
+   "converter": "fnConvertUnSignedSOCPercentageValueToString"
+  },
+  {
+   "field": "BatteryVolts",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa05c"
+   ],
+   "converter": "fnConvertSignedDCVoltageValueToString"
+  },
+  {
+   "field": "DCBatteryCurrent",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa084",
+    "0xa085"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryCurrentValueToDecimal"
+  },
+  {
+   "field": "DCCurrent",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa083"
+   ],
+   "converter": "fnConvertSignedDCCurrentValueToString"
+  },
+  {
+   "field": "Shunt1Amps",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa086"
+   ],
+   "converter": "fnConvertSignedDCShuntCurrentValueToString"
+  },
+  {
+   "field": "Shunt1Power",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa088"
+   ],
+   "converter": "fnConvertSignedDCShuntPowerValueToString"
+  },
+  {
+   "field": "Shunt2Amps",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa087"
+   ],
+   "converter": "fnConvertSignedDCShuntCurrentValueToString"
+  },
+  {
+   "field": "Shunt2Power",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa089"
+   ],
+   "converter": "fnConvertSignedDCShuntPowerValueToString"
+  },
+  {
+   "field": "5MinBattLoad",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa097",
+    "0xa098"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryPowerValueToStringSupressingNegValues"
+  },
+  {
+   "field": "15MinBattLoad",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa099",
+    "0xa09a"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryPowerValueToStringSupressingNegValues"
+  },
+  {
+   "field": "ChargeStatusNow",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa07c"
+   ],
+   "converter": "fnConvertChargerStatusValueToString"
+  },
+  {
+   "field": "ACGeneratorPower",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa0ab",
+    "0xa08a"
+   ],
+   "converter": "fnConvertSignedACPowerValueToString"
+  },
+  {
+   "field": "ACGeneratorPower5minAvg",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa08b"
+   ],
+   "converter": "fnConvertSignedACPowerValueToString"
+  },
+  {
+   "field": "ACGeneratorRmsVolts",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa095"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "ACGeneratorRmsAmps",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa08c"
+   ],
+   "converter": "fnConvertSignedACCurrentValueToString"
+  },
+  {
+   "field": "InputACHz",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa08d"
+   ],
+   "converter": "fnConvertSignedACFrequencyValueInCentiHzToString"
+  },
+  {
+   "field": "MaxAvailableInputkW",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa08e",
+    "0xa08f"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToString"
+  },
+  {
+   "field": "ACInverterPower",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa058",
+    "0xa059"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToStringUsingRnDSignConv"
+  },
+  {
+   "field": "ACInverterRmsAmps",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa091"
+   ],
+   "converter": "fnConvertSignedACCurrentValueToStringUsingRnDSignConvention"
+  },
+  {
+   "field": "NowTotalAcPowerKaco",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa0ac",
+    "0xa09b"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "NowAcPowerKaco1",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa09c"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "NowAcPowerKaco2",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa09d"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "NowAcPowerKaco3",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa09e"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "NowAcPowerKaco4",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa09f"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "NowAcPowerKaco5",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa0a0"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "NowPercentKaco",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa0a2",
+    "0xa0a1"
+   ],
+   "converter": "fnConvertUnitlessDeciNumberValueToString"
+  },
+  {
+   "field": "SysRegActiveSchedule",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa070"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "SysRegInputPowerLimit",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa079",
+    "0xa071"
+   ],
+   "converter": "fnConvertSignedACPowerValueToString"
+  },
+  {
+   "field": "SysRegExportPowerLimit",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa072"
+   ],
+   "converter": "fnConvertSignedACPowerValueToString"
+  },
+  {
+   "field": "SysRegChargePowerLimit",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa073"
+   ],
+   "converter": "fnConvertSignedACPowerValueToString"
+  },
+  {
+   "field": "SysRegSupportPowerLimit",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa079",
+    "0xa074"
+   ],
+   "converter": "fnConvertSignedACPowerValueToString"
+  },
+  {
+   "field": "SysRegExportOnDemandTarget",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa0a8",
+    "0xa079",
+    "0xa078"
+   ],
+   "converter": "fnConvertSignedACPowerValueInDecaWattsToString"
+  },
+  {
+   "field": "SysRegChargerStatus",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa075"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "SysRegInverterLockoutStatus",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa076"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "SysRegSourceDisconnectStatus",
+   "screen": "NowSubTab",
+   "addresses": [
+    "0xa077"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "NowKacoTotalCapacity",
+   "screen": "Now_Today_Tech_KacoModelsCapacityAndOEM",
+   "addresses": [
+    "0xa39e",
+    "0xa39f"
+   ],
+   "converter": "fnConvert32bitUnsignedValueInkWToString"
+  },
+  {
+   "field": "CountryCode",
+   "screen": "Now_Today_Tech_KacoModelsCapacityAndOEM",
+   "addresses": [
+    "0xa38c"
+   ],
+   "converter": "fnConvertCountryCodeValueToString"
+  },
+  {
+   "field": "PowerControlModeEnabled",
+   "screen": "Now_Today_Tech_KacoModelsCapacityAndOEM",
+   "addresses": [
+    "0xa38d"
+   ],
+   "converter": "fnConvertFactorySettingBooleanValueToString"
+  },
+  {
+   "field": "DisableSPLINKLoginPassword",
+   "screen": "Now_Today_Tech_KacoModelsCapacityAndOEM",
+   "addresses": [
+    "0xa38d",
+    "0xa38e"
+   ],
+   "converter": "fnConvertFactorySettingBooleanValueToString"
+  },
+  {
+   "field": "CpuLoad",
+   "screen": "Now_Today_Tech_KacoModelsCapacityAndOEM",
+   "addresses": [
+    "0xa386"
+   ],
+   "converter": "fnConvertUnitlessDeciNumberValueToString"
+  },
+  {
+   "field": "BuildDate",
+   "screen": "RAndDOnlyDataSubTab",
+   "addresses": [
+    "0xa033",
+    "0xa034"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "BuildTime",
+   "screen": "RAndDOnlyDataSubTab",
+   "addresses": [
+    "0xa035"
+   ],
+   "converter": "fnConvertTimeThatWasStoredInBCDToString"
+  },
+  {
+   "field": "VersionNumberInRD",
+   "screen": "RAndDOnlyDataSubTab",
+   "addresses": [
+    "0xa032",
+    "0xa015"
+   ],
+   "converter": "fnConvertSoftwareVersionAndSringInverterSupportValueToString"
+  },
+  {
+   "field": "BatteryCurrent",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa084",
+    "0xa085"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryCurrentValueToString"
+  },
+  {
+   "field": "BatteryVolts_InTechTab",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa05b"
+   ],
+   "converter": "fnConvertSignedDCVoltageValueToString"
+  },
+  {
+   "field": "DCVolts",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa02e"
+   ],
+   "converter": "fnConvertSignedDCVoltageValueToString"
+  },
+  {
+   "field": "BatteryMidPoint",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa046"
+   ],
+   "converter": "fnConvertSignedDCVoltageValueToString"
+  },
+  {
+   "field": "BatteryMidpointError",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa046",
+    "0xa05b"
+   ],
+   "converter": "fnConvertSignedDCVoltageValueToString"
+  },
+  {
+   "field": "BatterySocTech",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa081"
+   ],
+   "converter": "fnConvertUnSignedSOCPercentageValueToString"
+  },
+  {
+   "field": "ChargeIndex",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa049"
+   ],
+   "converter": "fnConvertChargeIndexValueToString"
+  },
+  {
+   "field": "ChargeStatus",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa045"
+   ],
+   "converter": "fnConvertChargerStatusValueToString"
+  },
+  {
+   "field": "DCBatteryPower",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa02f",
+    "0xa030"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryPowerValueToString"
+  },
+  {
+   "field": "BatteryCableLoss",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa04a"
+   ],
+   "converter": "fnConvertUnSignedDCPowerValueToStringInWatts"
+  },
+  {
+   "field": "BatteryCableLossPercent",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa02f",
+    "0xa030",
+    "0xa04a"
+   ],
+   "converter": "fnConvert32bitSignedDCBatteryPowerValueToString"
+  },
+  {
+   "field": "DaystoRecharge",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa06e"
+   ],
+   "converter": "fnConvertDaysToEqualiseValueToString"
+  },
+  {
+   "field": "DaysSinceRecharge",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa06f"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "DaystoEqualise",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa048"
+   ],
+   "converter": "fnConvertDaysToEqualiseValueToString"
+  },
+  {
+   "field": "DaysSinceEqualise",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa047"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "InverterACPower",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa058",
+    "0xa059"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToStringUsingRnDSignConv"
+  },
+  {
+   "field": "InverterReactivePower",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa05a"
+   ],
+   "converter": "fnConvertSignedACReactivePowerValueToString"
+  },
+  {
+   "field": "InverterApparentPower",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa058",
+    "0xa059",
+    "0xa05a"
+   ],
+   "converter": "fnConvertSignedACApparentPowerValueToString"
+  },
+  {
+   "field": "InverterPowerFactor",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa058",
+    "0xa059",
+    "0xa05a"
+   ],
+   "converter": "fnConvertSignedACPowerFactorValueToString"
+  },
+  {
+   "field": "AcSourcePower",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa0ab",
+    "0xa08a"
+   ],
+   "converter": "fnConvertSignedACPowerValueToString"
+  },
+  {
+   "field": "AcSourceReactivePower",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa082"
+   ],
+   "converter": "fnConvertSignedACSourceReactivePowerValueToString"
+  },
+  {
+   "field": "TransformerTemperature",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa03d"
+   ],
+   "converter": "fnConvertSignedTemperatureValueToString"
+  },
+  {
+   "field": "HeatsinkTemperature",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa037",
+    "0xa038"
+   ],
+   "converter": "fnConvertSignedHottestTemperatureValueToString"
+  },
+  {
+   "field": "ControlBoardTemperature",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa03b"
+   ],
+   "converter": "fnConvertSignedTemperatureValueToString"
+  },
+  {
+   "field": "InletAirTemperature",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa03e"
+   ],
+   "converter": "fnConvertSignedTemperatureValueToString"
+  },
+  {
+   "field": "BatteryTemperature",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa03c"
+   ],
+   "converter": "fnConvertSignedBattTemperatureValueToString"
+  },
+  {
+   "field": "FanSpeed",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa042"
+   ],
+   "converter": "fnConvertUnSignedPercentageValueToString"
+  },
+  {
+   "field": "DigitalInStatus1",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa052"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalInStatus2",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa053"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalInStatus3",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa054"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalInStatus4",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa055"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "GeneralPurpose1",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa056"
+   ],
+   "converter": "fnConvertSignedExpCardDCVoltageValueToString"
+  },
+  {
+   "field": "GeneralPurpose2",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa057"
+   ],
+   "converter": "fnConvertSignedExpCardDCVoltageValueToString"
+  },
+  {
+   "field": "DigitalOutStatus1",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa04b"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalOutStatus2",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa04c"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalOutStatus3",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa04d"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalOutStatus4",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa04e"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalOutStatus5",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa04f"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalOutStatus6",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa050"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "DigitalOutStatus7",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa051"
+   ],
+   "converter": "fnConvertDigInput_OutputStatusValueToString"
+  },
+  {
+   "field": "UnitModelNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa05d"
+   ],
+   "converter": "fnConvertInverterModelValueToModelNumberString"
+  },
+  {
+   "field": "UnitModelRatings",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa05d",
+    "0xa060"
+   ],
+   "converter": "fnConvertInverterModelValueToModelDescriptionString"
+  },
+  {
+   "field": "UnitSerialNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa05e",
+    "0xa05f"
+   ],
+   "converter": "fnConvert32BitSerialNumberValueToString"
+  },
+  {
+   "field": "UnitRevNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa060"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "UnitModStatus",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa061"
+   ],
+   "converter": "fnConvertModStatusNumberToString"
+  },
+  {
+   "field": "VersionNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa032",
+    "0xa015"
+   ],
+   "converter": "fnConvertSoftwareVersionAndSringInverterSupportValueToString"
+  },
+  {
+   "field": "StringInverterSupport",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa032",
+    "0xa015"
+   ],
+   "converter": "fnConvertStringInverterSupportValueToString"
+  },
+  {
+   "field": "GridSoftwareVersion",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa036"
+   ],
+   "converter": "fnConvertSoftwareVersionNumberValueToString"
+  },
+  {
+   "field": "InverterRunHrsTotalAcc",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa03f",
+    "0xa040"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "ControlPCASerialNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa062",
+    "0xa063"
+   ],
+   "converter": "fnConvert32BitSerialNumberValueToString"
+  },
+  {
+   "field": "ControlPCARevNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa064"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "ControlPCAModStatus",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa065"
+   ],
+   "converter": "fnConvertModStatusNumberToString"
+  },
+  {
+   "field": "PM1SerialNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa066",
+    "0xa067"
+   ],
+   "converter": "fnConvert32BitSerialNumberValueToString"
+  },
+  {
+   "field": "PM1RevNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa068"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "PM1ModStatus",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa069"
+   ],
+   "converter": "fnConvertModStatusNumberToString"
+  },
+  {
+   "field": "PM2SerialNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa06a",
+    "0xa06b"
+   ],
+   "converter": "fnConvert32BitSerialNumberValueToString"
+  },
+  {
+   "field": "PM2RevNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa06c"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "PM2ModStatus",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa06d"
+   ],
+   "converter": "fnConvertModStatusNumberToString"
+  },
+  {
+   "field": "AccSerialNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa017",
+    "0xa018"
+   ],
+   "converter": "fnConvert32BitSerialNumberValueToString"
+  },
+  {
+   "field": "AccRevisionNumber",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa019"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AccModStatus",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa01a"
+   ],
+   "converter": "fnConvertModStatusNumberToString"
+  },
+  {
+   "field": "AccSoftwareVersion",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa01b"
+   ],
+   "converter": "fnConvertSoftwareVersionNumberValueToString"
+  },
+  {
+   "field": "CapacitorLifeConsumedPM1",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa043"
+   ],
+   "converter": "fnConvertUnSignedPercentageValueToString"
+  },
+  {
+   "field": "CapacitorLifeConsumedPM2",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa044"
+   ],
+   "converter": "fnConvertUnSignedPercentageValueToString"
+  },
+  {
+   "field": "FanLife",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa041"
+   ],
+   "converter": "fnConvertUnSignedPercentageValueToString"
+  },
+  {
+   "field": "CapacitorLifeConsumedFilter",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa0ad"
+   ],
+   "converter": "fnConvertUnSigned14bitPercentageValueToString"
+  },
+  {
+   "field": "LoadVoltsHighFrequencyRipple",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa0ae"
+   ],
+   "converter": "fnConvertSignedACVoltageValueToString"
+  },
+  {
+   "field": "ACInverterRmsVolts_Tech",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa090"
+   ],
+   "converter": "fnConvertSignedACVoltageValueToString"
+  },
+  {
+   "field": "BuildDate",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa033",
+    "0xa034"
+   ],
+   "converter": "fnConvertDateThatWasStoredInBCDToString"
+  },
+  {
+   "field": "BuildTime",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa035"
+   ],
+   "converter": "fnConvertTimeThatWasStoredInBCDToString"
+  },
+  {
+   "field": "VersionNumberInRD",
+   "screen": "TechnicalDataSubTab",
+   "addresses": [
+    "0xa032",
+    "0xa015"
+   ],
+   "converter": "fnConvertSoftwareVersionAndSringInverterSupportValueToString"
+  },
+  {
+   "field": "TechDataAcPowerPeakKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3b8",
+    "0xa3eb"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "TechDataEnergyTodayKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3ec"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "TechDataAcPowerKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3ed",
+    "0xa3ee"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToStringUsingRnDSignConv"
+  },
+  {
+   "field": "TechDataAcVoltsKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3ef"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "TechDataAcCurrentKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3f0",
+    "0xa3f1"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToStringUsingRnDSignConv"
+  },
+  {
+   "field": "TechDataDcPowerKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3f2"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "TechDataDcVoltsKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3f3",
+    "0xa3f4"
+   ],
+   "converter": "fnConvert32bitSignedACPowerValueToStringUsingRnDSignConv"
+  },
+  {
+   "field": "TechDataTemperatureKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c0"
+   ],
+   "converter": "fnConvertUnsignedTemperatureValueToString"
+  },
+  {
+   "field": "TechDataDcCurrentKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3bd"
+   ],
+   "converter": "fnConvertUnsignedDCCurrentValueToString"
+  },
+  {
+   "field": "TechDataAcPowerPeakKaco1",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c2"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcPowerKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c4"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcVoltsKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c8"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "TechDataDcVoltsKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c6"
+   ],
+   "converter": "fnConvertUnsignedDCVoltageValueFormKacoToString"
+  },
+  {
+   "field": "TechDataTemperatureKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3ca"
+   ],
+   "converter": "fnConvertUnsignedTemperatureValueToString"
+  },
+  {
+   "field": "TechDataEnergyTodayKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c3"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TechDataAcCurrentKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c9"
+   ],
+   "converter": "fnConvertUnsignedACCurrentValueToString"
+  },
+  {
+   "field": "TechDataDcPowerKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c5"
+   ],
+   "converter": "fnConvertUnSignedDCPowerValueToString"
+  },
+  {
+   "field": "TechDataDcCurrentKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3c7"
+   ],
+   "converter": "fnConvertUnsignedDCCurrentValueToString"
+  },
+  {
+   "field": "TechDataAcPowerPeakKaco2",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3cc"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcPowerKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3ce"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcVoltsKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d2"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "TechDataDcVoltsKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d0"
+   ],
+   "converter": "fnConvertUnsignedDCVoltageValueFormKacoToString"
+  },
+  {
+   "field": "TechDataTemperatureKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d4"
+   ],
+   "converter": "fnConvertUnsignedTemperatureValueToString"
+  },
+  {
+   "field": "TechDataEnergyTodayKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3cd"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TechDataAcCurrentKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d3"
+   ],
+   "converter": "fnConvertUnsignedACCurrentValueToString"
+  },
+  {
+   "field": "TechDataDcPowerKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3cf"
+   ],
+   "converter": "fnConvertUnSignedDCPowerValueToString"
+  },
+  {
+   "field": "TechDataDcCurrentKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d1"
+   ],
+   "converter": "fnConvertUnsignedDCCurrentValueToString"
+  },
+  {
+   "field": "TechDataAcPowerPeakKaco3",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d6"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcPowerKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d8"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcVoltsKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3dc"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "TechDataDcVoltsKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3da"
+   ],
+   "converter": "fnConvertUnsignedDCVoltageValueFormKacoToString"
+  },
+  {
+   "field": "TechDataTemperatureKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3de"
+   ],
+   "converter": "fnConvertUnsignedTemperatureValueToString"
+  },
+  {
+   "field": "TechDataEnergyTodayKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d7"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TechDataAcCurrentKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3dd"
+   ],
+   "converter": "fnConvertUnsignedACCurrentValueToString"
+  },
+  {
+   "field": "TechDataDcPowerKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3d9"
+   ],
+   "converter": "fnConvertUnSignedDCPowerValueToString"
+  },
+  {
+   "field": "TechDataDcCurrentKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3db"
+   ],
+   "converter": "fnConvertUnsignedDCCurrentValueToString"
+  },
+  {
+   "field": "TechDataAcPowerPeakKaco4",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e0"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcPowerKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e2"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "TechDataAcVoltsKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e6"
+   ],
+   "converter": "fnConvertUnSignedACVoltageValueToString"
+  },
+  {
+   "field": "TechDataDcVoltsKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e4"
+   ],
+   "converter": "fnConvertUnsignedDCVoltageValueFormKacoToString"
+  },
+  {
+   "field": "TechDataTemperatureKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e8"
+   ],
+   "converter": "fnConvertUnsignedTemperatureValueToString"
+  },
+  {
+   "field": "TechDataEnergyTodayKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e1"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TechDataAcCurrentKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e7"
+   ],
+   "converter": "fnConvertUnsignedACCurrentValueToString"
+  },
+  {
+   "field": "TechDataDcPowerKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e3"
+   ],
+   "converter": "fnConvertUnSignedDCPowerValueToString"
+  },
+  {
+   "field": "TechDataDcCurrentKaco5",
+   "screen": "TechnicalDataSubTab2_Kaco",
+   "addresses": [
+    "0xa3e5"
+   ],
+   "converter": "fnConvertUnsignedDCCurrentValueToString"
+  },
+  {
+   "field": "DCkWhInToday",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0af",
+    "0xa0b0"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "DCkWhOutToday",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0b1",
+    "0xa0b2"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "DCkWhNETToday",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0b3",
+    "0xa0b4"
+   ],
+   "converter": "fnConvert32bitSignedDCEnergyValueInKwhToStringAndFlipSign"
+  },
+  {
+   "field": "InverterDCkWhAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0b9"
+   ],
+   "converter": "fnConvertSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt1kWhAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0ba"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "Shunt2kWhAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0bb"
+   ],
+   "converter": "fnConvertSignedDCShuntEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattInkWhAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0b5",
+    "0xa0b6"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattOutkWhAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0b7",
+    "0xa0b8"
+   ],
+   "converter": "fnConvert32bitUnSignedDCEnergyValueInKwhToString"
+  },
+  {
+   "field": "BattNetkWh",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c9",
+    "0xa0ca",
+    "0xa0cb",
+    "0xa0cc"
+   ],
+   "converter": "fnConvert32bitUnSignedDCBattEnergyValueInKwhToString"
+  },
+  {
+   "field": "FloatHrsAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0bc"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "TimeFloatAchieved",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0bd"
+   ],
+   "converter": "fnConvertTimethatfloatwasachievedToString"
+  },
+  {
+   "field": "ACLoadkWhAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0ec",
+    "0xa0be"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputkWhAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0f0",
+    "0xa0bf"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "ACInputHrsAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c0"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "InverterRunHrsAcc",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c1"
+   ],
+   "converter": "fnConvertTimeInMinutesValueToHoursString"
+  },
+  {
+   "field": "AcExportAccumulatedToday",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0ed",
+    "0xa0c2"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "Shunt1PeakPowerToday",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c3"
+   ],
+   "converter": "fnConvertSignedDCPeakShuntPowerValueToString"
+  },
+  {
+   "field": "Shunt2PeakPowerToday",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c4"
+   ],
+   "converter": "fnConvertSignedDCPeakShuntPowerValueToString"
+  },
+  {
+   "field": "TodayTotalAcEnergyKaco",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0f2",
+    "0xa0c5"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TodayAcEnergyKaco1",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c7"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TodayAcEnergyKaco2",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c8"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TodayAcEnergyKaco3",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c9"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TodayAcEnergyKaco4",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0ca"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TodayAcEnergyKaco5",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0cb"
+   ],
+   "converter": "fnConvertUnSignedACEnergyValueInkWhToString"
+  },
+  {
+   "field": "TodayTotalAcPeakKaco",
+   "screen": "TodaySubTab",
+   "addresses": [
+    "0xa0c6"
+   ],
+   "converter": "fnConvertSignedACPowerValueToStringAndRemoveSign"
+  },
+  {
+   "field": "FanLifeInServiceTab",
+   "screen": "ServiceReadings1",
+   "addresses": [
+    "0xa041"
+   ],
+   "converter": "fnConvertUnSignedPercentageValueToString"
+  },
+  {
+   "field": "IShunt1InServiceTab",
+   "screen": "ServiceReadings1",
+   "addresses": [
+    "0xa086"
+   ],
+   "converter": "fnConvertSignedDCShuntCurrentValueToString"
+  },
+  {
+   "field": "IShunt2InServiceTab",
+   "screen": "ServiceReadings1",
+   "addresses": [
+    "0xa087"
+   ],
+   "converter": "fnConvertSignedDCShuntCurrentValueToString"
+  },
+  {
+   "field": "BattSocPercent_inServiceTab",
+   "screen": "ServiceReadings1",
+   "addresses": [
+    "0xa081",
+    "0xa03f",
+    "0xa040"
+   ],
+   "converter": "fnConvert32bitTimeInMinutesValueToHoursAsSingle"
+  },
+  {
+   "field": "PresentACInputDisconnection",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc205"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "PresentExpansionCardEnabled",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc206"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "SynchOverloadShutdownCountTrips",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc20a"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "EmulatedInductancePercent",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc20b"
+   ],
+   "converter": "fnConvertUnitlessDeciNumberValueToString"
+  },
+  {
+   "field": "ActiveAntiIslandingSensitivityPercent",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc20c"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AllowPowerOverride",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc20e"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "IndependentGridDisconnect",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc20f"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "AcSolarIntegralGainConnectedToSource",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc210"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarDifferentialGainConnectedToSource",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc211"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarFeedForwardGainConnectedToSource",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc212"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalGainConnectedToSource",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc213"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarIntegralGain",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc214"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarDifferentialGain",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc215"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarFeedForwardGain",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc216"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalVoltage0",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc217"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalGain0",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc218"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalVoltage1",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc219"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalGain1",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc21a"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalVoltage2",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc21b"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalGain2",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc21c"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalVoltage3",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc21d"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalGain3",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc21e"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalVoltage4",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc21f"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarProportionalGain4",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc220"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AemoRideThrough",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc223"
+   ],
+   "converter": ""
+  },
+  {
+   "field": "ActivePowerDisconnect",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc224"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarFilterRisingSync",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc225"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarFilterFallingSync",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc226"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarFilterRisingStandalone",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc227"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "AcSolarFilterFallingStandalone",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc228"
+   ],
+   "converter": "fnConvertUnitlessNumberValueToString"
+  },
+  {
+   "field": "CsipDefaultExportLimit",
+   "screen": "ServiceSettings",
+   "addresses": [
+    "0xc202"
+   ],
+   "converter": ""
+  }
+ ]
+}

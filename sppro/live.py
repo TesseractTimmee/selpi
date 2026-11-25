@@ -175,13 +175,62 @@ def evaluate(field, mem):
     if field['kind'] == 'enum':
         label = tables().get(field['table'], {}).get(str(v))
         return v, label if label is not None else 'code %d' % v
+    if field['kind'] == 'bitfield':   # a status word: value = the int, text = the set bits' names (SP LINK's *ValueToList)
+        t = tables().get(field['table'], {})
+        iv = int(v)
+        names = [t[str(b)] for b in range(16) if (iv & (1 << b)) and str(b) in t]
+        return iv, ', '.join(names)
     if field['kind'] == 'raw':
         return v, str(v)
     return v, ('%.3f' % v).rstrip('0').rstrip('.') if isinstance(v, float) else str(v)
 
 
-def snapshot(reader, screens=None):
+
+_BY_KEY = None
+def _by_key():
+    global _BY_KEY
+    if _BY_KEY is None:
+        _BY_KEY = {f['key']: f for f in FIELDS}
+    return _BY_KEY
+
+# Feature presence: SP LINK hides whole groups of live fields when the feature is absent (no BMS battery, no AC
+# solar). We detect it from cheap probe fields and gate the tagged fields the same way.
+FEATURE_PROBE = {'ac_solar': ('number_of_kacos', lambda v: bool(v) and v > 0),
+                 'bms': ('tech_bms_model', lambda v: bool(v) and v > 0)}  # bms model 0 = None (no managed BMS)
+
+def present_features(reader):
+    """The feature set this unit has, from probe reads (so feature-gated fields can be hidden when absent).
+    'battery' comes from the factory batteryless flag (a batteryless unit has no battery readings at all)."""
+    probes = [_by_key()[k] for k, _ in FEATURE_PROBE.values() if k in _by_key()]
+    mem = read(reader, probes)
+    feats = set()
+    for feat, (key, ok) in FEATURE_PROBE.items():
+        f = _by_key().get(key)
+        if f is not None:
+            v, _t = evaluate(f, mem)
+            if v is not None and ok(v):
+                feats.add(feat)
+    if batteryless(reader) == 0:   # 1 = batteryless unit; None (read failed) -> don't claim the feature
+        feats.add('battery')
+    return feats
+
+
+def field_available(f, features=None, map_version=None):
+    """Whether a field applies to this unit. False when its feature group is absent, or when the unit's memory-map
+    version is below the field's needs_map_version (SP LINK's own per-field firmware gate). None = unknown -> keep."""
+    feat = f.get('feature')
+    if feat and features is not None and feat not in features:
+        return False
+    need = f.get('needs_map_version')
+    if need and map_version is not None and map_version < need:
+        return False
+    return True
+
+
+def snapshot(reader, screens=None, features=None, map_version=None):
     fields = fields_for(screens)
+    if features is not None or map_version is not None:
+        fields = [f for f in fields if field_available(f, features, map_version)]
     mem = read(reader, fields)
     out = []
     for f in fields:

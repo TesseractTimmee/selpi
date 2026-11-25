@@ -49,6 +49,15 @@ LOG_DEADLINE = 240        # a manual log download may legitimately run longer th
                           # real downloads short over a slow Select.Live link)
 LIVE_DEADLINE = 25
 SETTINGS_DEADLINE = 20
+_LIVE_FEATURES = {}       # unit key -> present feature set; static per unit, so probe once, not every 15 s Live refresh
+
+
+def _gate(r, unit_key):
+    """(features, map_version) for gating the Live page, reusing the link's cached version block and a one-off
+    feature probe per unit (the Live page auto-refreshes every 15 s; don't re-probe each time)."""
+    if unit_key not in _LIVE_FEATURES:
+        _LIVE_FEATURES[unit_key] = live.present_features(r)
+    return _LIVE_FEATURES[unit_key], (SPPRO.versions or {}).get('memory_map')
 CONFIG_DEADLINE = 20
 WRITE_DEADLINE = 60
 # How long a kept-open link may sit idle before it is dropped. On Select.Live, keep it comfortably above the
@@ -498,7 +507,8 @@ class Handler(BaseHTTPRequestHandler):
                         cols, template = {}, None
                         for mu in SPPRO.unit_list():
                             multiphase.change_destination(r, mu['index'], mu['serial'])
-                            rows = live.snapshot(r, screens)
+                            feats, mapv = _gate(r, mu['index'])
+                            rows = live.snapshot(r, screens, features=feats, map_version=mapv)
                             if template is None:
                                 template = rows
                             for row in rows:
@@ -523,7 +533,8 @@ class Handler(BaseHTTPRequestHandler):
                     except ValueError:
                         ui = None
                     u = next((x for x in (SPPRO.units or []) if x['index'] == ui), None)
-                read = multiphase.for_unit(u, SPPRO.multi, lambda r: live.snapshot(r, screens))
+                read = multiphase.for_unit(u, SPPRO.multi,
+                                           lambda r: live.snapshot(r, screens, *_gate(r, unit)))
                 rows = SPPRO.use('live read', read, wait=READ_WAIT, deadline=LIVE_DEADLINE,
                                  key='live:%s:' % unit + ','.join(screens or []))
                 return self._send(200, {'rows': rows, 'unit': unit, 'version_problems': SPPRO.version_problems,
