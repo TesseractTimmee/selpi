@@ -42,6 +42,7 @@ td, th { padding: 6px 12px; border-bottom: 1px solid var(--line); text-align: le
 th { font-weight: 600; color: var(--muted); font-size: 12px; }
 tr:last-child td { border-bottom: 0; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.txt { text-align: right; overflow-wrap: anywhere; }   /* long bitfield/enum text (e.g. mod status) wraps instead of clipping */
 td.addr, .muted { color: var(--muted); font-size: 12px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0 16px; }
 .msg { padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; background: var(--warn-bg); color: var(--warn); }
@@ -204,7 +205,7 @@ async function loadLive() {
     d.rows.forEach(r => (groups[r.screen] = groups[r.screen] || []).push(r));
     $('#live-out').innerHTML = '<div class="grid">' + Object.entries(groups).map(([s, rows]) =>
       `<div class="card"><h2>${esc(SCREEN[s] || s)}</h2><table>${rows.map(r =>
-        `<tr><td>${esc(r.label)}</td><td class="num">${esc(r.text)} <span class="muted">${esc(r.unit)}</span></td></tr>`).join('')}</table></div>`).join('') + '</div>';
+        `<tr><td>${esc(r.label)}</td><td class="${/^-?[\d.]+$/.test(r.text) ? 'num' : 'txt'}">${esc(r.text)} <span class="muted">${esc(r.unit)}</span></td></tr>`).join('')}</table></div>`).join('') + '</div>';
     $('#live-at').textContent = 'read ' + d.at.slice(11);
   } catch (e) { $('#live-at').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
   out.classList.remove('loading');
