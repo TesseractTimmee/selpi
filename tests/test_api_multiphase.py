@@ -109,3 +109,38 @@ class ApiMultiphase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+@unittest.skipUnless(os.path.exists(CAP), 'capture not present (captures/ is git-ignored)')
+class ApiIdentify(unittest.TestCase):
+    def mem(self):
+        return sim_sppro.capture_memory(CAP)
+
+    def test_info_advertises_identify(self):
+        api = make_api(sim_sppro.SimProtocol(self.mem(), multiphase=3))
+        self.assertTrue(api.info().get('identify'))
+
+    def test_identify_unit_readdresses_flashes_restores(self):
+        sim = sim_sppro.SimProtocol(self.mem(), multiphase=3)
+        api = make_api(sim)
+        api.info()                 # discovery
+        sim.writes.clear()
+        out = api.identify('2')
+        self.assertEqual((out['unit'], out['register'], out['value']), (2, '0xa389', 150))
+        self.assertEqual([(hex(a), d.hex()) for a, d in sim.writes],
+                         [('0xdfde', '0200'), ('0xa389', '9600'), ('0xdfde', '0000')])
+
+    def test_identify_rejects_system_device(self):
+        api = make_api(sim_sppro.SimProtocol(self.mem(), multiphase=3))
+        api.info()
+        with self.assertRaises(ValueError):
+            api.identify('system')
+
+    def test_identify_single_inverter(self):
+        sim = sim_sppro.SimProtocol(self.mem())      # single unit
+        api = make_api(sim)
+        api.info()
+        sim.writes.clear()
+        out = api.identify('')
+        self.assertEqual((out['unit'], out['register'], out['value']), (0, '0xa389', 150))
+        self.assertEqual([(hex(a), d.hex()) for a, d in sim.writes], [('0xa389', '9600')])

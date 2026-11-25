@@ -13,6 +13,7 @@ bearer token, because HA core doesn't come through the ingress proxy.
     POST /api/v1/control?name=generator&state=on|off   start / stop the generator if it isn't already (state-aware)
     POST /api/v1/control?name=output&state=on|idle     inverter output; idle (no AC output) needs confirm=outage
     POST /api/v1/control?name=equalise                 request an equalise charge (two long Generator presses)
+    POST /api/v1/identify?unit=N                        flash unit N's front panel LEDs to locate it (Powerchain)
 
 Read-only towards the SP PRO (same reads as the Live page), except front panel button presses (generator
 start/stop, silence alarm, and the ON button only with confirm=outage) and the controls built on them
@@ -126,7 +127,8 @@ class Api:
                 'serial': self.identity.get('serial'), 'firmware': self.firmware,
                 'versions': self.sppro.versions, 'version_problems': self.sppro.version_problems,
                 'units': units, 'multi': self.multi,          # units first: discovery sets self.multi
-                'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS)}
+                'buttons': sorted(API_BUTTONS) + ['on'], 'controls': sorted(CONTROLS),
+                'identify': True}     # per-inverter flash-LEDs (POST /api/v1/identify?unit=N); benign, no passcode
 
     def units(self):
         """The Powerchain units for the integration to build (sub-)devices from; a single inverter yields one unit.
@@ -287,6 +289,41 @@ class Api:
                 result[k] = out[k]
         return result
 
+    def identify(self, unit='', duration=''):
+        """Flash a unit's front panel LEDs to locate it physically (SP LINK's double-click identify).
+
+        `unit` = a Powerchain unit index; omit for a single inverter. A benign momentary write (0xa389): no
+        installer passcode and no configuration change, so it is allowed ahead of settings write-enablement.
+        """
+        from sppro import controls
+        if unit == 'system':
+            raise ValueError('identify is per inverter, not the computed System device')
+        if not self.mp_units:
+            self.units()                       # populate mp_units/multi (e.g. after an add-on restart)
+        u = self._unit(unit)
+        if u is None and self.multi and unit not in (None, ''):
+            raise ValueError('unknown unit %r' % unit)
+        if u is None and self.multi:
+            u = (self.mp_units or [None])[0]    # multi + no unit = the primary (L1 manager)
+        try:
+            duration_ms = int(duration) if duration != '' else multiphase.IDENTIFY_DEFAULT_MS
+        except ValueError:
+            raise ValueError('duration must be an integer number of milliseconds')
+
+        def act(r):
+            v = live.versions(r).get('memory_map')
+            if v is not None and v < multiphase.IDENTIFY_MIN_MAP_VERSION:
+                raise controls.ControlError('identify needs memory map version >= %d (unit reports %d)'
+                                            % (multiphase.IDENTIFY_MIN_MAP_VERSION, v))
+            return multiphase.identify(r, u, self.multi, duration_ms)
+        logging.warning('identify (flash LEDs) via the API: unit %s', unit or '(primary)')
+        try:
+            out = self.sppro.use('identify u%s' % (unit or ''), act, wait=30, deadline=30, check_versions=False)
+        except (controls.ControlError, RuntimeError) as e:
+            raise ConflictError(str(e))
+        return {'identified': True, 'unit': out['index'], 'register': '0x%x' % out['register'],
+                'value': out['value'], 'duration_ms': out['duration_ms']}
+
     def backup(self):
         if self.backup_running:
             return {'started': False, 'error': 'a backup is already running'}
@@ -359,6 +396,8 @@ def serve(api, port, token, host='::'):
                     return self._send(200, api.button(q.get('name', ''), q.get('confirm', '')))
                 if method == 'POST' and path == '/api/v1/control':
                     return self._send(200, api.control(q.get('name', ''), q.get('state', ''), q.get('confirm', '')))
+                if method == 'POST' and path == '/api/v1/identify':
+                    return self._send(200, api.identify(q.get('unit', ''), q.get('duration', '')))
                 return self._send(404, {'error': 'not found'})
             except api.Busy as e:
                 return self._send(503, {'error': str(e)})

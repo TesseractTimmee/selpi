@@ -191,3 +191,37 @@ def verified_write(reader, unit, multi, address, data):
     if multi and unit is not None:
         change_destination(reader, unit['index'], unit['serial'])   # raises on serial mismatch -> no write
     reader.write(address, data)
+
+
+# --- Identify / flash front-panel LEDs --------------------------------------------------------------------------
+# SP LINK's "Double-click a serial to identify it by flashing front panel LEDs" (btnIdentify_Click ->
+# IdentifyFrontPanelLeds in the 16.11 IL; confirmed on the wire 25 Nov: captures/mp-identify-20261125.jsonl +
+# identify-il-20261125.txt). A benign momentary write - no installer passcode, changes no configuration - so it
+# can ship ahead of settings write-enablement.
+REG_IDENTIFY = 0xa389              # flash-duration register. SP LINK tags the write enFrom 0x20 "FlashBattLeds";
+                                   #   that tag is SP LINK-internal and does NOT appear on the wire (the capture
+                                   #   shows a plain write to 0xa389), so selpi just writes the register.
+IDENTIFY_MIN_MAP_VERSION = 20      # 0x14: IdentifyFrontPanelLeds returns without writing below this map version.
+IDENTIFY_DEFAULT_MS = 3000         # SP LINK's btnIdentify_Click hardcodes 0xbb8 -> value 150.
+
+
+def identify_value(duration_ms=IDENTIFY_DEFAULT_MS):
+    """The 0xa389 value SP LINK writes to flash for `duration_ms`: (u16) round(min(ms / 20, 999)). 3000 -> 150."""
+    return min(int(round(duration_ms / 20.0)), 999)
+
+
+def identify(reader, unit=None, multi=False, duration_ms=IDENTIFY_DEFAULT_MS):
+    """Flash a unit's front-panel LEDs to locate it physically (SP LINK's double-click identify).
+
+    Re-addresses to `unit` (verified by a serial read-back, like any per-unit write), writes the flash-duration
+    register, then restores the link to the primary - mirrors IdentifyFrontPanelLeds. `unit` is a detect() dict;
+    None / multi=False = the lone inverter (no re-address). Call inside the link lock. Returns what was written.
+    """
+    value = identify_value(duration_ms)
+    index = unit['index'] if unit else 0
+    if multi and unit is not None:
+        change_destination(reader, index, unit.get('serial'))    # verified re-address (raises on serial mismatch)
+    reader.write(REG_IDENTIFY, struct.pack('<H', value))
+    if multi and unit is not None and index != 0:
+        change_destination(reader, 0)                            # restore the link to the primary, as SP LINK does
+    return {'index': index, 'register': REG_IDENTIFY, 'value': value, 'duration_ms': duration_ms}

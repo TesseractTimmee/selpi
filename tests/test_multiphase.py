@@ -103,3 +103,57 @@ class AgainstSim(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class IdentifyValue(unittest.TestCase):
+    def test_value_matches_splink(self):
+        self.assertEqual(mp.identify_value(3000), 150)        # SP LINK's btnIdentify_Click default (0xbb8)
+        self.assertEqual(mp.identify_value(), 150)            # default arg
+        self.assertEqual(mp.identify_value(20), 1)
+        self.assertEqual(mp.identify_value(0), 0)
+        self.assertEqual(mp.identify_value(10 ** 6), 999)     # clamped at 999
+
+
+@unittest.skipUnless(os.path.exists(CAP), 'capture not present (captures/ is git-ignored)')
+class IdentifyAgainstSim(unittest.TestCase):
+    def mem(self):
+        return sim_sppro.capture_memory(CAP)
+
+    @staticmethod
+    def _writes(sim):
+        return [(hex(a), d.hex()) for a, d in sim.writes]
+
+    def test_multi_readdresses_then_writes_then_restores(self):
+        sim = sim_sppro.SimProtocol(self.mem(), multiphase=3)
+        r = reader_for(sim)
+        units = mp.detect(r)
+        sim.writes.clear()
+        out = mp.identify(r, units[2], multi=True)
+        self.assertEqual(out, {'index': 2, 'register': 0xa389, 'value': 150, 'duration_ms': 3000})
+        # re-address to unit 2, flash write, then restore the link to the primary (index 0)
+        self.assertEqual(self._writes(sim),
+                         [('0xdfde', '0200'), ('0xa389', '9600'), ('0xdfde', '0000')])
+
+    def test_primary_unit_addresses_but_does_not_restore(self):
+        sim = sim_sppro.SimProtocol(self.mem(), multiphase=3)
+        r = reader_for(sim)
+        units = mp.detect(r)
+        sim.writes.clear()
+        mp.identify(r, units[0], multi=True)
+        self.assertEqual(self._writes(sim), [('0xdfde', '0000'), ('0xa389', '9600')])
+
+    def test_single_inverter_just_writes_the_register(self):
+        sim = sim_sppro.SimProtocol(self.mem())          # single unit, no multiphase
+        r = reader_for(sim)
+        sim.writes.clear()
+        mp.identify(r, None, multi=False)
+        self.assertEqual(self._writes(sim), [('0xa389', '9600')])
+
+    def test_wrong_serial_refuses_without_flashing(self):
+        sim = sim_sppro.SimProtocol(self.mem(), multiphase=3)
+        r = reader_for(sim)
+        mp.detect(r)
+        sim.writes.clear()
+        with self.assertRaises(RuntimeError):
+            mp.identify(r, {'index': 1, 'serial': 999999}, multi=True)
+        self.assertNotIn('0xa389', [hex(a) for a, _ in sim.writes])   # verify failed -> no flash write
