@@ -1,4 +1,11 @@
 class Connection:
+    # Whether the SP PRO expects the 0x1f0000 MD5 serial login before it answers. True for a direct serial / TCP
+    # link; False for Select.Live, where the LOGIN/USER/CONNECT handshake authenticates and the tunnel then carries
+    # reads with no serial login (SP LINK never sends one over Select.Live). Gating the login on this stops a brief
+    # Select.Live stall (a silent read) from being mistaken for a login prompt and firing extra reads/writes at an
+    # already-struggling link.
+    requires_sppro_login = True
+
     def __init__(self):
         self.__connected = False
 

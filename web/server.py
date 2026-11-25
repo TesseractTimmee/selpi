@@ -44,8 +44,9 @@ BREAKER_FAILS = 3         # consecutive link failures before the circuit breaker
 BREAKER_COOLDOWN = 20     # s to serve Busy instantly between recovery probes while the breaker is tripped
 CLOCK_DEADLINE = 25       # the automatic ops must stay short so they can't block everything
 BACKUP_DEADLINE = 90
-LOG_DEADLINE = 180        # base budget for a log download; scaled up per log + per day of range (see logs_job)
-LOG_DEADLINE_MAX = 420    # but never hold the link (and block polls) longer than this
+LOG_DEADLINE = 240        # a manual log download may legitimately run longer than a poll, but still bounded so a
+                          # stalled link can't hold the lock (and block polls) indefinitely (was 120, which cut
+                          # real downloads short over a slow Select.Live link)
 LIVE_DEADLINE = 25
 SETTINGS_DEADLINE = 20
 CONFIG_DEADLINE = 20
@@ -388,12 +389,7 @@ def logs_job(since, until, keys):
                                   '%s (%d of %d): %d of %d records' % (title, index + 1, len(keys), done, total))
             return scales, logs.download(reader, keys, since, until, progress)
         job['message'] = 'waiting for the SP PRO link' + (' (busy: %s)' % SPPRO.busy if SPPRO.busy else '')
-        # Budget scales with the work: a wide date range or several logs legitimately takes longer than the base,
-        # and Select.Live's ~60 s silent-close + reconnect eats into it, so the old flat 120 s guillotined real
-        # downloads. Still capped so a manual download can't hold the link (and block polls) indefinitely.
-        days = max(1, int((until - since).total_seconds() // 86400) + 1)
-        deadline = min(LOG_DEADLINE_MAX, LOG_DEADLINE + 60 * (len(keys) - 1) + min(180, 10 * days))
-        scales, records = SPPRO.use('log download', work, wait=READ_WAIT, deadline=deadline)
+        scales, records = SPPRO.use('log download', work, wait=READ_WAIT, deadline=LOG_DEADLINE)
         job['message'] = 'building the CSV files'
         job['progress'] = dict(job.get('progress') or {}, percent=100)
         merged = {}

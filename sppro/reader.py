@@ -22,24 +22,9 @@ class Reader:
         # monotonic time after which calls stop retrying and give up, so a single operation (e.g. a whole
         # configuration read of many blocks over a flaky Select.Live link) can't hold the link lock for minutes.
         self.deadline = None
-        # Called with this reader just after each (re)connect, to re-establish per-session device state before the
-        # next read. Select.Live drops the link mid-transfer and we reconnect transparently; a log download sets
-        # this so download mode (0xa251) is re-asserted on the fresh session rather than reading from a unit that
-        # has fallen out of it. Reentrancy-guarded: the hook's own writes won't re-trigger it.
-        self.on_connect = None
-        self.__priming = False
 
     def __expired(self):
         return self.deadline is not None and time.monotonic() > self.deadline
-
-    def __reconnect(self):
-        self.__protocol = self.__factory()
-        if self.on_connect is not None and not self.__priming:
-            self.__priming = True
-            try:
-                self.on_connect(self)
-            finally:
-                self.__priming = False
 
     def __call(self, what: str, fn):
         last = None
@@ -48,11 +33,24 @@ class Reader:
                 raise TimeoutError('%s: SP PRO link deadline exceeded' % what)
             try:
                 if self.__protocol is None:
-                    self.__reconnect()
+                    self.__protocol = self.__factory()
                 return fn(self.__protocol)
             except Exception as e:  # connection loss, short read, CRC error, ...
                 last = e
-                self.__protocol = None
+                # A stalled read (timeout / short read) usually means the Select.Live tunnel went briefly quiet,
+                # not that it broke. Keep the session and retry on it (as SP LINK does) rather than reconnecting:
+                # a reconnect opens a NEW Select.Live session while the old one lingers (~60 s), so the relay can
+                # leave the device bound to the dying session and the stall feeds itself. Drop the link only on a
+                # genuine error, or on the final attempt (so the next call starts fresh).
+                transient = isinstance(e, (TimeoutError, BufferError))
+                if transient and attempt < self.__retries and self.__protocol is not None \
+                        and hasattr(self.__protocol, 'reset'):
+                    try:
+                        self.__protocol.reset()
+                    except Exception:
+                        self.__protocol = None
+                else:
+                    self.__protocol = None
                 logging.warning('%s failed (attempt %d/%d): %s', what, attempt, self.__retries, e)
                 if self.__expired():
                     break

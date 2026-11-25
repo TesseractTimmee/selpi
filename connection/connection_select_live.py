@@ -15,6 +15,8 @@ SERVERS = {
 
 
 class ConnectionSelectLive(Connection):
+    requires_sppro_login = False     # the LOGIN/USER/CONNECT handshake authenticates; no 0x1f0000 serial login
+
     def __init__(
             self,
             create_ssl_connection_function: create_ssl_connection=None,

@@ -17,6 +17,12 @@ class Protocol:
     def close(self):
         self.__connection.close()
 
+    def reset(self):
+        """Clear transient per-request state so the SAME connection can be retried after a stalled read, without
+        reconnecting. Drops any partial read buffer and the mid-login flag; the socket stays open."""
+        self.__read_buffer = bytearray()
+        self.__logging_in = False
+
     """
     Request memory from the SP Pro
     """
@@ -25,6 +31,10 @@ class Protocol:
         try:
             return self.__send(req).memory()
         except BufferError as e:
+            # A silent read. On serial/TCP it means "log in first"; over Select.Live it is just a stall (no serial
+            # login exists there), so re-raise and let the caller retry rather than firing a spurious login.
+            if not getattr(self.__connection, 'requires_sppro_login', True):
+                raise
             self.login()
         return self.__send(req).memory()
 

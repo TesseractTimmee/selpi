@@ -122,12 +122,10 @@ def download(reader: Reader, keys, since: datetime, until: datetime, progress=No
     """{key: [(address, raw)]} for the requested logs; download mode is always cleared afterwards.
     progress(key, index, phase, done, total), if given, reports each log's search and records read."""
     out = {}
-    # Re-assert download mode on every (re)connect: Select.Live routinely drops the link mid-download (see
-    # reader.py) and the fresh session would otherwise read from a unit no longer in download mode. The hook is
-    # reentrancy-guarded in the reader, so this write won't re-trigger it.
-    prev_hook = getattr(reader, 'on_connect', None)
-    if hasattr(reader, 'on_connect'):
-        reader.on_connect = lambda r: r.write(DOWNLOAD_MODE, struct.pack('<H', 1))
+    # Download mode (0xa251) is device state on the SP PRO, not Select.Live session state: a dropped-and-
+    # reconnected tunnel is a fresh path to the same serial port and the register persists, so it is set once
+    # here and cleared once at the end. (Re-asserting it on every reconnect only piles failed writes onto a
+    # stalled link and makes a dead download far slower to give up.)
     reader.write(DOWNLOAD_MODE, struct.pack('<H', 1))
     try:
         for index, key in enumerate(keys):
@@ -136,8 +134,6 @@ def download(reader: Reader, keys, since: datetime, until: datetime, progress=No
             out[key] = list(read_records(reader, log, since, until, report))
             logging.info('%s: %d records', log.title, len(out[key]))
     finally:
-        if hasattr(reader, 'on_connect'):       # stop re-priming before we clear the mode, or a reconnect on the
-            reader.on_connect = prev_hook       # clearing write would set it straight back to 1
         reader.write(DOWNLOAD_MODE, struct.pack('<H', 0))
     return out
 

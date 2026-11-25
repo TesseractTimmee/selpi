@@ -1,106 +1,108 @@
+import struct
 import unittest
+from datetime import datetime
 
 from sppro.reader import Reader
 from sppro import logs
 
 
-class FakeProto:
-    """Minimal SP PRO protocol: records writes, answers queries with zeros, and can be told to drop the next
-    operation once (simulating Select.Live closing the link mid-transfer)."""
-    def __init__(self, registry):
-        self.writes = []
-        self.queries = 0
-        self.boom = False
-        registry.append(self)
-
-    def _maybe(self):
-        if self.boom:
-            self.boom = False
-            raise IOError('link dropped')
-
-    def query(self, rng):
-        self._maybe()
-        self.queries += 1
-        return b'\x00' * (rng.words * 2)
-
-    def write(self, address, data):
-        self._maybe()
-        self.writes.append((address, bytes(data)))
-
-    def close(self):
-        pass
+def zeros(rng):
+    return b'\x00' * (rng.words * 2)
 
 
-class TestReaderReconnectHook(unittest.TestCase):
-    def test_on_connect_fires_on_each_connect(self):
+class TestReaderStallHandling(unittest.TestCase):
+    def test_transient_stall_retries_the_same_session(self):
+        # A stalled read (timeout) must be retried on the SAME connection (reset first), not by reconnecting —
+        # reconnecting spawns a second Select.Live session and makes stalls worse.
         created = []
-        r = Reader(protocol_factory=lambda: FakeProto(created))
-        fired = []
-        r.on_connect = lambda rr: fired.append(len(created))
-        r.read(0x2000, 1)                     # first connect
-        self.assertEqual(len(created), 1)
-        self.assertEqual(fired, [1])          # hook fired once, for the first session
 
-    def test_reconnect_reprimes_download_mode(self):
-        created = []
-        r = Reader(protocol_factory=lambda: FakeProto(created), retries=3)
-        # as logs.download does: re-assert download mode on every (re)connect
-        r.on_connect = lambda rr: rr.write(logs.DOWNLOAD_MODE, b'\x01\x00')
+        class P:
+            def __init__(self):
+                self.calls = 0
+                self.resets = 0
+                created.append(self)
+
+            def query(self, rng):
+                self.calls += 1
+                if self.calls == 1:
+                    raise TimeoutError('read timed out')
+                return zeros(rng)
+
+            def reset(self):
+                self.resets += 1
+
+            def close(self):
+                pass
+
+        r = Reader(protocol_factory=P, retries=3)
         r.read(0x2000, 1)
-        self.assertEqual(len(created), 1)
-        self.assertEqual(created[0].writes, [(logs.DOWNLOAD_MODE, b'\x01\x00')])   # primed on first session
-        created[0].boom = True                # next op drops the link
-        r.read(0x2000, 1)                     # fails once -> reconnect -> reprime -> retry succeeds
-        self.assertEqual(len(created), 2)                                          # one reconnect happened
-        self.assertEqual(created[1].writes, [(logs.DOWNLOAD_MODE, b'\x01\x00')])   # re-primed on the new session
+        self.assertEqual(len(created), 1)        # one session only — no reconnect
+        self.assertEqual(created[0].resets, 1)   # buffer reset before the retry
+        self.assertEqual(created[0].calls, 2)    # timed out once, then succeeded on the same session
 
-    def test_hook_is_reentrancy_guarded(self):
-        # The hook itself writes; that write must not recursively re-fire the hook (which would recurse / double up).
+    def test_hard_error_reconnects(self):
         created = []
-        r = Reader(protocol_factory=lambda: FakeProto(created))
-        depth = {'max': 0, 'cur': 0}
 
-        def hook(rr):
-            depth['cur'] += 1
-            depth['max'] = max(depth['max'], depth['cur'])
-            rr.write(logs.DOWNLOAD_MODE, b'\x01\x00')   # goes through the reader; must not re-enter the hook
-            depth['cur'] -= 1
+        class P:
+            def __init__(self):
+                self.calls = 0
+                created.append(self)
 
-        r.on_connect = hook
+            def query(self, rng):
+                self.calls += 1
+                if len(created) == 1:
+                    raise ValueError('CRC mismatch')   # not transient -> drop + reconnect
+                return zeros(rng)
+
+            def reset(self):
+                pass
+
+            def close(self):
+                pass
+
+        r = Reader(protocol_factory=P, retries=3)
         r.read(0x2000, 1)
-        self.assertEqual(depth['max'], 1)               # never nested
+        self.assertEqual(len(created), 2)        # hard error dropped the link, so it reconnected
+
+    def test_persistent_stall_gives_up_without_reconnect_churn(self):
+        created = []
+
+        class P:
+            def __init__(self):
+                created.append(self)
+
+            def query(self, rng):
+                raise TimeoutError('still stalled')
+
+            def reset(self):
+                pass
+
+            def close(self):
+                pass
+
+        r = Reader(protocol_factory=P, retries=2)
+        with self.assertRaises(TimeoutError):
+            r.read(0x2000, 1)
+        self.assertEqual(len(created), 1)        # retried on one session, never spun up new ones mid-op
 
 
-class TestLogsDownloadHook(unittest.TestCase):
-    def test_download_sets_reprime_hook_in_mode_and_restores_after(self):
-        import struct
-        from datetime import datetime
-
+class TestLogsDownloadMode(unittest.TestCase):
+    def test_download_sets_then_clears_mode(self):
         class FakeReader:
             def __init__(self):
-                self.on_connect = 'ORIGINAL'          # download() must restore whatever was here
                 self.writes = []
-                self.hook_while_downloading = 'unset'
 
             def write(self, address, data):
                 self.writes.append((address, bytes(data)))
-                if address == logs.DOWNLOAD_MODE and bytes(data) == b'\x01\x00':
-                    self.hook_while_downloading = self.on_connect   # capture the hook during the download
 
             def read(self, address, words):
-                # find(): report "no records" (STATUS_NONE) so the search ends at once
-                return struct.pack('<HIIH', logs.STATUS_NONE, 0, 0, 0)
+                return struct.pack('<HIIH', logs.STATUS_NONE, 0, 0, 0)   # "no records"
 
         fr = FakeReader()
         out = logs.download(fr, ['events'], datetime(2026, 1, 1), datetime(2026, 1, 2))
         self.assertEqual(out, {'events': []})
-        # mode written 1 (enter) then 0 (exit)
         modes = [d for a, d in fr.writes if a == logs.DOWNLOAD_MODE]
-        self.assertEqual(modes, [b'\x01\x00', b'\x00\x00'])
-        # while in download mode a reprime hook was installed (not the original)
-        self.assertTrue(callable(fr.hook_while_downloading))
-        # and it was restored afterwards, so later polls don't keep re-writing download mode
-        self.assertEqual(fr.on_connect, 'ORIGINAL')
+        self.assertEqual(modes, [b'\x01\x00', b'\x00\x00'])   # enter download mode, then leave — once each
 
 
 if __name__ == '__main__':

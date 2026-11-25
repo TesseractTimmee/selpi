@@ -146,3 +146,27 @@ class ProtocolTest(TestCase):
         connection.write.assert_called_once_with(b'\x51\x00\x00\xa0\x00\x00\x9d\x4b')
 
 
+
+
+class SelectLiveLoginGating(TestCase):
+    def test_silent_read_over_select_live_does_not_attempt_serial_login(self):
+        # Over Select.Live there is no 0x1f0000 serial login; a silent read is a stall, so query() must re-raise
+        # BufferError rather than firing a login (which caused the "Attempted to start multiple logins" noise).
+        connection = create_autospec(Connection)
+        connection.requires_sppro_login = False
+        connection.read.side_effect = [b'', b'', b'']          # three empty reads -> BufferError
+        protocol = Protocol(connection)
+        with self.assertRaises(BufferError):
+            protocol.query(Range(0xa000, 1))
+        self.assertEqual(connection.write.call_count, 1)        # only the query write; no login handshake write
+
+    def test_silent_read_on_serial_still_logs_in(self):
+        connection = create_autospec(Connection)
+        connection.requires_sppro_login = True
+        # query empty x3 -> BufferError -> login() is attempted (its own query writes to 0x1f0000). On a silent
+        # serial link that login then fails; the point of this test is only that the login path IS taken.
+        connection.read.side_effect = [b'', b'', b'', b'', b'', b'']
+        protocol = Protocol(connection, b'pw')
+        with self.assertRaises(Exception):
+            protocol.query(Range(0xa000, 1))
+        self.assertGreaterEqual(connection.write.call_count, 2)  # query write + the login's own query write
