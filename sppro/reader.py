@@ -22,9 +22,24 @@ class Reader:
         # monotonic time after which calls stop retrying and give up, so a single operation (e.g. a whole
         # configuration read of many blocks over a flaky Select.Live link) can't hold the link lock for minutes.
         self.deadline = None
+        # Called with this reader just after each (re)connect, to re-establish per-session device state before the
+        # next read. Select.Live drops the link mid-transfer and we reconnect transparently; a log download sets
+        # this so download mode (0xa251) is re-asserted on the fresh session rather than reading from a unit that
+        # has fallen out of it. Reentrancy-guarded: the hook's own writes won't re-trigger it.
+        self.on_connect = None
+        self.__priming = False
 
     def __expired(self):
         return self.deadline is not None and time.monotonic() > self.deadline
+
+    def __reconnect(self):
+        self.__protocol = self.__factory()
+        if self.on_connect is not None and not self.__priming:
+            self.__priming = True
+            try:
+                self.on_connect(self)
+            finally:
+                self.__priming = False
 
     def __call(self, what: str, fn):
         last = None
@@ -33,7 +48,7 @@ class Reader:
                 raise TimeoutError('%s: SP PRO link deadline exceeded' % what)
             try:
                 if self.__protocol is None:
-                    self.__protocol = self.__factory()
+                    self.__reconnect()
                 return fn(self.__protocol)
             except Exception as e:  # connection loss, short read, CRC error, ...
                 last = e

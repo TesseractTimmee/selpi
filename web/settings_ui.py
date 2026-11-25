@@ -98,6 +98,30 @@ def limits(cells, battery=None, values=None):
     return out
 
 
+def range_texts(cells, battery=None, values=None):
+    """Formatted range strings (e.g. '[39.6 - 52.8 V]') for the settings whose range is not fixed: DC voltages
+    scale per cell by the unit's model (24 / 48 / 120 V) and Battery Type, and a few maxima come from other
+    settings. settings_layout.json carries only a fixed reference string (SP LINK's 48 V / Lead-Acid screen), so
+    the page would otherwise show the wrong numbers; send the real range for these fields and let the page prefer
+    it over the static text. Only the dynamic fields are emitted; everything else keeps its curated text."""
+    out = {}
+    for n, e in settings.META.items():
+        if 'per_cell_min' not in e and 'per_cell_by_battery' not in e and not e.get('max_from'):
+            continue
+        mn, mx = settings._limits(e, cells, battery, values)
+        if mn is None and mx is None:
+            continue
+        dec = e.get('decimals') or 0
+        unit = (' ' + e['unit']) if e.get('unit') else ''
+        if mn is not None and mx is not None:
+            out[n] = '[%.*f - %.*f%s]' % (dec, mn, dec, mx, unit)
+        elif mx is not None:
+            out[n] = '[≤ %.*f%s]' % (dec, mx, unit)
+        else:
+            out[n] = '[≥ %.*f%s]' % (dec, mn, unit)
+    return out
+
+
 def _forget_old():
     now = time.time()
     for rid in [r for r, v in READS.items() if now - v['at'] > READ_MAX_AGE]:
@@ -158,6 +182,7 @@ def _render(rid, snap, from_cache):
             'unit': settings.unit_context(model, versions, batteryless),   # unit props for dependent-visibility
             'values': _values(raw, cells), 'problems': problems,
             'limits': limits(cells, shown.get('BatteryType'), shown),
+            'ranges': range_texts(cells, shown.get('BatteryType'), shown),
             'version_problems': live.version_problems(versions) if versions else [],
             'map_mismatch': bool(versions) and versions.get('memory_map') != live.VERIFIED['memory_map'],
             'writes_allowed': writes_allowed(),
@@ -248,7 +273,8 @@ def _evaluate(reader, s_sess, changes):
         unit, link = _unit_state(reader, raw_now, cells)
         send = [p for p in settings.send_check(raw_new, raw_now, unit, link, cells, model) if p['severity'] != 'skipped']
     return {'changes': out, 'problems': caused, 'send_problems': send,
-            'limits': limits(cells, shown.get('BatteryType'), shown)}, raw_changes
+            'limits': limits(cells, shown.get('BatteryType'), shown),
+            'ranges': range_texts(cells, shown.get('BatteryType'), shown)}, raw_changes
 
 
 def check(reader, rid, changes):

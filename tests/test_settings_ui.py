@@ -76,6 +76,20 @@ class TestConfigurationPage(unittest.TestCase):
         c = settings_ui.check(r, d['read_id'], {'BatteryType': 'Custom'})
         self.assertEqual(c['limits']['FloatV'][:2], [48.0, 68.4])
 
+    def test_ranges_are_dynamic_for_dc_voltages(self):
+        # The displayed range for per-cell DC voltages must reflect the unit's cell count + Battery Type, not the
+        # fixed 48 V / Lead-Acid reference string in settings_layout.json. Sim = 24 cells, Battery Type Lead Acid.
+        s, r = sim()
+        d = settings_ui.read(r)
+        self.assertEqual(d['ranges']['LowDcShutDown0PercentLoad'], '[39.6 - 48.0 V]')   # 1.65-2.0 V/cell x 24
+        self.assertEqual(d['ranges']['EqualiseV'], '[48.0 - 64.8 V]')
+        # switch to a lithium-ish type (Custom: up to 2.2 V/cell) and the top of the range must move to 52.8 V
+        c = settings_ui.check(r, d['read_id'], {'BatteryType': 'Custom'})
+        self.assertEqual(c['ranges']['LowDcShutDown0PercentLoad'], '[39.6 - 52.8 V]')
+        # only the unit-dependent fields get a dynamic string; a fixed-range setting is not in the map
+        self.assertNotIn('ShutdownSoC', d['ranges'])
+        self.assertNotIn('StatOfChargeShutdownSoC', d['ranges'])
+
     def test_firmware_gated_setting_not_writable(self):
         # a setting needing a higher config version than the unit has is refused
         s, r = sim()

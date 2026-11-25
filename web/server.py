@@ -44,11 +44,18 @@ BREAKER_FAILS = 3         # consecutive link failures before the circuit breaker
 BREAKER_COOLDOWN = 20     # s to serve Busy instantly between recovery probes while the breaker is tripped
 CLOCK_DEADLINE = 25       # the automatic ops must stay short so they can't block everything
 BACKUP_DEADLINE = 90
-LOG_DEADLINE = 120
+LOG_DEADLINE = 180        # base budget for a log download; scaled up per log + per day of range (see logs_job)
+LOG_DEADLINE_MAX = 420    # but never hold the link (and block polls) longer than this
 LIVE_DEADLINE = 25
 SETTINGS_DEADLINE = 20
 CONFIG_DEADLINE = 20
 WRITE_DEADLINE = 60
+# How long a kept-open link may sit idle before it is dropped. On Select.Live, keep it comfortably above the
+# poll interval so steady polling reuses one logged-in session instead of reconnecting (and re-logging in) on
+# the 60 s boundary — connection/login churn is what trips Select.Live. A failure still drops the session at
+# once (so SP LINK can take the device), and it closes after this once polling stops.
+SELECTLIVE_IDLE = 150
+TCP_IDLE = 60
 
 
 class Busy(Exception):
@@ -205,8 +212,11 @@ class Inverter:
             self.lock.release()
 
 
-    def close_if_idle(self, idle_s=60):
-        """Drop a kept-open link (Select.Live) once nothing has used it for idle_s."""
+    def close_if_idle(self, idle_s=None):
+        """Drop a kept-open link (Select.Live) once nothing has used it for idle_s. Default idle is connection-aware
+        (SELECTLIVE_IDLE for Select.Live, so steady polling keeps one session rather than reconnecting every poll)."""
+        if idle_s is None:
+            idle_s = SELECTLIVE_IDLE if os.environ.get('SELPI_CONNECTION_TYPE') == 'SelectLive' else TCP_IDLE
         if self.reader is None or self.last_ok is None or self.keep_open:
             return
         if (datetime.now() - self.last_ok).total_seconds() < idle_s or not self.lock.acquire(blocking=False):
@@ -378,7 +388,12 @@ def logs_job(since, until, keys):
                                   '%s (%d of %d): %d of %d records' % (title, index + 1, len(keys), done, total))
             return scales, logs.download(reader, keys, since, until, progress)
         job['message'] = 'waiting for the SP PRO link' + (' (busy: %s)' % SPPRO.busy if SPPRO.busy else '')
-        scales, records = SPPRO.use('log download', work, wait=READ_WAIT, deadline=LOG_DEADLINE)
+        # Budget scales with the work: a wide date range or several logs legitimately takes longer than the base,
+        # and Select.Live's ~60 s silent-close + reconnect eats into it, so the old flat 120 s guillotined real
+        # downloads. Still capped so a manual download can't hold the link (and block polls) indefinitely.
+        days = max(1, int((until - since).total_seconds() // 86400) + 1)
+        deadline = min(LOG_DEADLINE_MAX, LOG_DEADLINE + 60 * (len(keys) - 1) + min(180, 10 * days))
+        scales, records = SPPRO.use('log download', work, wait=READ_WAIT, deadline=deadline)
         job['message'] = 'building the CSV files'
         job['progress'] = dict(job.get('progress') or {}, percent=100)
         merged = {}

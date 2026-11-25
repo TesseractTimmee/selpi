@@ -301,7 +301,7 @@ function rowHtml(r, where) {
   const was = changed ? `<span class="fieldmsg muted">was ${esc(names.map(currentText).join(' '))}</span>` : '';
   const ctl = r.month ? `<span class="date">${control(r.setting)} ${control(r.month)}</span>` : control(r.setting);
   return `<tr class="${changed ? 'changed' : ''}"><td class="lbl">${esc(r.label || r.setting)}${where ? `<div class="muted">${esc(where)}</div>` : ''}</td>` +
-    `<td>${ctl}${was}${held}${msgs}</td><td class="rng">${esc(r.month ? '' : (r.range || ''))}</td></tr>`;
+    `<td>${ctl}${was}${held}${msgs}</td><td class="rng">${esc(r.month ? '' : rangeText(r.setting, r.range))}</td></tr>`;
 }
 const CAT_LABEL = {legacy: 'legacy', unreleased: 'experimental', advanced: 'advanced'};
 const groupShown = g => !g.visibility || $('#cfg-factory').checked;
@@ -458,6 +458,11 @@ $('#cfg-out').addEventListener('change', e => {
 // decimals; the same here, with a note. Limits set by another setting are left to the rule check.
 // the limits after the pending changes (Battery Type, Float...) once checked; until then those from the read
 const lim = name => ((CHECK && CHECK.limits) || READ.limits || {})[name] || [null, null, 0];
+// The displayed range: for DC voltages and other unit-dependent settings the server sends the real range
+// (scaled to this unit's model + Battery Type, and following pending edits); prefer it over settings_layout's
+// fixed reference text so the page doesn't show, e.g., a 48 V Lead-Acid range on a 120 V or lithium unit.
+const rangeText = (name, fallback) =>
+  (CHECK && CHECK.ranges && CHECK.ranges[name]) || (READ.ranges && READ.ranges[name]) || fallback || '';
 function held(name, text) {
   delete NOTES[name];
   const [mn, mx, dec] = lim(name);
