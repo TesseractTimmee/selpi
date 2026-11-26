@@ -107,3 +107,58 @@ class TestLogsDownloadMode(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class TestIdleReconnect(unittest.TestCase):
+    """Select.Live idle-closes at ~60 s; with idle_reconnect set, the reader pre-empts that by closing a session
+    that has been idle too long so the next call reconnects fresh (instead of wasting the first read on a dead
+    socket). A fast poll (idle < the threshold) must NOT reconnect."""
+
+    def _reader(self, idle_reconnect):
+        created, closed = [], []
+
+        class P:
+            def __init__(self):
+                created.append(self)
+
+            def query(self, rng):
+                return zeros(rng)
+
+            def reset(self):
+                pass
+
+            def close(self):
+                closed.append(self)
+
+        return Reader(protocol_factory=P, idle_reconnect=idle_reconnect), created, closed
+
+    def _patch_clock(self):
+        import sppro.reader as R
+        self._R = R
+        self._orig = R.time.monotonic
+        self._now = [1000.0]
+        R.time.monotonic = lambda: self._now[0]
+
+    def tearDown(self):
+        if getattr(self, "_R", None) is not None:
+            self._R.time.monotonic = self._orig
+
+    def test_long_idle_reconnects(self):
+        self._patch_clock()
+        r, created, closed = self._reader(idle_reconnect=50)
+        r.read(0x2000, 1)                      # session 1
+        self.assertEqual(len(created), 1)
+        self._now[0] += 40                     # 40 s idle (< 50): keep the session
+        r.read(0x2000, 1)
+        self.assertEqual((len(created), len(closed)), (1, 0))
+        self._now[0] += 60                     # 60 s idle (> 50): stale -> close + reconnect
+        r.read(0x2000, 1)
+        self.assertEqual((len(created), len(closed)), (2, 1))
+
+    def test_disabled_never_reconnects_on_idle(self):
+        self._patch_clock()
+        r, created, closed = self._reader(idle_reconnect=None)   # local link: no idle-close
+        r.read(0x2000, 1)
+        self._now[0] += 10000                  # arbitrarily long idle
+        r.read(0x2000, 1)
+        self.assertEqual((len(created), len(closed)), (1, 0))

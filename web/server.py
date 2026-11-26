@@ -66,6 +66,10 @@ WRITE_DEADLINE = 60
 # once (so SP LINK can take the device), and it closes after this once polling stops.
 SELECTLIVE_IDLE = 150
 TCP_IDLE = 60
+SELECTLIVE_RECONNECT_IDLE = 50   # Select.Live idle-closes a connection at ~60 s; when a poll interval is longer,
+                                 # reconnect pre-emptively past this so the first read of the poll isn't wasted on a
+                                 # socket Select.Live already dropped (see Reader(idle_reconnect=...)). A fast poll
+                                 # (< this) keeps the link warm and never trips it. Local links don't idle-close.
 
 
 class Busy(Exception):
@@ -195,7 +199,8 @@ class Inverter:
         self.busy = what
         try:
             if self.reader is None:
-                self.reader = Reader()
+                idle = SELECTLIVE_RECONNECT_IDLE if os.environ.get('SELPI_CONNECTION_TYPE') == 'SelectLive' else None
+                self.reader = Reader(idle_reconnect=idle)
             self.reader.deadline = (time.monotonic() + deadline) if deadline else None
             if self.versions is None and check_versions:
                 self.versions = live.versions(self.reader)

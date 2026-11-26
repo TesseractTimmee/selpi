@@ -49,6 +49,18 @@ class TestCatalog(unittest.TestCase):
         self.assertEqual(by['ac_out_status']['options'], ['Econo', 'Idle', 'On', 'Sync'])
         self.assertEqual(by['inverter_run_hrs_total_acc']['state_class'], 'total_increasing')
 
+    def test_fast_flag_tracks_screens(self):
+        from sppro import field_meta
+        cat = api.catalog()
+        self.assertTrue(any(e['fast'] for e in cat))       # the fast (Now/Technical power) screens
+        self.assertTrue(any(not e['fast'] for e in cat))   # and the slow ones (energy, history, ...)
+        for e in cat:
+            self.assertEqual(e['fast'], e['screen'] in field_meta.FAST_SCREENS)
+        by = {f['key']: f for f in cat}
+        self.assertTrue(by['load_ac_power']['fast'])       # NowSubTab
+        self.assertTrue(by['ac_source_power']['fast'])     # TechnicalDataSubTab (grid/chart input)
+        self.assertFalse(by['ac_loadk_wh_acc']['fast'])    # TodaySubTab energy accumulator -> slow
+
 
 class TestValues(unittest.TestCase):
     def setUp(self):

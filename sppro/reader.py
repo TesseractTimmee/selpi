@@ -12,7 +12,7 @@ class Reader:
     Select.Live sometimes never delivers a reply and closes the connection about a minute later;
     every request is therefore retried on a fresh connection a few times before giving up.
     """
-    def __init__(self, protocol_factory=None, retries: int = 3):
+    def __init__(self, protocol_factory=None, retries: int = 3, idle_reconnect: float = None):
         if protocol_factory is None:
             from memory import Protocol
             protocol_factory = Protocol
@@ -22,11 +22,23 @@ class Reader:
         # monotonic time after which calls stop retrying and give up, so a single operation (e.g. a whole
         # configuration read of many blocks over a flaky Select.Live link) can't hold the link lock for minutes.
         self.deadline = None
+        # Select.Live closes a connection after about a minute idle. When the poll interval is longer than that,
+        # the first read of each poll lands on a socket Select.Live has already dropped: it returns nothing, and
+        # the retries soft-reset a dead session (~6 s wasted) before the next read reconnects -- so the first
+        # block of the poll (now the Now/power block, since scales are cached) is lost every cycle. When
+        # idle_reconnect is set, pre-empt it: if the link has been idle this long, close the (dying) session
+        # cleanly before the next call so it reconnects fresh. Only set for Select.Live; a local link
+        # (serial/TCP/ESP) does not idle-close, so it stays None there. A fast poll (< this) never trips it.
+        self.__idle_reconnect = idle_reconnect
+        self.__last = None            # time.monotonic() of the last successful call
 
     def __expired(self):
         return self.deadline is not None and time.monotonic() > self.deadline
 
     def __call(self, what: str, fn):
+        if self.__idle_reconnect is not None and self.__protocol is not None and self.__last is not None \
+                and time.monotonic() - self.__last > self.__idle_reconnect:
+            self.close()              # stale (Select.Live idle-closed) session: drop it so the call below reconnects
         last = None
         for attempt in range(1, self.__retries + 1):
             if self.__expired():
@@ -34,7 +46,9 @@ class Reader:
             try:
                 if self.__protocol is None:
                     self.__protocol = self.__factory()
-                return fn(self.__protocol)
+                out = fn(self.__protocol)
+                self.__last = time.monotonic()
+                return out
             except Exception as e:  # connection loss, short read, CRC error, ...
                 last = e
                 # A stalled read (timeout / short read) usually means the Select.Live tunnel went briefly quiet,

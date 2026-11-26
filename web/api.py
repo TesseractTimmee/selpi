@@ -76,6 +76,8 @@ def catalog():
         entry = {'key': k, 'name': name, 'unit': f['unit'], 'kind': f['kind'], 'screen': f['screen'],
                  'default': k in DEFAULTS, 'note': f.get('note', ''), 'feature': f.get('feature'),
                  'needs_map_version': f.get('needs_map_version'),
+                 'fast': f['screen'] in field_meta.FAST_SCREENS,   # poll on the integration's fast coordinator
+
                  'aggregatable': multiphase.aggregation(f['unit'], f['key']) is not None}   # rolls up to the System device
         entry.update(field_meta.hints(f))
         if f['kind'] == 'enum':
