@@ -10,6 +10,7 @@ import logging
 import math
 import os
 import re
+import time
 
 from . import field_meta
 
@@ -142,11 +143,47 @@ def fields_for(screens=None):
     return [f for f in FIELDS if want is None or f['screen'] in want]
 
 
-def read(reader, fields):
+SCALE_TTL = 600   # seconds. The scale block (0xa028) holds the unit's calibration factors (AcVolts / AcCurrent /
+                  # DcVolts / DcCurrent / Temperature / InternalVoltages) -- commissioning constants that do not
+                  # change at runtime. SP LINK reads them once; we cache them on the reader (per Powerchain unit)
+                  # and refresh only this often instead of re-reading them every poll. Re-reading every poll is
+                  # wasted work and, where that one block is flaky over Select.Live, a retry-storm (3 x ~2 s) that
+                  # stalls the whole poll -- which is what blocks any faster cadence.
+
+
+def _scales_into(reader, mem, unit, block):
+    """Put the scale registers (SCALE_BASE..+len(SCALES)) into mem. Cached on the reader object so they persist
+    across polls and reset on reconnect (a fresh reader re-reads them), keyed per Powerchain unit. The block is
+    read from the link only when there is no cached set yet, or the cache has aged past SCALE_TTL; otherwise the
+    constant scales are served from cache with no round trip."""
+    store = getattr(reader, '_scale_cache', None)
+    if store is None:
+        try:
+            store = reader._scale_cache = {}
+        except AttributeError:                      # a reader that can't hold the attribute: just read every time
+            block(SCALE_BASE, len(SCALES))
+            return
+    cached, at = store.get(unit, (None, 0.0))
+    now = time.monotonic()
+    if cached is None or now - at >= SCALE_TTL:
+        if cached is not None:
+            store[unit] = (cached, now)             # one refresh attempt per TTL, even if this read fails
+        block(SCALE_BASE, len(SCALES))
+        got = {SCALE_BASE + i: mem[SCALE_BASE + i] for i in range(len(SCALES)) if SCALE_BASE + i in mem}
+        if len(got) == len(SCALES):                 # only trust (and cache) a complete read
+            cached = got
+            store[unit] = (cached, now)
+    if cached:
+        for a, w in cached.items():
+            mem.setdefault(a, w)
+
+
+def read(reader, fields, unit=None):
     """Read every block the fields need, plus the scale factors. Returns {address: word}. A block that fails
     (a flaky/slow Select.Live link, or the operation's deadline running out) is skipped rather than failing the
     whole poll, so a slow poll returns partial data — the fields on the blocks that did come back — instead of
-    nothing. The reader reconnects per block, so a skipped block doesn't disturb the next one."""
+    nothing. The reader reconnects per block, so a skipped block doesn't disturb the next one. The scale block
+    (constant calibration) is cached per reader+unit, not re-read every poll (see _scales_into)."""
     mem = {}
 
     def block(base, n):
@@ -156,7 +193,7 @@ def read(reader, fields):
         except Exception as e:                      # link loss / short read / deadline: skip this block
             logging.debug('live read 0x%x+%d skipped: %s', base, n, e)
 
-    block(SCALE_BASE, len(SCALES))
+    _scales_into(reader, mem, unit, block)
     for screen in sorted({f['screen'] for f in fields}):
         for base, n in BLOCKS.get(screen, []):
             block(base, n)

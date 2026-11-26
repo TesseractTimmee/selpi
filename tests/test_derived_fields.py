@@ -161,3 +161,55 @@ class FeatureGate(unittest.TestCase):
         self.assertNotIn('tech_bms_so_c', rows)            # bms feature absent -> hidden
         self.assertNotIn('now_percent_kaco', rows) if 'now_percent_kaco' not in rows else None
         self.assertIn('now_total_ac_power_kaco', rows)     # ac_solar present -> shown
+
+
+class ScaleCache(unittest.TestCase):
+    """The scale block (0xa028) is commissioning-constant, so read() caches it on the reader (per unit) and
+    does not re-read it every poll (see live._scales_into / SCALE_TTL)."""
+
+    class Rec:
+        """A reader that records every words() call and can be told to fail the scale block."""
+        def __init__(self, fail_scales=False):
+            self.calls = []
+            self.fail_scales = fail_scales
+
+        def words(self, base, n):
+            self.calls.append((base, n))
+            if base == live.SCALE_BASE and self.fail_scales:
+                raise OSError('simulated short read')
+            return [1000] * n
+
+    def scale_reads(self, r):
+        return [c for c in r.calls if c[0] == live.SCALE_BASE]
+
+    def test_scale_block_read_once_then_served_from_cache(self):
+        r = self.Rec()
+        for _ in range(3):
+            live.read(r, [])
+        self.assertEqual(len(self.scale_reads(r)), 1)
+
+    def test_cached_scales_injected_without_a_reread(self):
+        r = self.Rec()
+        mem1 = live.read(r, [])
+        self.assertIn(live.SCALE_BASE, mem1)
+        r.fail_scales = True                      # would raise if the block were read again
+        mem2 = live.read(r, [])
+        self.assertEqual(len(self.scale_reads(r)), 1)   # not re-read
+        self.assertEqual(mem2.get(live.SCALE_BASE), 1000)
+
+    def test_uncached_failure_keeps_retrying(self):
+        r = self.Rec(fail_scales=True)
+        live.read(r, [])
+        live.read(r, [])
+        self.assertEqual(len(self.scale_reads(r)), 2)   # no cache yet -> try every poll until it succeeds
+
+    def test_cache_is_per_unit(self):
+        r = self.Rec()
+        live.read(r, [], unit=0)
+        live.read(r, [], unit=1)
+        live.read(r, [], unit=0)
+        self.assertEqual(len(self.scale_reads(r)), 2)   # one read per distinct unit, then cached
+
+
+if __name__ == '__main__':
+    unittest.main()

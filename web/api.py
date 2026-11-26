@@ -201,13 +201,13 @@ class Api:
                     cols = {f['key']: [] for f in fields}
                     for mu in self.mp_units:
                         multiphase.change_destination(r, mu['index'], mu['serial'])
-                        mem = live.read(r, fields)
+                        mem = live.read(r, fields, unit=mu['index'])
                         for f in fields:
                             cols[f['key']].append(live.evaluate(f, mem)[0])
                     return {f['key']: (multiphase.aggregate(f['unit'], cols[f['key']], f['key']), None) for f in fields}
                 if u is not None and self.multi:
                     multiphase.change_destination(r, u['index'], u['serial'])   # verify serial, then read this unit
-                mem = live.read(r, fields)
+                mem = live.read(r, fields, unit=(u['index'] if (u is not None and self.multi) else None))
                 return {f['key']: live.evaluate(f, mem) for f in fields}
             got = self.sppro.use('HA poll%s' % ('' if unit is None else ' u%s' % unit), read,
                                   wait=VALUE_WAIT, deadline=POLL_DEADLINE,
