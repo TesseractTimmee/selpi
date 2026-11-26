@@ -39,6 +39,19 @@ class TestCircuitBreaker(unittest.TestCase):
         with self.assertRaises(server.Busy):
             self.inv.use('poll', lambda r: 'ok', wait=True, check_versions=False)
 
+    def test_backoff_escalates_per_failed_probe_and_caps(self):
+        # A sustained wedge must escalate the probe gap past Select.Live's ~60 s session-linger, else every
+        # short-gap probe just opens a new session while the old one still holds the device (the overnight hang).
+        self.inv._fails = server.BREAKER_FAILS                    # just tripped
+        self.assertEqual(self.inv._backoff_secs(), server.BREAKER_COOLDOWN)
+        self.inv._fails = server.BREAKER_FAILS + 1               # one failed probe -> doubled
+        self.assertEqual(self.inv._backoff_secs(), server.BREAKER_COOLDOWN * 2)
+        self.inv._fails = server.BREAKER_FAILS + 2
+        self.assertEqual(self.inv._backoff_secs(), server.BREAKER_COOLDOWN * 4)
+        self.inv._fails = server.BREAKER_FAILS + 50              # escalates far -> capped
+        self.assertEqual(self.inv._backoff_secs(), server.BREAKER_COOLDOWN_MAX)
+        self.assertGreater(server.BREAKER_COOLDOWN_MAX, 60)      # long enough for the dead session to clear
+
 
 if __name__ == '__main__':
     unittest.main()

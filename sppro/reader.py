@@ -12,13 +12,19 @@ class Reader:
     Select.Live sometimes never delivers a reply and closes the connection about a minute later;
     every request is therefore retried on a fresh connection a few times before giving up.
     """
-    def __init__(self, protocol_factory=None, retries: int = 3, idle_reconnect: float = None):
+    def __init__(self, protocol_factory=None, retries: int = 3, idle_reconnect: float = None,
+                 max_words: int = MAX_WORDS):
         if protocol_factory is None:
             from memory import Protocol
             protocol_factory = Protocol
         self.__factory = protocol_factory
         self.__protocol = None
         self.__retries = retries
+        # Largest single read. A local link happily serves the whole block in one request (MAX_WORDS). Over
+        # Select.Live a big block (e.g. the Now screen's 85 words, or Technical's 154) is one slow cloud
+        # round-trip that stalls easily; splitting it into smaller reads keeps each request sub-second, so a
+        # stall costs one chunk instead of the whole screen. Set small only for Select.Live.
+        self.__max_words = max_words if max_words and max_words > 0 else MAX_WORDS
         # monotonic time after which calls stop retrying and give up, so a single operation (e.g. a whole
         # configuration read of many blocks over a flaky Select.Live link) can't hold the link lock for minutes.
         self.deadline = None
@@ -84,7 +90,7 @@ class Reader:
         from memory import Range
         out = bytearray()
         while words > 0:
-            n = min(words, MAX_WORDS)
+            n = min(words, self.__max_words)
             out += self.__call('read 0x%x+%d' % (address, n), lambda p: bytes(p.query(Range(address, n))))
             address += n
             words -= n

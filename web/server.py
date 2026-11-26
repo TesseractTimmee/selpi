@@ -41,7 +41,15 @@ ANON_READ_PATHS = {'/api/live', '/api/status'}   # safe to expose to a non-ingre
 # for the lock instead of failing the instant it is in use.
 READ_WAIT = 30            # s a read waits for the link before giving up (then Busy)
 BREAKER_FAILS = 3         # consecutive link failures before the circuit breaker trips (fail fast)
-BREAKER_COOLDOWN = 20     # s to serve Busy instantly between recovery probes while the breaker is tripped
+BREAKER_COOLDOWN = 20     # s between recovery probes when the breaker first trips (serve Busy instantly meanwhile)
+BREAKER_COOLDOWN_MAX = 150  # s: the probe gap doubles per failed probe up to this. Select.Live leaves a dead
+                            # session bound to the device for ~60 s, so probing every 20 s just opens a new session
+                            # each time while the old one still holds it -- the stall feeds itself and never clears
+                            # (what hung the link overnight). Escalating the gap past the ~60 s linger gives a quiet
+                            # window where the sessions expire and the device unbinds, so the next probe reconnects
+                            # clean and self-heals without a restart.
+SELECTLIVE_MAX_WORDS = int(os.environ.get('SELPI_SELECTLIVE_MAX_WORDS') or 64)  # chunk big reads over Select.Live
+                            # into sub-second requests (a whole Now/Technical block in one cloud round-trip stalls)
 CLOCK_DEADLINE = 25       # the automatic ops must stay short so they can't block everything
 BACKUP_DEADLINE = 90
 LOG_DEADLINE = 240        # a manual log download may legitimately run longer than a poll, but still bounded so a
@@ -143,6 +151,12 @@ class Inverter:
                 self._inflight.pop(key, None)
             flight.event.set()
 
+    def _backoff_secs(self):
+        """Recovery-probe gap: doubles per failed probe past the trip point, capped at BREAKER_COOLDOWN_MAX. A
+        brief blip recovers in ~BREAKER_COOLDOWN s; a sustained Select.Live wedge escalates the gap past the
+        ~60 s session-linger so the dead session clears and the next probe reconnects clean (self-heal)."""
+        return min(BREAKER_COOLDOWN * (2 ** max(0, self._fails - BREAKER_FAILS)), BREAKER_COOLDOWN_MAX)
+
     def _breaker_ok(self):
         """False while the link is in a failure backoff (fail fast). When the cooldown has elapsed, let exactly
         one caller through as a recovery probe and re-arm the backoff so the others keep failing fast until it
@@ -152,7 +166,7 @@ class Inverter:
             if self._backoff_until and now < self._backoff_until:
                 return False
             if self._backoff_until:                        # cooldown elapsed: this caller probes; re-arm for others
-                self._backoff_until = now + BREAKER_COOLDOWN
+                self._backoff_until = now + self._backoff_secs()
             return True
 
     def _breaker_record(self, ok):
@@ -165,10 +179,11 @@ class Inverter:
             else:
                 self._fails += 1
                 if self._fails == BREAKER_FAILS:           # just tripped: log it once
-                    logging.warning('SP PRO link down after %d failures (%s); backing off, probing every %ds',
-                                    self._fails, self.last_error, BREAKER_COOLDOWN)
+                    logging.warning('SP PRO link down after %d failures (%s); backing off, probing every '
+                                    '%d-%ds (escalating)', self._fails, self.last_error,
+                                    BREAKER_COOLDOWN, BREAKER_COOLDOWN_MAX)
                 if self._fails >= BREAKER_FAILS:
-                    self._backoff_until = time.monotonic() + BREAKER_COOLDOWN
+                    self._backoff_until = time.monotonic() + self._backoff_secs()
 
     @property
     def link_down(self):
@@ -199,8 +214,9 @@ class Inverter:
         self.busy = what
         try:
             if self.reader is None:
-                idle = SELECTLIVE_RECONNECT_IDLE if os.environ.get('SELPI_CONNECTION_TYPE') == 'SelectLive' else None
-                self.reader = Reader(idle_reconnect=idle)
+                sl = os.environ.get('SELPI_CONNECTION_TYPE') == 'SelectLive'
+                idle = SELECTLIVE_RECONNECT_IDLE if sl else None
+                self.reader = Reader(idle_reconnect=idle, max_words=(SELECTLIVE_MAX_WORDS if sl else None))
             self.reader.deadline = (time.monotonic() + deadline) if deadline else None
             if self.versions is None and check_versions:
                 self.versions = live.versions(self.reader)

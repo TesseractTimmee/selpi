@@ -85,6 +85,29 @@ class TestReaderStallHandling(unittest.TestCase):
             r.read(0x2000, 1)
         self.assertEqual(len(created), 1)        # retried on one session, never spun up new ones mid-op
 
+    def test_max_words_chunks_large_reads(self):
+        # Over Select.Live a big block is split into max_words-sized reads (each a quick cloud round-trip);
+        # a local link keeps one read of the whole block.
+        ranges = []
+
+        class P:
+            def query(self, rng):
+                ranges.append(rng.words)
+                return zeros(rng)
+
+            def reset(self):
+                pass
+
+            def close(self):
+                pass
+
+        out = Reader(protocol_factory=P, max_words=4).read(0x2000, 10)
+        self.assertEqual(len(out), 20)           # 10 words x 2 bytes, fully reassembled
+        self.assertEqual(ranges, [4, 4, 2])      # chunked at max_words
+        ranges.clear()
+        Reader(protocol_factory=P).read(0x2000, 10)   # default (local): one big read
+        self.assertEqual(ranges, [10])
+
 
 class TestLogsDownloadMode(unittest.TestCase):
     def test_download_sets_then_clears_mode(self):
